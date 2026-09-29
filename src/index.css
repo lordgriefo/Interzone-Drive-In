@@ -1,0 +1,462 @@
+/* ============================================================
+   INTERZONE DRIVE-IN — Global CSS Variable Theme System
+   Phase 1 | Strangelet Kinet-O-Chop
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── DEFAULT THEME: INTERZONE (Black · Orange · Electric Blue) ── */
+:root,
+[data-theme="interzone"] {
+  /* Backgrounds — Locked Neutral Dark Charcoals & Matte Blacks */
+  --bg-primary:       #0a0a0c;
+  --bg-secondary:     #121215;
+  --bg-panel:         #141418;
+  --bg-panel-alt:     #18181c;
+  --bg-track:         #0c0c0f;
+  --bg-track-label:   #101014;
+  --bg-ruler:         #0e0e12;
+
+  /* Accents */
+  --accent-orange:    #FF6B00;
+  --accent-orange-dim: rgba(255, 107, 0, 0.22);
+  --accent-orange-glow: rgba(255, 107, 0, 0.55);
+  --accent-blue:      #00E5FF;
+  --accent-blue-dim:  rgba(0, 229, 255, 0.18);
+  --accent-blue-glow: rgba(0, 229, 255, 0.50);
+
+  /* Text */
+  --text-primary:     #E8E8E8;
+  --text-dim:         #4A4A4A;
+  --text-muted:       #2A2A2A;
+  --text-track:       #666666;
+
+  /* Borders */
+  --border-dim:       #1C1C1C;
+  --border-mid:       #252525;
+  --border-bright:    #333333;
+
+  /* Playhead / Timecode */
+  --playhead-color:   #00E5FF;
+  --playhead-glow:    rgba(0, 229, 255, 0.70);
+  --timecode-color:   #00E5FF;
+
+  /* Selected / Active */
+  --clip-selected-border: #FF6B00;
+  --clip-selected-bg:     rgba(255, 107, 0, 0.20);
+  --pad-highlight:    #FF6B00;
+
+  /* Waveform / Automation */
+  --waveform-color:   rgba(0, 229, 255, 0.40);
+  --transient-color:  #FF6B00;
+  --automation-color: #a78bfa;
+  --lyric-color:      #7c3aed;
+
+  /* Resize handle */
+  --handle-color:     #1A1A1A;
+  --handle-hover:     #FF6B00;
+
+  /* Font stack */
+  --font-ui:     'Righteous', 'Inter', system-ui, sans-serif;
+  --font-mono:   'Space Mono', 'Courier New', monospace;
+  --font-label:  'Righteous', 'Inter', monospace;
+}
+
+/* ── THEME: MPC60 GREY ── */
+[data-theme="mpc60_grey"] {
+  --bg-primary:       #121215;
+  --bg-secondary:     #18181c;
+  --bg-panel:         #202024;
+  --bg-panel-alt:     #26262b;
+  --bg-track:         #141418;
+  --bg-track-label:   #1a1a1e;
+  --bg-ruler:         #16161a;
+
+
+  --accent-orange:    #E8E8E8;
+  --accent-orange-dim: rgba(232, 232, 232, 0.15);
+  --accent-orange-glow: rgba(232, 232, 232, 0.40);
+  --accent-blue:      #C0C0C0;
+  --accent-blue-dim:  rgba(192, 192, 192, 0.15);
+  --accent-blue-glow: rgba(192, 192, 192, 0.35);
+
+  --text-primary:     #D0D0D0;
+  --text-dim:         #707070;
+  --text-muted:       #444444;
+  --text-track:       #888888;
+
+  --border-dim:       #333333;
+  --border-mid:       #404040;
+  --border-bright:    #555555;
+
+  --playhead-color:   #BBBBBB;
+  --playhead-glow:    rgba(180, 180, 180, 0.60);
+  --timecode-color:   #C0C0C0;
+
+  --clip-selected-border: #FFFFFF;
+  --clip-selected-bg:     rgba(255, 255, 255, 0.12);
+  --pad-highlight:    #DDDDDD;
+
+  --waveform-color:   rgba(180, 180, 180, 0.35);
+  --transient-color:  #CCCCCC;
+  --automation-color: #888888;
+  --lyric-color:      #999999;
+
+  --handle-color:     #2E2E2E;
+  --handle-hover:     #CCCCCC;
+}
+
+/* ── THEME: AMBER INDUSTRIAL ── */
+[data-theme="amber_industrial"] {
+  --bg-primary:       #0A0800;
+  --bg-secondary:     #100E00;
+  --bg-panel:         #161200;
+  --bg-panel-alt:     #1C1800;
+  --bg-track:         #0E0C00;
+  --bg-track-label:   #121000;
+  --bg-ruler:         #0C0A00;
+
+  --accent-orange:    #FFB300;
+  --accent-orange-dim: rgba(255, 179, 0, 0.20);
+  --accent-orange-glow: rgba(255, 179, 0, 0.55);
+  --accent-blue:      #FF8C00;
+  --accent-blue-dim:  rgba(255, 140, 0, 0.18);
+  --accent-blue-glow: rgba(255, 140, 0, 0.45);
+
+  --text-primary:     #FFD54F;
+  --text-dim:         #5C4800;
+  --text-muted:       #2E2400;
+  --text-track:       #7A6200;
+
+  --border-dim:       #1E1800;
+  --border-mid:       #2E2400;
+  --border-bright:    #403200;
+
+  --playhead-color:   #FF8C00;
+  --playhead-glow:    rgba(255, 140, 0, 0.70);
+  --timecode-color:   #FFB300;
+
+  --clip-selected-border: #FFB300;
+  --clip-selected-bg:     rgba(255, 179, 0, 0.18);
+  --pad-highlight:    #FFB300;
+
+  --waveform-color:   rgba(255, 179, 0, 0.38);
+  --transient-color:  #FF8C00;
+  --automation-color: #FFA000;
+  --lyric-color:      #CC8400;
+
+  --handle-color:     #181400;
+  --handle-hover:     #FFB300;
+}
+
+/* ── THEME: GREEN CRT ── */
+[data-theme="green_crt"] {
+  --bg-primary:       #000A00;
+  --bg-secondary:     #000F00;
+  --bg-panel:         #001200;
+  --bg-panel-alt:     #001800;
+  --bg-track:         #000E00;
+  --bg-track-label:   #001000;
+  --bg-ruler:         #000C00;
+
+  --accent-orange:    #00FF41;
+  --accent-orange-dim: rgba(0, 255, 65, 0.18);
+  --accent-orange-glow: rgba(0, 255, 65, 0.55);
+  --accent-blue:      #00CC33;
+  --accent-blue-dim:  rgba(0, 204, 51, 0.18);
+  --accent-blue-glow: rgba(0, 204, 51, 0.45);
+
+  --text-primary:     #00FF41;
+  --text-dim:         #005A14;
+  --text-muted:       #002A09;
+  --text-track:       #007A1C;
+
+  --border-dim:       #001A00;
+  --border-mid:       #002800;
+  --border-bright:    #003800;
+
+  --playhead-color:   #00FF41;
+  --playhead-glow:    rgba(0, 255, 65, 0.70);
+  --timecode-color:   #00FF41;
+
+  --clip-selected-border: #00FF41;
+  --clip-selected-bg:     rgba(0, 255, 65, 0.15);
+  --pad-highlight:    #00FF41;
+
+  --waveform-color:   rgba(0, 255, 65, 0.35);
+  --transient-color:  #00CC33;
+  --automation-color: #00AA2A;
+  --lyric-color:      #008822;
+
+  --handle-color:     #001400;
+  --handle-hover:     #00FF41;
+}
+
+/* ── THEME: STRANGELET (Black · Orange · Purple) ── */
+[data-theme="strangelet"] {
+  --bg-primary:       #080608;
+  --bg-secondary:     #0e0b10;
+  --bg-panel:         #120e14;
+  --bg-panel-alt:     #171219;
+  --bg-track:         #0a0810;
+  --bg-track-label:   #0f0c12;
+  --bg-ruler:         #0c0a0e;
+
+  --accent-orange:    #FF6B00;
+  --accent-orange-dim: rgba(255, 107, 0, 0.22);
+  --accent-orange-glow: rgba(255, 107, 0, 0.55);
+  --accent-blue:      #A855F7;
+  --accent-blue-dim:  rgba(168, 85, 247, 0.18);
+  --accent-blue-glow: rgba(168, 85, 247, 0.50);
+
+  --text-primary:     #E8E4F0;
+  --text-dim:         #3A2F42;
+  --text-muted:       #221A2A;
+  --text-track:       #5A4A68;
+
+  --border-dim:       #1A1020;
+  --border-mid:       #261A2E;
+  --border-bright:    #342444;
+
+  --playhead-color:   #A855F7;
+  --playhead-glow:    rgba(168, 85, 247, 0.70);
+  --timecode-color:   #A855F7;
+
+  --clip-selected-border: #FF6B00;
+  --clip-selected-bg:     rgba(255, 107, 0, 0.18);
+  --pad-highlight:    #FF6B00;
+
+  --waveform-color:   rgba(168, 85, 247, 0.38);
+  --transient-color:  #FF6B00;
+  --automation-color: #C084FC;
+  --lyric-color:      #7C3AED;
+
+  --handle-color:     #120E18;
+  --handle-hover:     #FF6B00;
+}
+
+/* ── THEME: NOIR ROSE (Black · Hot Pink · Magenta) ── */
+[data-theme="noir_rose"] {
+  --bg-primary:       #08060A;
+  --bg-secondary:     #0E0A10;
+  --bg-panel:         #120D14;
+  --bg-panel-alt:     #171018;
+  --bg-track:         #0A0810;
+  --bg-track-label:   #0F0B12;
+  --bg-ruler:         #0C090E;
+
+  --accent-orange:    #FF2D78;
+  --accent-orange-dim: rgba(255, 45, 120, 0.22);
+  --accent-orange-glow: rgba(255, 45, 120, 0.55);
+  --accent-blue:      #FF00C8;
+  --accent-blue-dim:  rgba(255, 0, 200, 0.18);
+  --accent-blue-glow: rgba(255, 0, 200, 0.45);
+
+  --text-primary:     #F0E0EC;
+  --text-dim:         #4A2040;
+  --text-muted:       #2A1024;
+  --text-track:       #6A3060;
+
+  --border-dim:       #1C0E1A;
+  --border-mid:       #2A1228;
+  --border-bright:    #3A1C38;
+
+  --playhead-color:   #FF00C8;
+  --playhead-glow:    rgba(255, 0, 200, 0.70);
+  --timecode-color:   #FF00C8;
+
+  --clip-selected-border: #FF2D78;
+  --clip-selected-bg:     rgba(255, 45, 120, 0.18);
+  --pad-highlight:    #FF2D78;
+
+  --waveform-color:   rgba(255, 0, 200, 0.35);
+  --transient-color:  #FF2D78;
+  --automation-color: #C026D3;
+  --lyric-color:      #9333EA;
+
+  --handle-color:     #120D14;
+  --handle-hover:     #FF2D78;
+}
+
+/* ── THEME: DEEP SPACE (Black · Electric Blue · Indigo) ── */
+[data-theme="deep_space"] {
+  --bg-primary:       #04060E;
+  --bg-secondary:     #080C18;
+  --bg-panel:         #0A1020;
+  --bg-panel-alt:     #0E1428;
+  --bg-track:         #060A1A;
+  --bg-track-label:   #080E1E;
+  --bg-ruler:         #060A16;
+
+  --accent-orange:    #00D4FF;
+  --accent-orange-dim: rgba(0, 212, 255, 0.20);
+  --accent-orange-glow: rgba(0, 212, 255, 0.55);
+  --accent-blue:      #6366F1;
+  --accent-blue-dim:  rgba(99, 102, 241, 0.18);
+  --accent-blue-glow: rgba(99, 102, 241, 0.50);
+
+  --text-primary:     #D0E4F8;
+  --text-dim:         #1C2E50;
+  --text-muted:       #0E1830;
+  --text-track:       #2A4070;
+
+  --border-dim:       #0C1628;
+  --border-mid:       #142038;
+  --border-bright:    #1E2E50;
+
+  --playhead-color:   #00D4FF;
+  --playhead-glow:    rgba(0, 212, 255, 0.70);
+  --timecode-color:   #00D4FF;
+
+  --clip-selected-border: #6366F1;
+  --clip-selected-bg:     rgba(99, 102, 241, 0.18);
+  --pad-highlight:    #00D4FF;
+
+  --waveform-color:   rgba(99, 102, 241, 0.38);
+  --transient-color:  #00D4FF;
+  --automation-color: #818CF8;
+  --lyric-color:      #4F46E5;
+
+  --handle-color:     #0C1220;
+  --handle-hover:     #00D4FF;
+}
+
+
+
+/* ── GLOBAL RESETS ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: var(--font-ui);
+  color-scheme: dark;
+}
+
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #0a0a0c;
+  color: var(--text-primary);
+  transition: none !important;
+}
+
+
+/* ── SCROLLBAR THEMING ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-orange);
+}
+
+/* ── TIMELINE RESIZE ANIMATIONS ── */
+.timeline-pane {
+  transition: height 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.timeline-pane.collapsed {
+  transition: height 0.14s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── CLIP EDITING TOOL CURSORS ── */
+.tool-blade  { cursor: crosshair !important; }
+.tool-select { cursor: default; }
+
+/* ── BLADE HOVER LINE (injected via JS) ── */
+.blade-cursor-line {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--accent-orange);
+  box-shadow: 0 0 6px var(--accent-orange-glow);
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0.85;
+}
+
+/* ── PLAYHEAD PULSE ANIMATION ── */
+@keyframes playhead-pulse {
+  0%   { box-shadow: 0 0 4px var(--playhead-glow); }
+  50%  { box-shadow: 0 0 10px var(--playhead-glow), 0 0 20px var(--accent-blue-dim); }
+  100% { box-shadow: 0 0 4px var(--playhead-glow); }
+}
+
+.playhead-active {
+  animation: playhead-pulse 1s ease-in-out infinite;
+}
+
+/* ── CLIP REVERSE BADGE ANIMATION ── */
+@keyframes reverse-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* ── WHISPER PROGRESS PULSE (indeterminate bar) ── */
+@keyframes progressPulse {
+  0%   { opacity: 1; transform: scaleX(0.3) translateX(-100%); }
+  50%  { opacity: 0.8; transform: scaleX(0.6) translateX(60%); }
+  100% { opacity: 1; transform: scaleX(0.3) translateX(300%); }
+}
+.progress-indeterminate {
+  transform-origin: left center;
+  animation: progressPulse 1.6s ease-in-out infinite;
+}
+
+/* ── THEME SWITCHER FLOATING PILL ── */
+.theme-switcher {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-mid);
+  border-radius: 20px;
+  padding: 4px 10px 4px 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  transition: border-color 0.2s;
+}
+.theme-switcher:hover {
+  border-color: var(--accent-orange);
+}
+.theme-switcher label {
+  font-family: var(--font-label);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.theme-switcher select {
+  background: transparent;
+  border: none;
+  color: var(--accent-orange);
+  font-family: var(--font-label);
+  font-size: 10px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+}
+.theme-switcher select option {
+  background: #111111;
+  color: #e8e8e8;
+}

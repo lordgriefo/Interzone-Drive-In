@@ -1,0 +1,30 @@
+export const ERA_FILTER_MAP = {
+  lynchian_interzone: 'saturate(0.3) contrast(1.8) brightness(0.75) hue-rotate(-12deg) sepia(0.15)',
+  '1902_melies':      'saturate(2.0) contrast(1.4) sepia(0.6) hue-rotate(-15deg) brightness(1.1)',
+  '1920_caligari':    'saturate(0.0) contrast(2.0) brightness(0.7) sepia(0.5)',
+  '1927_metropolis':  'saturate(0.2) contrast(1.8) sepia(0.4) brightness(1.2)',
+  '1940_noir':        'saturate(0.0) contrast(2.0) brightness(0.65)',
+  '1950_bandstand':   'saturate(1.8) contrast(1.3) sepia(0.5) brightness(1.1) hue-rotate(-5deg)',
+  '1960_psychedelic': 'hue-rotate(90deg) saturate(3.0) brightness(1.3) contrast(1.4)',
+  '1970_grindhouse':  'sepia(0.7) contrast(1.5) saturate(0.6) brightness(1.1) hue-rotate(-5deg)',
+  '1980_vhs':         'saturate(1.4) hue-rotate(-8deg) contrast(1.3) brightness(1.05)',
+  '2020_cyber':       'saturate(2.0) hue-rotate(180deg) contrast(1.6) brightness(1.2)',
+  roswell_signal:     'hue-rotate(120deg) saturate(2.0) contrast(1.8) brightness(0.85) invert(0.15)',
+  xenotrope:          'hue-rotate(-45deg) saturate(2.2) contrast(1.8) brightness(0.8)',
+  default:            'brightness(1) contrast(1)',
+};
+
+export const ERA_OPTIONS = [
+  { value: 'lynchian_interzone', label: '☕ Lynchian Interzone (Red Velvet & Subliminals)' },
+  { value: '1902_melies', label: '1902: Méliès Twilight' },
+  { value: '1920_caligari', label: '1920: Cabinet of Caligari' },
+  { value: '1927_metropolis', label: '1927: Metropolis Machine' },
+  { value: '1940_noir', label: '1940: Film Noir Shadow' },
+  { value: '1950_bandstand', label: '1950: The Bandstand Hop' },
+  { value: '1960_psychedelic', label: '1960: Psychedelic Trip' },
+  { value: '1970_grindhouse', label: '1970: Drive-In Grindhouse' },
+  { value: '1980_vhs', label: '1980: Analog VHS Tape' },
+  { value: '2020_cyber', label: '2020: Neon Glitch Grid' },
+  { value: 'roswell_signal', label: '👽 Roswell Transmission' },
+  { value: 'xenotrope', label: '👽 Xenotrope Projection' },
+];

@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+dist-ssr/
+
+# Vite temporary files
+vite.config.js.timestamp-*
+
+# Archives / backups
+*.rar
+*.zip
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+

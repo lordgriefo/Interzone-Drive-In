@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>THE STRANGELET LOUNGE // B984-25</title>
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --deep-black: #020202;
+            --lapis-void: #081a2e;
+            --vegas-gold: #D4AF37;
+            --neon-pink: #FF007F;
+        }
+
+        body { 
+            background: linear-gradient(to bottom, var(--deep-black) 75%, var(--lapis-void) 100%);
+            color: var(--vegas-gold);
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            padding-top: 14vh; /* The Atomic Lift */
+            font-family: sans-serif;
+        }
+
+        h1 {
+            font-family: 'Major Mono Display', monospace;
+            font-size: 3rem;
+            letter-spacing: 15px;
+            text-shadow: 0 0 15px var(--neon-pink), 0 0 30px rgba(255, 0, 127, 0.4);
+            z-index: 10;
+            pointer-events: none;
+            margin: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .sigil {
+            position: absolute;
+            font-family: serif;
+            color: var(--vegas-gold);
+            text-shadow: 0 0 12px var(--vegas-gold), 0 0 25px var(--neon-pink);
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+        }
+
+        @keyframes pop-in {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            50% { transform: scale(1.6) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1.2) rotate(20deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>tHe STrAnGeLeT kInET-O-cHoP</h1>
+
+    <script>
+        // Added the Atom (⚛) several times to increase its frequency!
+        const sigils = [
+            '⚛', '⚛', '⚛', // The Atom Pop
+            '⌬', '⏣', '⚗', // Molecular Rings & Flasks
+            '✧', '❂', '◈', // Celestial Radiance
+            '☉', '☿', '⛤', // Alchemical Gold/Mercury/Star
+            '⚙', '𐎟', '𐎠'  // Gears & Sumerian Phonetics
+nbpm
+        function initStars() {
+            for (let i = 0; i < 150; i++) {
+                let star = document.createElement('div');
+                star.className = 'star';
+                let size = Math.random() * 2 + 'px';
+                star.style.width = size;
+                star.style.height = size;
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.opacity = Math.random();
+                document.body.appendChild(star);
+            }
+        }
+
+        function triggerPop() {
+            let p = document.createElement('div');
+            p.className = 'sigil';
+            p.innerText = sigils[Math.floor(Math.random() * sigils.length)];
+            p.style.left = Math.random() * 100 + 'vw';
+            // Keeping them in the lower 2/3 of the screen
+            p.style.top = (Math.random() * 65 + 20) + 'vh'; 
+            p.style.fontSize = (Math.random() * 40 + 20) + 'px';
+            p.style.animation = "pop-in 0.8s ease-out forwards";
+            document.body.appendChild(p);
+            setTimeout(() => { p.remove(); }, 900);
+        }
+
+        initStars();
+        
+        // Sudden pops to keep the energy high
+        setInterval(() => {
+            if(Math.random() > 0.6) triggerPop();
+        }, 350);
+
+        // Twinkle
+        setInterval(() => {
+            let allStars = document.querySelectorAll('.star');
+            let randomStar = allStars[Math.floor(Math.random() * allStars.length)];
+            if(randomStar) randomStar.style.opacity = Math.random();
+        }, 200);
+    </script>
+
+</body>
+</html>

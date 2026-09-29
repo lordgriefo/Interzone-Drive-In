@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "kinet-o-chop",
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"lmstudio-copilot.autoRefreshModels": false
+	}
+}
