@@ -164,11 +164,18 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
         transportClock.resetClock();
       });
 
-      // Auto-load procedural demo track so duration is populated immediately
+      // Auto-load default track (Excavating Neverland) so duration & waveform are populated immediately
       try {
-        const url = createProceduralAudioTrack(32, bpm);
-        if (url) { el.src = url; el.load(); }
-      } catch (_) {}
+        const defaultTrackUrl = './assets-bg/excavating-neverland.mp3';
+        el.src = defaultTrackUrl;
+        el.load();
+        decodeWaveformPeaks(defaultTrackUrl).then(setWaveformPeaks);
+      } catch (_) {
+        try {
+          const url = createProceduralAudioTrack(32, bpm);
+          if (url) { el.src = url; el.load(); }
+        } catch (_) {}
+      }
     }
 
     return () => {
@@ -371,8 +378,9 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
 
     // Auto-generate fallback if no source loaded
     if (!el.src || el.src === window.location.href || el.src === '') {
-      const url = createProceduralAudioTrack(32, bpm);
-      if (url) { el.src = url; el.load(); }
+      const defaultTrackUrl = './assets-bg/excavating-neverland.mp3';
+      el.src = defaultTrackUrl;
+      el.load();
     }
 
     ensureAudioGraph();

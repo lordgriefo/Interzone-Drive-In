@@ -378,6 +378,27 @@ export function FXConsole({
           }}
         />
 
+        {currentTrackTitle && (
+          <div
+            style={{
+              fontSize: 9,
+              color: 'var(--accent-orange)',
+              fontFamily: 'var(--font-mono, monospace)',
+              padding: '4px 6px',
+              backgroundColor: 'rgba(255, 107, 0, 0.08)',
+              border: '1px solid rgba(255, 107, 0, 0.28)',
+              borderRadius: 3,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              letterSpacing: '0.3px',
+            }}
+            title={currentTrackTitle}
+          >
+            🎵 {currentTrackTitle}
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
           <button
             onClick={onTogglePlay}

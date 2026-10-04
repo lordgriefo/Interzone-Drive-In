@@ -173,7 +173,7 @@ export default function App() {
   const [selectedRube,  setSelectedRube]  = useState('none');
   const [chaosLevel,    setChaosLevel]    = useState(0);
   const [rubeDecay,     setRubeDecay]     = useState(800);
-  const [trackTitle,    setTrackTitle]    = useState('');
+  const [trackTitle,    setTrackTitle]    = useState('Excavating Neverland by The Magic Static Society');
 
   const [moonVariant, setMoonVariant] = useState('classic_halo');
   const [moonFilter,  setMoonFilter]  = useState('silent_silver');
@@ -312,21 +312,22 @@ export default function App() {
   const handleRubeStageChange = useCallback((s) => setRubeStage(s), []);
 
 
-  const lastAudioFileRef = useRef(null);
+  const DEFAULT_TRACK_URL = './assets-bg/excavating-neverland.mp3';
+  const DEFAULT_TRACK_TITLE = 'Excavating Neverland by The Magic Static Society';
+
+  const lastAudioFileRef = useRef(DEFAULT_TRACK_URL);
   const hasAudioLoaded   = Boolean(lastAudioFileRef.current);
 
-  // Auto-load built-in demo track on startup so duration & waveform are populated immediately
+  // Auto-load Excavating Neverland on startup so duration & waveform are populated immediately
   useEffect(() => {
     try {
-      const defaultTrackUrl = createProceduralAudioTrack(32, bpm);
-      if (defaultTrackUrl) {
-        loadAudioTrack(defaultTrackUrl);
-        setTrackTitle('INTERZONE DRIVE-IN // THEME 01 (120 BPM)');
-      }
+      loadAudioTrack(DEFAULT_TRACK_URL);
+      setTrackTitle(DEFAULT_TRACK_TITLE);
+      lastAudioFileRef.current = DEFAULT_TRACK_URL;
     } catch (err) {
       console.warn('[App] Default audio track init warning:', err);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [loadAudioTrack]);
 
 
   // ── Timeline state (includes editing ops) ──
