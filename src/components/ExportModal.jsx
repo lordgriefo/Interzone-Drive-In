@@ -33,6 +33,7 @@ export function ExportModal({
   const [isWebRecording, setIsWebRecording] = useState(false);
   const [webQuality, setWebQuality] = useState('1080p-master');
   const [webFormat, setWebFormat] = useState('mp4');
+  const [recordViewportOnly, setRecordViewportOnly] = useState(true);
   const webExportControllerRef = useRef(null);
 
   // Electron mode state
@@ -82,6 +83,7 @@ export function ExportModal({
       audioDestinationRef,
       exportQuality: webQuality,
       exportFormat: webFormat,
+      recordViewportOnly,
       onStop: () => {
         setIsWebRecording(false);
         webExportControllerRef.current = null;
@@ -525,7 +527,25 @@ export function ExportModal({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 10,
+                color: recordViewportOnly ? 'var(--accent-cyan, #00e5ff)' : '#a1a1aa',
+                cursor: 'pointer',
+                userSelect: 'none',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={recordViewportOnly}
+                  onChange={(e) => setRecordViewportOnly(e.target.checked)}
+                  style={{ accentColor: 'var(--accent-cyan, #00e5ff)', cursor: 'pointer' }}
+                />
+                Record Viewport Only (crops out sidebars, timeline & studio UI)
+              </label>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
                 <button
                   onClick={handleToggleWebRecord}
                   style={{

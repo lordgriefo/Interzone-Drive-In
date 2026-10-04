@@ -10,12 +10,45 @@ const TIMELINE_MAX_H = 600;
 const TIMELINE_DEFAULT_H = 240;
 const TIMELINE_COLLAPSED_H = 30;
 
-export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none' }) {
+export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none', onToggleCinema = null, cinemaMode = false }) {
   const [timelineHeight, setTimelineHeight] = useState(TIMELINE_DEFAULT_H);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showCinemaHud, setShowCinemaHud] = useState(true);
+  const cinemaTimerRef = useRef(null);
+  const viewportRef = useRef(null);
   const dragStateRef = useRef(null);
   const frameRef = useRef(null);
+
+  // Auto-hide Cinema exit button and cursor after 2.5s of no mouse movement
+  useEffect(() => {
+    if (!cinemaMode) {
+      setShowCinemaHud(true);
+      if (cinemaTimerRef.current) clearTimeout(cinemaTimerRef.current);
+      return;
+    }
+
+    // Show on enter, then fade out
+    setShowCinemaHud(true);
+    cinemaTimerRef.current = setTimeout(() => {
+      setShowCinemaHud(false);
+    }, 2500);
+
+    const onMouseMove = () => {
+      setShowCinemaHud(true);
+      if (cinemaTimerRef.current) clearTimeout(cinemaTimerRef.current);
+      cinemaTimerRef.current = setTimeout(() => {
+        setShowCinemaHud(false);
+      }, 2500);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      if (cinemaTimerRef.current) clearTimeout(cinemaTimerRef.current);
+    };
+  }, [cinemaMode]);
 
   // ── 'T' key toggles collapse ──
   useEffect(() => {
@@ -31,6 +64,40 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  // ── Fullscreen toggle ──
+  const handleToggleFullscreen = useCallback(() => {
+    const el = viewportRef.current || document.getElementById('main-viewport');
+    if (!el) return;
+    if (!document.fullscreenElement) {
+      el.requestFullscreen().catch((err) => {
+        console.warn('[Fullscreen] Failed to enter fullscreen:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }, []);
+
+  // Track fullscreen state changes (user may press Escape to exit)
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
+
+  // 'F' key = fullscreen toggle
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        handleToggleFullscreen();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [handleToggleFullscreen]);
 
   // ── Drag-handle resize ──
   const handleResizeMouseDown = useCallback((e) => {
@@ -66,104 +133,112 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
       ref={frameRef}
       style={{
         flex: 1,
-        position: 'relative',
+        position: cinemaMode ? 'fixed' : 'relative',
+        inset: cinemaMode ? 0 : undefined,
+        width: cinemaMode ? '100vw' : '100%',
+        height: cinemaMode ? '100vh' : '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        backgroundColor: 'var(--bg-primary)',
+        justifyContent: cinemaMode ? 'center' : 'flex-start',
+        backgroundColor: '#000000',
         overflow: 'hidden',
-        padding: '4px 12px 0',
+        padding: cinemaMode ? 0 : '4px 12px 0',
         minWidth: 0,
-        zIndex: 1,
+        zIndex: cinemaMode ? 99999 : 1,
       }}
     >
       {/* ── COSMIC BACKGROUND — z-index 0, strictly OUTSIDE #main-viewport ── */}
-      <InterzoneBackground
-        era="default"
-        audioSignals={isPlaying ? audioSignals : null}
-        isPlaying={isPlaying}
-        moonVariant={moonVariant || 'classic_halo'}
-        moonFilter={moonFilter || 'silent_silver'}
-      />
+      {!cinemaMode && (
+        <InterzoneBackground
+          era="default"
+          audioSignals={isPlaying ? audioSignals : null}
+          isPlaying={isPlaying}
+          moonVariant={moonVariant || 'classic_halo'}
+          moonFilter={moonFilter || 'silent_silver'}
+        />
+      )}
+
       {/* ── INTERZONE DRIVE-IN BANNER ── */}
-      <div style={{
-        position: 'relative',
-        zIndex: 10,
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 5,
-        flexShrink: 0,
-        padding: '4px 0 6px',
-        borderBottom: '1px solid var(--border-dim)',
-        gap: 14,
-      }}>
-        {/* Left logo image */}
-        <img
-          src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
-          alt="Interzone Drive-In"
-          style={{
-            height: 42,
-            width: 'auto',
-            objectFit: 'contain',
-            borderRadius: 3,
-            opacity: 0.88,
-            boxShadow: '0 0 10px var(--accent-blue-glow), 0 0 2px rgba(0,229,255,0.4)',
-            border: '1px solid rgba(0,229,255,0.25)',
-          }}
-        />
-
-        {/* Main banner */}
+      {!cinemaMode && (
         <div style={{
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          lineHeight: 1,
+          justifyContent: 'center',
+          marginBottom: 5,
+          flexShrink: 0,
+          padding: '4px 0 6px',
+          borderBottom: '1px solid var(--border-dim)',
+          gap: 14,
         }}>
-          <h1 style={{
-            margin: 0,
-            fontFamily: "'Bebas Neue', var(--font-mono)",
-            fontSize: 'clamp(1.2rem, 2.6vw, 1.65rem)',
-            letterSpacing: '10px',
-            color: 'var(--accent-orange)',
-            textShadow: '0 0 18px var(--accent-orange-glow), 0 0 36px rgba(255,107,0,0.22)',
-            textTransform: 'uppercase',
-            fontWeight: 'normal',
-          }}>
-            INTERZONE DRIVE-IN
-          </h1>
-          <div style={{
-            fontFamily: "'Syncopate', var(--font-mono)",
-            fontSize: 'clamp(0.42rem, 0.95vw, 0.56rem)',
-            letterSpacing: '6px',
-            color: 'var(--accent-blue)',
-            textShadow: '0 0 10px var(--accent-blue-glow)',
-            marginTop: 4,
-            textTransform: 'uppercase',
-            fontWeight: 700,
-          }}>
-            STRANGELET · KINET-O-CHOP
-          </div>
-        </div>
+          {/* Left logo image */}
+          <img
+            src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
+            alt="Interzone Drive-In"
+            style={{
+              height: 42,
+              width: 'auto',
+              objectFit: 'contain',
+              borderRadius: 3,
+              opacity: 0.88,
+              boxShadow: '0 0 10px var(--accent-blue-glow), 0 0 2px rgba(0,229,255,0.4)',
+              border: '1px solid rgba(0,229,255,0.25)',
+            }}
+          />
 
-        {/* Right logo image */}
-        <img
-          src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
-          alt="Interzone Drive-In"
-          style={{
-            height: 42,
-            width: 'auto',
-            objectFit: 'contain',
-            borderRadius: 3,
-            opacity: 0.88,
-            boxShadow: '0 0 10px var(--accent-blue-glow), 0 0 2px rgba(0,229,255,0.4)',
-            border: '1px solid rgba(0,229,255,0.25)',
-            transform: 'scaleX(-1)',
-          }}
-        />
-      </div>
+          {/* Main banner */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            lineHeight: 1,
+          }}>
+            <h1 style={{
+              margin: 0,
+              fontFamily: "'Bebas Neue', var(--font-mono)",
+              fontSize: 'clamp(1.2rem, 2.6vw, 1.65rem)',
+              letterSpacing: '10px',
+              color: 'var(--accent-orange)',
+              textShadow: '0 0 18px var(--accent-orange-glow), 0 0 36px rgba(255,107,0,0.22)',
+              textTransform: 'uppercase',
+              fontWeight: 'normal',
+            }}>
+              INTERZONE DRIVE-IN
+            </h1>
+            <div style={{
+              fontFamily: "'Syncopate', var(--font-mono)",
+              fontSize: 'clamp(0.42rem, 0.95vw, 0.56rem)',
+              letterSpacing: '6px',
+              color: 'var(--accent-blue)',
+              textShadow: '0 0 10px var(--accent-blue-glow)',
+              marginTop: 4,
+              textTransform: 'uppercase',
+              fontWeight: 700,
+            }}>
+              STRANGELET · KINET-O-CHOP
+            </div>
+          </div>
+
+          {/* Right logo image */}
+          <img
+            src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
+            alt="Interzone Drive-In"
+            style={{
+              height: 42,
+              width: 'auto',
+              objectFit: 'contain',
+              borderRadius: 3,
+              opacity: 0.88,
+              boxShadow: '0 0 10px var(--accent-blue-glow), 0 0 2px rgba(0,229,255,0.4)',
+              border: '1px solid rgba(0,229,255,0.25)',
+              transform: 'scaleX(-1)',
+            }}
+          />
+        </div>
+      )}
 
       {/* ── MAIN VIEWPORT (#main-viewport) ── */}
       {/* isolation: isolate + contain: strict prevents cosmic background bleed
@@ -173,7 +248,8 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
         zIndex: 10,
         flex: 1,
         width: '100%',
-        maxWidth: 980,
+        height: '100%',
+        maxWidth: cinemaMode ? '100vw' : 980,
         minHeight: 0,
         display: 'flex',
         alignItems: 'center',
@@ -181,38 +257,123 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
       }}>
         <div
           id="main-viewport"
+          ref={viewportRef}
           style={{
             width: '100%',
             height: '100%',
-            maxHeight: timeline
-              ? `calc(100vh - 90px - ${effectiveTimelineH + 14}px)`
-              : 'calc(100vh - 90px)',
-            aspectRatio: '16/9',
-            border: '6px solid var(--border-bright)',
+            maxHeight: cinemaMode
+              ? '100vh'
+              : (timeline
+                ? `calc(100vh - 90px - ${effectiveTimelineH + 14}px)`
+                : 'calc(100vh - 90px)'),
+            aspectRatio: cinemaMode ? undefined : '16/9',
+            border: cinemaMode ? 'none' : '6px solid var(--border-bright)',
             backgroundColor: '#000000',
-            boxShadow: '0 0 40px rgba(0,0,0,0.98), inset 0 0 20px rgba(0,0,0,0.85)',
+            boxShadow: cinemaMode ? 'none' : '0 0 40px rgba(0,0,0,0.98), inset 0 0 20px rgba(0,0,0,0.85)',
             overflow: 'hidden',
-            borderRadius: 3,
+            borderRadius: cinemaMode ? 0 : 3,
             position: 'relative',
             /* Viewport isolation — exports/previews won't capture ambient background */
             isolation: 'isolate',
             contain: 'strict',
+            cursor: cinemaMode && !showCinemaHud ? 'none' : 'default',
           }}
         >
           {children}
-          {/* Badge REMOVED per Phase 1 spec (was: U-DO-U CERTIFIED / MAKE COOL STUFF) */}
+
+          {/* Fullscreen / Cinema Exit HUD Button */}
+          {cinemaMode ? (
+            <div
+              style={{
+                position: 'absolute',
+                top: 14,
+                right: 14,
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                opacity: showCinemaHud ? 1 : 0,
+                pointerEvents: showCinemaHud ? 'auto' : 'none',
+                transition: 'opacity 0.4s ease-in-out',
+              }}
+              onMouseEnter={() => {
+                if (cinemaTimerRef.current) clearTimeout(cinemaTimerRef.current);
+              }}
+              onMouseLeave={() => {
+                cinemaTimerRef.current = setTimeout(() => setShowCinemaHud(false), 2000);
+              }}
+            >
+              <button
+                onClick={onToggleCinema}
+                title="Exit Cinema Fullscreen Mode (Shortcut: C or ESC)"
+                style={{
+                  background: 'rgba(0,0,0,0.8)',
+                  border: '1px solid var(--accent-orange, #FF6B00)',
+                  borderRadius: 4,
+                  color: 'var(--accent-orange, #FF6B00)',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  padding: '7px 14px',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  boxShadow: '0 0 16px rgba(255,107,0,0.4)',
+                  transition: 'all 0.15s ease-in-out',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--accent-orange, #FF6B00)';
+                  e.currentTarget.style.color = '#000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                  e.currentTarget.style.color = 'var(--accent-orange, #FF6B00)';
+                }}
+              >
+                ✕ EXIT CINEMA MODE [C / ESC]
+              </button>
+            </div>
+          ) : (
+            /* Fullscreen toggle button — top-right, appears on hover */
+            <button
+              onClick={handleToggleFullscreen}
+              title={isFullscreen ? 'Exit fullscreen (F)' : 'Fullscreen (F)'}
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                zIndex: 20,
+                background: 'rgba(0,0,0,0.6)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 4,
+                color: '#fff',
+                fontSize: 13,
+                lineHeight: 1,
+                padding: '5px 8px',
+                cursor: 'pointer',
+                opacity: 0,
+                transition: 'opacity 0.2s',
+                backdropFilter: 'blur(4px)',
+                fontFamily: 'monospace',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; }}
+            >
+              {isFullscreen ? '✕ EXIT' : '⛶ FS'}
+            </button>
+          )}
         </div>
       </div>
 
       {/* ── HARDWARE TRANSPORT BAR ── */}
-      {transportBar && (
+      {!cinemaMode && transportBar && (
         <div style={{ width: '100%', maxWidth: 980, flexShrink: 0, position: 'relative', zIndex: 100, pointerEvents: 'auto', marginTop: 4 }}>
           {transportBar}
         </div>
       )}
 
       {/* ── RUBE GOLDBERG CHAIN STRIP ── */}
-      {selectedRube !== 'none' && (
+      {!cinemaMode && selectedRube !== 'none' && (
         <div style={{
           width: '100%',
           maxWidth: 980,
@@ -354,10 +515,25 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
           from { transform: scale(1.0); opacity: 1; }
           to   { transform: scale(1.1); opacity: 0.8; }
         }
+        #main-viewport:fullscreen {
+          width: 100vw !important;
+          height: 100vh !important;
+          max-height: 100vh !important;
+          border: none !important;
+          border-radius: 0 !important;
+          aspect-ratio: auto !important;
+        }
+        #main-viewport:-webkit-full-screen {
+          width: 100vw !important;
+          height: 100vh !important;
+          max-height: 100vh !important;
+          border: none !important;
+          border-radius: 0 !important;
+        }
       `}</style>
 
       {/* ── TIMELINE PANE (resizable + collapsible) ── */}
-      {timeline && (
+      {!cinemaMode && timeline && (
         <div
           style={{
             width: '100%',
@@ -421,7 +597,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
       )}
 
       {/* ── NOW PLAYING label ── */}
-      {trackTitle && (
+      {!cinemaMode && trackTitle && (
         <div style={{
           position: 'relative',
           zIndex: 10,

@@ -4,6 +4,7 @@
 // Optional: asset bin snapshot (image/video IDs + base64 thumbnails for session restore).
 
 import React, { useState, useRef, useCallback } from 'react';
+import { exportPlaylistZip, exportCurrentSongZip, importPlaylistZip } from '../utils/playlistZip';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,12 +74,19 @@ export function PlaylistPanel({
 
   // For loading presets back into App
   onLoadPreset = () => {},      // (preset, assets?) → restores app state from playlist entry
+  onLoadAssets = () => {},
+
+  // Currently loaded song — lets us export it even when it isn't in the playlist
+  currentTrackTitle = '',
+  currentDuration = 0,
+  getCurrentAudio = () => null, // () → File | url string | null
 
   isOpen = false,
   setIsOpen = () => {},
 }) {
   const fileInputRef = useRef(null);
   const importInputRef = useRef(null);
+  const zipInputRef = useRef(null);
   const [editingId, setEditingId] = useState(null); // which entry's title is being edited
   const [editingTitle, setEditingTitle] = useState('');
 
@@ -193,6 +201,60 @@ export function PlaylistPanel({
     e.target.value = '';
   }, [onPlaylistChange]);
 
+  // ── Export playlist + assets as ZIP ──────────────────────────────────────
+  const handleZipExport = useCallback(async () => {
+    if (playlist.length === 0) return;
+    try {
+      await exportPlaylistZip(playlist, currentAssets);
+    } catch (err) {
+      console.error('[Playlist] ZIP export failed:', err);
+      alert('ZIP export failed: ' + err.message);
+    }
+  }, [playlist, currentAssets]);
+
+  // ── Export the currently loaded song (audio + FX + images) as ZIP ────────
+  const handleCurrentSongZip = useCallback(async () => {
+    try {
+      const audio = getCurrentAudio();
+      const result = await exportCurrentSongZip({
+        title: currentTrackTitle || 'Untitled',
+        audioSource: audio,
+        duration: currentDuration,
+        preset: { ...currentPreset },
+        assets: currentAssets,
+      });
+      if (!audio) {
+        alert('Exported FX + images, but no audio file was available to include.\n(The built-in demo track can\'t be packed — load your own song to include audio.)');
+      } else if (result?.assetsPacked === 0) {
+        console.info('[Playlist] Song exported with no images (Asset Bin was empty).');
+      }
+    } catch (err) {
+      console.error('[Playlist] Current-song ZIP export failed:', err);
+      alert('ZIP export failed: ' + err.message);
+    }
+  }, [getCurrentAudio, currentTrackTitle, currentDuration, currentPreset, currentAssets]);
+
+
+  // ── Import playlist + assets from ZIP ────────────────────────────────────
+  const handleZipImport = useCallback(async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const { playlist: imported, assets: importedAssets } = await importPlaylistZip(file);
+      // Merge assets into the app's asset bin via the onLoadPreset callback,
+      // or just extend the playlist entries — the assets array is passed back.
+      onPlaylistChange((prev) => [...prev, ...imported]);
+      // Notify parent so it can merge the restored assets into the Asset Bin
+      if (typeof onLoadAssets === 'function') {
+        onLoadAssets(importedAssets);
+      }
+    } catch (err) {
+      console.error('[Playlist] ZIP import failed:', err);
+      alert('ZIP import failed: ' + err.message);
+    }
+    e.target.value = '';
+  }, [onPlaylistChange, onLoadAssets]);
+
   // ── Title inline edit ────────────────────────────────────────────────────
   const startEditTitle = (entry) => {
     setEditingId(entry.id);
@@ -276,6 +338,15 @@ export function PlaylistPanel({
               SAVE IMAGES WITH TRACK
             </label>
           </div>
+
+          {/* Export the song that's loaded right now — always available */}
+          <button
+            onClick={handleCurrentSongZip}
+            style={{ ...actionBtn('#06b6d4'), flex: 'none', width: '100%', padding: '8px', fontSize: 9 }}
+            title="Save the current song's audio, FX settings and Asset Bin images as one .zip"
+          >
+            📦 EXPORT CURRENT SONG (AUDIO + FX + IMAGES) .ZIP
+          </button>
 
           {/* Track list */}
           {playlist.length === 0 ? (
@@ -437,6 +508,13 @@ export function PlaylistPanel({
             >
               📂 IMPORT JSON
             </button>
+            <button
+              onClick={() => zipInputRef.current?.click()}
+              style={actionBtn('#06b6d4')}
+              title="Import a previously exported session ZIP (restores images too)"
+            >
+              📦 IMPORT ZIP
+            </button>
             {playlist.length > 0 && (
               <>
                 <button
@@ -449,9 +527,16 @@ export function PlaylistPanel({
                 <button
                   onClick={handleExport}
                   style={actionBtn('#10b981')}
-                  title="Export playlist as JSON"
+                  title="Export playlist as JSON (no images)"
                 >
-                  💾 EXPORT
+                  💾 JSON
+                </button>
+                <button
+                  onClick={handleZipExport}
+                  style={actionBtn('#06b6d4')}
+                  title="Export playlist + all images as a ZIP archive"
+                >
+                  📦 ZIP+IMG
                 </button>
                 <button
                   onClick={() => {
@@ -486,6 +571,15 @@ export function PlaylistPanel({
             type="file"
             accept=".json,application/json"
             onChange={handleImport}
+            style={{ display: 'none' }}
+          />
+
+          {/* Hidden ZIP import input */}
+          <input
+            ref={zipInputRef}
+            type="file"
+            accept=".zip,application/zip"
+            onChange={handleZipImport}
             style={{ display: 'none' }}
           />
 

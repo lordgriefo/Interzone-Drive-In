@@ -63,6 +63,55 @@ export default function App() {
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
+  // ── Cinema Mode: hides panels + goes fullscreen for clean viewport recording ──
+  const [cinemaMode, setCinemaMode] = useState(false);
+
+  const handleToggleCinema = useCallback(() => {
+    const next = !cinemaMode;
+    setCinemaMode(next);
+    const el = document.getElementById('main-viewport') || document.documentElement;
+    if (next) {
+      if (!document.fullscreenElement && el?.requestFullscreen) {
+        el.requestFullscreen().catch((err) => {
+          console.warn('[Cinema] Native fullscreen request not allowed or canceled:', err);
+        });
+      }
+    } else {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  }, [cinemaMode]);
+
+  // When user presses Escape and fullscreen exits, also turn off cinema mode
+  useEffect(() => {
+    const onFsChange = () => {
+      if (!document.fullscreenElement && cinemaMode) {
+        setCinemaMode(false);
+      }
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, [cinemaMode]);
+
+  // Global key listener for Cinema Mode (C key to toggle, Escape to exit)
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if ((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        handleToggleCinema();
+      }
+      if (e.key === 'Escape' && cinemaMode) {
+        e.preventDefault();
+        handleToggleCinema();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [cinemaMode, handleToggleCinema]);
+
 
 
 
@@ -75,6 +124,8 @@ export default function App() {
     setExportQuality,
     exportFormat,
     setExportFormat,
+    recordViewportOnly,
+    setRecordViewportOnly,
     qualityPresets,
   } = useVideoRecorder();
 
@@ -471,7 +522,7 @@ export default function App() {
       stopRecording();
     } else {
       const element = document.getElementById('main-viewport');
-      startRecording(element, audioDestinationRef);
+      startRecording(element, audioDestinationRef, recordViewportOnly);
     }
   };
 
@@ -494,12 +545,13 @@ export default function App() {
         display: 'flex',
         width: '100vw',
         height: '100vh',
-        backgroundColor: 'var(--bg-primary)',
+        backgroundColor: cinemaMode ? '#000' : 'var(--bg-primary)',
         overflow: 'hidden',
         position: 'relative',
       }}>
 
-        <AssetBin
+        {!cinemaMode && (
+          <AssetBin
           assets={assets}
           onAddAssets={handleAddAssets}
           onRemoveAsset={handleRemoveAsset}
@@ -517,8 +569,11 @@ export default function App() {
           activeSlot={puppetActiveSlot}
           isPlaying={isPlaying}
         />
+        )}
 
         <InterzoneFrame
+          cinemaMode={cinemaMode}
+          onToggleCinema={handleToggleCinema}
           isPlaying={isPlaying}
           trackTitle={trackTitle}
           audioSignals={audioSignals}
@@ -640,8 +695,9 @@ export default function App() {
 
         </InterzoneFrame>
 
-        <FXConsole
-          selectedEra={selectedEra}
+        {!cinemaMode && (
+          <FXConsole
+            selectedEra={selectedEra}
           setSelectedEra={setSelectedEra}
           isEraLocked={isEraLocked}
           setIsEraLocked={setIsEraLocked}
@@ -724,7 +780,17 @@ export default function App() {
           setPlaylistOpen={setPlaylistOpen}
           currentPreset={currentPreset}
           currentAssets={assets}
+          onAddAssets={handleAddAssets}
+          cinemaMode={cinemaMode}
+          onToggleCinema={handleToggleCinema}
+          setCinemaMode={handleToggleCinema}
+          recordViewportOnly={recordViewportOnly}
+          setRecordViewportOnly={setRecordViewportOnly}
+          currentTrackTitle={trackTitle}
+          currentDuration={duration}
+          getCurrentAudio={() => lastAudioFileRef.current}
         />
+        )}
 
         <ExportModal
           isOpen={isExportModalOpen}

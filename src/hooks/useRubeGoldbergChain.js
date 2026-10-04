@@ -334,7 +334,68 @@ const PRESET_OVERRIDES = {
     // 7 RESET — quiet dissolve
     { maxDuration: 450 },
   ],
+
+  // ── GENTLE presets — slow, small moves meant to sit alongside the MV edits ──
+  // No axis splits, no invert flash, no era mutation, no hard strobing.
+
+  soft_pulse: [
+    null,
+    { maxDuration: 3000, patch: { tiltAngle: 0, dollyScale: 1.01, opacityBleed: 1 } },
+    { maxDuration: 2600, patch: { axisSplit: false, dollyScale: 1.02, opacityBleed: 1 } },
+    { maxDuration: 500,  patch: { axisSplit: false, opacityBleed: 1 } },
+    { trigger: ({ bass }) => bass > 0.35, patch: { gravityY: 0, dollyScale: 1.035 } },
+    { maxDuration: 3000, patch: { prismSplit: false, dollyScale: 1.025, opacityBleed: 1 } },
+    { maxDuration: 2400, patch: { zRecoil: 0, dollyScale: 1.03 } },
+    { maxDuration: 600,  patch: { flashInvert: false } },
+  ],
+
+  warm_drift: [
+    null,
+    { maxDuration: 3500, patch: { filmBurn: 0.08, tiltAngle: (Math.random() > 0.5 ? 1 : -1) * 0.8, opacityBleed: 1 } },
+    { maxDuration: 3000, patch: { filmBurn: 0.16, axisSplit: false, opacityBleed: 1 } },
+    { maxDuration: 500,  patch: { filmBurn: 0.20, axisSplit: false, opacityBleed: 1 } },
+    { trigger: ({ bass }) => bass > 0.42, patch: { filmBurn: 0.28, gravityY: 0, dollyScale: 1.02 } },
+    { maxDuration: 3200, patch: { filmBurn: 0.18, prismSplit: false, dollyScale: 1.015 } },
+    { maxDuration: 2600, patch: { filmBurn: 0.10, zRecoil: 0, dollyScale: 1.03 } },
+    { maxDuration: 800,  patch: { flashInvert: false } },
+  ],
+
+  dream_haze: [
+    null,
+    { maxDuration: 3200, patch: { chromaOffset: 2, tiltAngle: 0, opacityBleed: 0.97 } },
+    { maxDuration: 2800, patch: { chromaOffset: 3, axisSplit: false, opacityBleed: 0.95 } },
+    { maxDuration: 500,  patch: { chromaOffset: 3, axisSplit: false, opacityBleed: 0.95 } },
+    { trigger: ({ bass }) => bass > 0.38, patch: { chromaOffset: 4, gravityY: 0, dollyScale: 1.03 } },
+    { maxDuration: 3000, patch: { chromaOffset: 3, prismSplit: false, dollyScale: 1.04, opacityBleed: 0.96 } },
+    { maxDuration: 2400, patch: { chromaOffset: 2, zRecoil: 0, dollyScale: 1.05 } },
+    { maxDuration: 700,  patch: { flashInvert: false } },
+  ],
+
+  gentle_sway: [
+    null,
+    { maxDuration: 3000, patch: { tiltAngle: (Math.random() > 0.5 ? 1 : -1) * 1.5, opacityBleed: 1 } },
+    { maxDuration: 2800, patch: { tiltAngle: (Math.random() > 0.5 ? 1 : -1) * 2.0, axisSplit: false, opacityBleed: 1 } },
+    { maxDuration: 600,  patch: { tiltAngle: 0.8, axisSplit: false, opacityBleed: 1 } },
+    { trigger: ({ bass }) => bass > 0.40, patch: { gravityY: 8, dollyScale: 0.99 } },
+    { maxDuration: 2800, patch: { prismSplit: false, tiltAngle: -1.2, dollyScale: 1.02 } },
+    { maxDuration: 2400, patch: { zRecoil: 0, tiltAngle: 0, dollyScale: 1.03 } },
+    { maxDuration: 600,  patch: { flashInvert: false } },
+  ],
+
+  heartbeat: [
+    null,
+    { trigger: ({ bass }) => bass > 0.30, maxDuration: 3000, patch: { tiltAngle: 0, dollyScale: 1.02, opacityBleed: 1 } },
+    { maxDuration: 900,  patch: { axisSplit: false, dollyScale: 1.0, opacityBleed: 1 } },
+    { maxDuration: 400,  patch: { axisSplit: false, dollyScale: 1.03, opacityBleed: 1 } },
+    { trigger: ({ bass }) => bass > 0.34, patch: { gravityY: 10, dollyScale: 1.04 } },
+    { maxDuration: 900,  patch: { prismSplit: false, dollyScale: 1.0 } },
+    { maxDuration: 1400, patch: { zRecoil: 0, dollyScale: 1.02 } },
+    { maxDuration: 500,  patch: { flashInvert: false } },
+  ],
 };
+
+// Gentle presets never trigger era swaps or the full-frame invert flash.
+export const GENTLE_RUBES = new Set(['soft_pulse', 'warm_drift', 'dream_haze', 'gentle_sway', 'heartbeat']);
 
 
 const TOTAL_STAGES = STAGE_DEFS.length; // 8
@@ -392,6 +453,7 @@ export function useRubeGoldbergChain({
   useEffect(() => { currentTimeRef.current = currentTime; }, [currentTime]);
 
   const canMutateEra = useCallback(() => {
+    if (GENTLE_RUBES.has(selectedRubeRef.current)) return false;
     if (isEraLockedRef.current) return false;
     const now = typeof currentTimeRef.current === 'number' && currentTimeRef.current > 0
       ? currentTimeRef.current * 1000

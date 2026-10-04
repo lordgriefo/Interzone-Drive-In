@@ -5,7 +5,7 @@ import { useAppState } from '../AppContext';
 import { ERA_FILTER_MAP } from '../constants/eras';
 import { getActiveClipsAtTime } from '../utils/timelineCrossfade';
 import { useRubeGoldbergEngine } from '../hooks/useRubeGoldbergEngine';
-import { RUBE_STAGE_NAMES } from '../hooks/useRubeGoldbergChain';
+import { RUBE_STAGE_NAMES, GENTLE_RUBES } from '../hooks/useRubeGoldbergChain';
 import { GlitchLayer } from './GlitchLayer';
 import { useCssEnvelope } from '../hooks/useCssEnvelope';
 import { usePuppetEngine } from '../hooks/usePuppetEngine';
@@ -468,7 +468,7 @@ export function CanvasWorkspace({
     if (rubeVisuals.eraOverride && rubeStage >= 3) {
       parts.push(`hue-rotate(${rubeStage * 12}deg)`);
     }
-    if (rubeVisuals.colorInvert || rubeStage === 7) {
+    if (rubeVisuals.colorInvert || (rubeStage === 7 && !GENTLE_RUBES.has(selectedRube))) {
       parts.push('invert(1)');
     }
     if (rubeVisuals.flashInvert) {
@@ -851,6 +851,92 @@ export function CanvasWorkspace({
         };
       }
 
+      // ── MV LONG CUT: ~5s hold, bass-reactive scale + brightness pulse during clip ──
+      case 'mv_long_cut': {
+        const mvBass = Number(audioSignals?.bass) || 0;
+        const mvRms  = Number(audioSignals?.rms)  || 0;
+        // Slow heartbeat scale: subtle pulse every beat, bigger on transients
+        const beatPhase = (currentTime * (bpm / 60)) % 1;
+        const beatPulse = Math.exp(-beatPhase * 5) * 0.045 * mvBass;
+        const transientBump = audioSignals?.isTransient ? 0.06 : 0;
+        const mvScale = 1.0 + beatPulse + transientBump;
+        // Warm brightness lift on RMS, slight colour warmth
+        const warmBright = 1.0 + mvRms * 0.18;
+        const warmSat = 1.05 + mvRms * 0.22;
+        return {
+          transform: `scale(${mvScale.toFixed(4)})`,
+          filter: `brightness(${warmBright.toFixed(3)}) saturate(${warmSat.toFixed(3)})`,
+          transition: audioSignals?.isTransient ? 'transform 0.05s ease-out' : 'transform 0.35s ease-out, filter 0.25s ease-out',
+        };
+      }
+
+      // ── MV SLOW BURN: ~10s hold, very gentle warmth swell + beat glow ──
+      case 'mv_slow_burn': {
+        const sbBass = Number(audioSignals?.bass) || 0;
+        const sbRms  = Number(audioSignals?.rms)  || 0;
+        const sbMid  = Number(audioSignals?.mid)  || 0;
+        // Very subtle drift — barely noticeable, cinematic feel
+        const slowDriftX = Math.sin(currentTime * 0.08) * 6 + sbMid * 4;
+        const slowDriftY = Math.cos(currentTime * 0.06) * 4;
+        const burnScale = 1.0 + Math.sin(currentTime * 0.05) * 0.012 + sbBass * 0.03;
+        // Sepia-warm glow that swells on bass hits
+        const sepiaAmt = 0.12 + sbRms * 0.18;
+        const burnBright = 1.0 + sbRms * 0.12 + (audioSignals?.isTransient ? 0.15 : 0);
+        return {
+          transform: `translate(${slowDriftX.toFixed(2)}px, ${slowDriftY.toFixed(2)}px) scale(${burnScale.toFixed(4)})`,
+          filter: `sepia(${sepiaAmt.toFixed(3)}) brightness(${burnBright.toFixed(3)}) saturate(1.12) contrast(1.05)`,
+          transition: audioSignals?.isTransient
+            ? 'filter 0.08s ease-out'
+            : 'transform 3s ease-in-out, filter 0.8s ease-in-out',
+        };
+      }
+
+      // ── MV FLASH CUT: 2-4 beat hold, white-flash punch on every transient ──
+      case 'mv_flash_cut': {
+        const fcBass = Number(audioSignals?.bass) || 0;
+        const fcMid  = Number(audioSignals?.mid)  || 0;
+        // Sharp scale pop on transient — fast decay back to 1.0
+        const beatIndex = Math.floor(currentTime * (bpm / 60));
+        const beatFrac  = (currentTime * (bpm / 60)) % 1;
+        // Alternate slight zoom direction every 2 beats for kinetic feel
+        const zoomDir = beatIndex % 2 === 0 ? 1 : -1;
+        const zoomAmt = (1.0 + Math.max(0, (0.08 - beatFrac * 0.08)) * zoomDir * 0.5) + fcBass * 0.06;
+        const flashBright = audioSignals?.isTransient ? 1.55 + fcBass * 0.4 : (1.0 + fcBass * 0.12);
+        const flashSat    = audioSignals?.isTransient ? 0.0  : (1.0 + fcMid * 0.3);
+        return {
+          transform: `scale(${Math.max(0.94, Math.min(1.14, zoomAmt)).toFixed(4)})`,
+          filter: `brightness(${flashBright.toFixed(3)}) saturate(${flashSat.toFixed(3)}) contrast(${(1.0 + fcBass * 0.2).toFixed(3)})`,
+          transition: audioSignals?.isTransient ? 'none' : 'transform 0.12s ease-out, filter 0.18s ease-out',
+        };
+      }
+
+      // ── MV CINEMATIC GLIDE: ~6s hold, smooth horizontal pan + bass swell ──
+      case 'mv_cinematic_glide': {
+        const panPhase = (currentTime * 0.15) * Math.PI;
+        const panX = Math.sin(panPhase) * 6; // gentle 6% pan
+        const glideBass = Number(audioSignals?.bass) || 0;
+        const glideScale = 1.03 + Math.cos(panPhase * 0.7) * 0.02 + glideBass * 0.04;
+        return {
+          transform: `translate(${panX.toFixed(2)}%, 0) scale(${glideScale.toFixed(4)})`,
+          transition: audioSignals?.isTransient ? 'transform 0.1s ease-out' : 'transform 2.5s ease-in-out',
+        };
+      }
+
+      // ── MV HYPNOTIC DRIFT: ~8s hold, dreamy hue rotation + soft bloom ──
+      case 'mv_hypnotic_drift': {
+        const driftBass = Number(audioSignals?.bass) || 0;
+        const driftMid  = Number(audioSignals?.mid)  || 0;
+        const hue = (currentTime * 12) % 360;
+        const bloom = 1.0 + (audioSignals?.isTransient ? 0.22 : 0) + driftBass * 0.12;
+        const sat = 1.1 + driftMid * 0.25;
+        const driftScale = 1.0 + Math.sin(currentTime * 0.1) * 0.015;
+        return {
+          transform: `scale(${driftScale.toFixed(4)})`,
+          filter: `hue-rotate(${hue.toFixed(1)}deg) brightness(${bloom.toFixed(3)}) saturate(${sat.toFixed(3)})`,
+          transition: audioSignals?.isTransient ? 'filter 0.06s ease-out' : 'transform 3s ease-in-out, filter 1.2s ease-in-out',
+        };
+      }
+
       default:
         return {};
     }
@@ -868,7 +954,7 @@ export function CanvasWorkspace({
     if (isTransient && !previousTransientRef.current) {
       // ── Per-style minimum hold between slide advances ──
       // Chill styles use a long hold so slides linger instead of flicking rapidly.
-      const CHILL_STYLES = new Set(['ambient_drift', 'lo_fi_flicker', 'slow_dissolve', 'dreamscape', 'deren_meshes', 'marker_jetee', 'warhol_screen', 'debord_detourne', 'lynch_redroom', 'lynch_eraserhead']);
+      const CHILL_STYLES = new Set(['ambient_drift', 'lo_fi_flicker', 'slow_dissolve', 'dreamscape', 'deren_meshes', 'marker_jetee', 'warhol_screen', 'debord_detourne', 'lynch_redroom', 'lynch_eraserhead', 'mv_long_cut', 'mv_slow_burn', 'mv_flash_cut', 'mv_cinematic_glide', 'mv_hypnotic_drift']);
       const CHILL_MIN_HOLD_MS = {
         ambient_drift: 8000,   // new slide every ~8s minimum — very languid
         lo_fi_flicker: 2500,   // every ~2.5s — lo-fi groove, mid-tempo rhythm
@@ -880,6 +966,11 @@ export function CanvasWorkspace({
         debord_detourne: 3000,
         lynch_redroom:   7000,  // agonizing holds — the Red Room operates on dream time
         lynch_eraserhead: 4000, // industrial holds — slightly more frequent than redroom
+        mv_long_cut:   5000,   // 5 second minimum hold between cuts
+        mv_slow_burn:  10000,  // 10 second minimum hold
+        mv_flash_cut:  2000,   // 2 second minimum hold (2–4 beat feel)
+        mv_cinematic_glide: 6000, // 6 second hold
+        mv_hypnotic_drift:  8000, // 8 second hold
       };
       const currentStyle = (selectedStyle || selectedEra || '').toLowerCase();
       const minHold = CHILL_MIN_HOLD_MS[currentStyle] ?? 0; // 0 = no throttle for hi-nrg styles
@@ -1019,7 +1110,8 @@ export function CanvasWorkspace({
       // Director tributes
       'deren_meshes', 'anger_scorpio', 'mekas_diary', 'marker_jetee',
       'warhol_screen', 'jarman_super8', 'debord_detourne', 'smith_flaming', 'schneemann_fuses',
-      'lynch_redroom', 'lynch_eraserhead',
+      'lynch_redroom', 'lynch_eraserhead', 'mv_long_cut', 'mv_slow_burn', 'mv_flash_cut',
+      'mv_cinematic_glide', 'mv_hypnotic_drift'
     ]);
     const needsAnimation =
       isPlaying &&

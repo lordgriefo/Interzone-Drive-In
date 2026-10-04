@@ -126,6 +126,38 @@ export const EDIT_PROFILES = [
   { id: 'schneemann_fuses',  category: 'Directors', label: '26. Carolee Schneemann — Fuses',           description: 'Direct emulsion body cinema: painted-over frames, radical superimposition, organic grain storms. Inspired by Fuses (1965).' },
   { id: 'lynch_redroom',     category: 'Directors', label: '27. David Lynch — Red Room',                description: 'Twin Peaks velvet dread: deep crimson saturation, agonizing 12fps slow pans, electrical surge on bass drops, and Red Room subliminal text. Inspired by Twin Peaks (1990–2017).' },
   { id: 'lynch_eraserhead',  category: 'Directors', label: '28. David Lynch — Eraserhead',             description: 'Industrial monochrome nightmare: tungsten flicker, heavy shadow crush, blinding electrical transient flashes, and factory-floor subliminal text. Inspired by Eraserhead (1977).' },
+
+  // ── MUSIC VIDEO / AI VIDEO STYLES ──────────────────────────────────────────
+  {
+    id: 'mv_long_cut',
+    label: '29. MV Long Cut (5s AI Video Hold)',
+    description: 'Holds each clip for ~5 seconds. Cuts only on strong bass transients. Audio-reactive brightness and scale pulse during hold. Designed for 5–10s AI-generated video clips.',
+    category: 'Music Video',
+  },
+  {
+    id: 'mv_slow_burn',
+    label: '30. MV Slow Burn (10s Cinematic Hold)',
+    description: 'Holds each clip for ~10 seconds with a warm colour-grade pulse on beats. Very infrequent cuts — lets long AI video clips play through almost completely.',
+    category: 'Music Video',
+  },
+  {
+    id: 'mv_flash_cut',
+    label: '31. MV Flash Cut (Beat-Locked Quick Edit)',
+    description: 'Cuts every 2–4 beats with a white-flash punch on the downbeat. Keeps clips visible for 2–4 seconds — the classic music video quick-cut tempo feel.',
+    category: 'Music Video',
+  },
+  {
+    id: 'mv_cinematic_glide',
+    label: '32. MV Cinematic Glide (6s Slow Pan & Swell)',
+    description: 'Holds clips for ~6 seconds with an ultra-smooth widescreen dolly pan and subtle bass-reactive scale swell. Perfect for cinematic landscape and AI video footage.',
+    category: 'Music Video',
+  },
+  {
+    id: 'mv_hypnotic_drift',
+    label: '33. MV Hypnotic Drift (8s Dream Bloom)',
+    description: 'Holds clips for ~8 seconds with dreamy slow hue-shifting, soft exposure breathing, and gentle Gaussian bloom on transients.',
+    category: 'Music Video',
+  },
 ];
 
 export const WEBM_LOOP_PRESETS = [

@@ -48,89 +48,153 @@ function resolveMimeType(formatPreference = 'mp4') {
 }
 
 export function useVideoRecorder() {
-  const [isRecording,   setIsRecording]   = useState(false);
-  const [exportQuality, setExportQuality] = useState(DEFAULT_QUALITY);
-  const [exportFormat,  setExportFormat]  = useState(DEFAULT_FORMAT);
+  const [isRecording,          setIsRecording]          = useState(false);
+  const [exportQuality,        setExportQuality]        = useState(DEFAULT_QUALITY);
+  const [exportFormat,         setExportFormat]         = useState(DEFAULT_FORMAT);
+  const [recordViewportOnly,   setRecordViewportOnly]   = useState(true);
 
   const mediaRecorderRef  = useRef(null);
   const recordedChunksRef = useRef([]);
+  const cleanupRef        = useRef(null);
 
-  const startRecording = async (viewportElement, audioDestinationRef) => {
+  const startRecording = async (viewportElement, audioDestinationRef, cropViewport = recordViewportOnly) => {
     recordedChunksRef.current = [];
 
     const preset = QUALITY_PRESETS[exportQuality] || QUALITY_PRESETS[DEFAULT_QUALITY];
 
-    // ── Strategy 1a: Element Capture (Chrome 104+) ──
-    // CropTarget crops the tab stream to a single DOM element — only
-    // #main-viewport is recorded, with no cursor and explicit resolution hints.
+    // Capture tab stream via getDisplayMedia
     let displayStream = null;
     try {
-      if (viewportElement && window.CropTarget?.fromElement) {
-        // Grab the tab stream with resolution hints and cursor hidden
-        displayStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            preferCurrentTab: true,
-            frameRate: { ideal: preset.fps, max: preset.fps },
-            width: { ideal: preset.width || 1920, max: preset.width || 1920 },
-            height: { ideal: preset.height || 1080, max: preset.height || 1080 },
-            cursor: 'never',
-          },
-          audio: false,
-          selfBrowserSurface: 'include',
-          systemAudio: 'exclude',
-          surfaceSwitching: 'exclude',
-        });
-        // Crop down strictly to the viewport element
-        const cropTarget = await window.CropTarget.fromElement(viewportElement);
-        const [videoTrack] = displayStream.getVideoTracks();
-        if (videoTrack?.cropTo) {
-          await videoTrack.cropTo(cropTarget);
-        }
-      } else {
-        // ── Strategy 1b: full-tab capture (no element crop) ──
-        displayStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            preferCurrentTab: true,
-            frameRate: { ideal: preset.fps, max: preset.fps },
-            width: { ideal: preset.width || 1920, max: preset.width || 1920 },
-            height: { ideal: preset.height || 1080, max: preset.height || 1080 },
-            cursor: 'never',
-          },
-          audio: false,
-          selfBrowserSurface: 'include',
-          systemAudio: 'exclude',
-          surfaceSwitching: 'exclude',
-        });
-      }
+      displayStream = await navigator.mediaDevices.getDisplayMedia({
+        video: {
+          displaySurface: 'browser',
+          preferCurrentTab: true,
+          frameRate: { ideal: preset.fps, max: preset.fps },
+          width: { ideal: preset.width || 1920, max: preset.width || 1920 },
+          height: { ideal: preset.height || 1080, max: preset.height || 1080 },
+          cursor: 'never',
+        },
+        audio: false,
+        selfBrowserSurface: 'include',
+        systemAudio: 'exclude',
+        surfaceSwitching: 'exclude',
+      });
     } catch (e) {
-      console.warn('[Recorder] getDisplayMedia failed:', e);
-    }
-
-    // ── Strategy 2: fallback to captureStream on a canvas if available ──
-    if (!displayStream && viewportElement) {
-      const canvas = viewportElement.querySelector('canvas') || viewportElement;
-      if (canvas?.captureStream) {
-        try {
-          displayStream = canvas.captureStream(preset.fps);
-        } catch (e2) {
-          console.warn('[Recorder] captureStream fallback also failed:', e2);
-        }
-      }
-    }
-
-    if (!displayStream) {
-      alert(
-        'Recording not available in this browser.\n\n' +
-        'Chrome 94+, Brave, or Edge required.\n' +
-        'Make sure the page is served over https:// or localhost.\n\n' +
-        'Tip: you can also use OBS or the OS screen recorder.'
-      );
+      console.warn('[Recorder] getDisplayMedia canceled or failed:', e);
       return;
     }
 
-    // Build combined stream: display video + Web Audio output
+    if (!displayStream) return;
+
+    let recordStream = displayStream;
+    let stopCropper = null;
+
+    // ── Dedicated Real-Time Viewport Canvas Cropper ──
+    // When cropViewport is enabled and viewportElement is provided, extract strictly
+    // the #main-viewport bounding rectangle into a dedicated 16:9 canvas stream.
+    // This completely excludes sidebars, timeline, and banner from the recording.
+    if (cropViewport && viewportElement) {
+      try {
+        const hiddenVideo = document.createElement('video');
+        hiddenVideo.srcObject = displayStream;
+        hiddenVideo.muted = true;
+        hiddenVideo.playsInline = true;
+        hiddenVideo.style.position = 'fixed';
+        hiddenVideo.style.top = '0';
+        hiddenVideo.style.left = '0';
+        hiddenVideo.style.width = '1px';
+        hiddenVideo.style.height = '1px';
+        hiddenVideo.style.opacity = '0.01';
+        hiddenVideo.style.pointerEvents = 'none';
+        hiddenVideo.style.zIndex = '-9999';
+        document.body.appendChild(hiddenVideo);
+
+        await hiddenVideo.play().catch(() => {});
+
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width = preset.width || 1920;
+        cropCanvas.height = preset.height || 1080;
+        const cropCtx = cropCanvas.getContext('2d', { alpha: false });
+
+        let isCropping = true;
+        let cropRaf = null;
+
+        const cropLoop = () => {
+          if (!isCropping) return;
+          if (hiddenVideo.readyState >= 2 && hiddenVideo.videoWidth > 0) {
+            const rect = viewportElement.getBoundingClientRect();
+
+            // Detect whether user shared a Tab vs Window/Screen:
+            // A Tab capture's aspect ratio matches window.innerWidth / window.innerHeight.
+            // A Window capture includes the browser title bar, tab strip, and URL address bar at the top.
+            const streamRatio = hiddenVideo.videoWidth / hiddenVideo.videoHeight;
+            const contentRatio = window.innerWidth / window.innerHeight;
+            const isTabCapture = Math.abs(streamRatio - contentRatio) < 0.04;
+
+            let chromeTop = 0;
+            let chromeLeft = 0;
+            let baseW = window.innerWidth;
+            let baseH = window.innerHeight;
+
+            if (!isTabCapture) {
+              // Window capture: web content starts below the browser's tabs + URL address bar
+              const totalChromeH = Math.max(0, window.outerHeight - window.innerHeight);
+              chromeTop = Math.max(0, totalChromeH - 8);
+              chromeLeft = Math.max(0, (window.outerWidth - window.innerWidth) / 2);
+              baseW = window.outerWidth;
+              baseH = window.outerHeight;
+            }
+
+            const sX = hiddenVideo.videoWidth / baseW;
+            const sY = hiddenVideo.videoHeight / baseH;
+
+            // Trim 5px inside the viewport border to ensure zero bezel/border bleed
+            const inset = 5;
+            const targetX = rect.left + chromeLeft + inset;
+            const targetY = rect.top + chromeTop + inset;
+            const targetW = Math.max(10, rect.width - inset * 2);
+            const targetH = Math.max(10, rect.height - inset * 2);
+
+            const sx = Math.max(0, targetX * sX);
+            const sy = Math.max(0, targetY * sY);
+            const sw = Math.min(hiddenVideo.videoWidth - sx, targetW * sX);
+            const sh = Math.min(hiddenVideo.videoHeight - sy, targetH * sY);
+
+            if (sw > 10 && sh > 10) {
+              cropCtx.drawImage(
+                hiddenVideo,
+                sx,
+                sy,
+                sw,
+                sh,
+                0,
+                0,
+                cropCanvas.width,
+                cropCanvas.height
+              );
+            }
+          }
+          cropRaf = requestAnimationFrame(cropLoop);
+        };
+        cropLoop();
+
+        recordStream = cropCanvas.captureStream(preset.fps || 60);
+
+        stopCropper = () => {
+          isCropping = false;
+          if (cropRaf) cancelAnimationFrame(cropRaf);
+          hiddenVideo.pause();
+          hiddenVideo.srcObject = null;
+          hiddenVideo.remove();
+        };
+      } catch (cropErr) {
+        console.warn('[Recorder] Canvas cropper init failed, recording full stream:', cropErr);
+      }
+    }
+
+    // Combine video (cropped or full) + Web Audio master bus
     const combinedStream = new MediaStream();
-    displayStream.getVideoTracks().forEach((t) => combinedStream.addTrack(t));
+    recordStream.getVideoTracks().forEach((t) => combinedStream.addTrack(t));
 
     if (audioDestinationRef?.current?.stream) {
       audioDestinationRef.current.stream
@@ -138,44 +202,49 @@ export function useVideoRecorder() {
         .forEach((t) => combinedStream.addTrack(t));
     }
 
-    // Pick the best supported codec matching format preference
     const mimeType = resolveMimeType(exportFormat);
 
     const mediaRecorder = new MediaRecorder(combinedStream, {
       mimeType,
       videoBitsPerSecond: preset.bitrate,
-      audioBitsPerSecond: 320_000, // 320 kbps high fidelity stereo audio
+      audioBitsPerSecond: 320_000,
     });
+
+    cleanupRef.current = () => {
+      if (stopCropper) stopCropper();
+      displayStream.getTracks().forEach((t) => t.stop());
+    };
 
     mediaRecorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data);
     };
 
     mediaRecorder.onstop = () => {
-      // Stop all display capture tracks so the browser indicator dismisses
-      displayStream.getTracks().forEach((t) => t.stop());
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      }
 
       const ext  = mimeType.includes('mp4') ? 'mp4' : 'webm';
       const blob = new Blob(recordedChunksRef.current, { type: mimeType });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
-      a.download = `interzone-${exportQuality}-${Date.now()}.${ext}`;
+      a.download = `interzone-${cropViewport ? 'viewport' : 'full'}-${Date.now()}.${ext}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 10000);
+      setIsRecording(false);
     };
 
-    // If user closes the display picker or stops via browser UI, sync state
-    displayStream.getVideoTracks()[0].addEventListener('ended', () => {
+    displayStream.getVideoTracks()[0]?.addEventListener('ended', () => {
       if (mediaRecorderRef.current?.state !== 'inactive') {
         mediaRecorderRef.current.stop();
       }
       setIsRecording(false);
     });
 
-    // 1000ms chunking for clean GOP intervals & reduced CPU encoding pressure
     mediaRecorder.start(1000);
     mediaRecorderRef.current = mediaRecorder;
     setIsRecording(true);
@@ -196,6 +265,8 @@ export function useVideoRecorder() {
     setExportQuality,
     exportFormat,
     setExportFormat,
+    recordViewportOnly,
+    setRecordViewportOnly,
     qualityPresets: QUALITY_PRESETS,
   };
 }

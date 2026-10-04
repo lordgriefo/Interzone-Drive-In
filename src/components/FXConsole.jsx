@@ -285,6 +285,15 @@ export function FXConsole({
   setPlaylistOpen = () => {},
   currentPreset = {},
   currentAssets = [],
+  onAddAssets = () => {},
+  cinemaMode = false,
+  setCinemaMode = () => {},
+  onToggleCinema = null,
+  recordViewportOnly = true,
+  setRecordViewportOnly = () => {},
+  currentTrackTitle = '',
+  currentDuration = 0,
+  getCurrentAudio = () => null,
 }) {
 
 
@@ -341,6 +350,10 @@ export function FXConsole({
           setSaveImages={setSaveImages}
           currentPreset={currentPreset}
           currentAssets={currentAssets}
+          onLoadAssets={onAddAssets}
+          currentTrackTitle={currentTrackTitle}
+          currentDuration={currentDuration}
+          getCurrentAudio={getCurrentAudio}
           isOpen={playlistOpen}
           setIsOpen={setPlaylistOpen}
         />
@@ -422,6 +435,50 @@ export function FXConsole({
         >
           {isRecording ? '⏹ STOP & SAVE WEBM/MP4' : '⏺ RECORD VIDEO EXPORT'}
         </button>
+
+        {/* Viewport crop toggle */}
+        <label style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          fontSize: 9,
+          fontFamily: 'var(--font-mono, monospace)',
+          color: recordViewportOnly ? 'var(--accent-blue, #00e5ff)' : 'var(--text-dim, #71717a)',
+          cursor: 'pointer',
+          padding: '2px 4px',
+          userSelect: 'none',
+        }}>
+          <input
+            type="checkbox"
+            checked={recordViewportOnly}
+            onChange={(e) => setRecordViewportOnly(e.target.checked)}
+            style={{ accentColor: 'var(--accent-blue, #00e5ff)', cursor: 'pointer' }}
+          />
+          RECORD VIEWPORT ONLY (CROP OUT UI)
+        </label>
+
+        <button
+          onClick={() => (onToggleCinema ? onToggleCinema() : setCinemaMode((v) => !v))}
+          style={{
+            backgroundColor: cinemaMode ? '#FF6B00' : 'transparent',
+            color: cinemaMode ? '#000' : 'var(--accent-orange)',
+            border: '1px solid var(--accent-orange)',
+            padding: '9px',
+            borderRadius: 4,
+            fontWeight: 700,
+            fontSize: 11,
+            cursor: 'pointer',
+            fontFamily: 'var(--font-label)',
+            transition: 'all 0.15s',
+            letterSpacing: 0.5,
+          }}
+          title="Cinema Mode [Shortcut: C]: Fullscreen viewport with all panels, timeline & UI hidden. Press C or ESC anytime to exit."
+        >
+          {cinemaMode ? '◼ EXIT FULLSCREEN CINEMA [C]' : '🎬 CINEMA MODE · FULLSCREEN [C]'}
+        </button>
+        <span style={{ fontSize: 8, color: 'var(--text-dim)', textAlign: 'center', lineHeight: 1.4, marginTop: -2 }}>
+          Hides UI & enters Fullscreen. Press <strong style={{ color: 'var(--accent-orange)' }}>C</strong> or <strong style={{ color: '#fff' }}>ESC</strong> to exit.
+        </span>
       </div>
 
       {/* ── 2. LRC LYRIC SYNC ── */}
@@ -630,6 +687,13 @@ export function FXConsole({
           <option value="neon_pulse">9. Neon Pulse (Electric Jolt → Rainbow Fringe → Warp)</option>
           <option value="slow_burn">10. Slow Burn (Amber Creep → Cinematic Flare → Bloom)</option>
           <option value="ghost_loop">11. Ghost Loop (Haunting Drift → Phantom Split → Dissolve)</option>
+          <optgroup label="── Gentle (pairs with MV edits) ──">
+            <option value="soft_pulse">12. Soft Pulse (Breathe → Bloom → Settle)</option>
+            <option value="warm_drift">13. Warm Drift (Amber Haze → Sway → Fade)</option>
+            <option value="dream_haze">14. Dream Haze (Soft Ghost → Drift → Clear)</option>
+            <option value="gentle_sway">15. Gentle Sway (Tilt → Rock → Settle)</option>
+            <option value="heartbeat">16. Heartbeat (Thump → Echo → Rest)</option>
+          </optgroup>
         </select>
 
         {/* 8-Stage LED strip */}
