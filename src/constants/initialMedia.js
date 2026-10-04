@@ -77,14 +77,6 @@ export const createProceduralAudioDataUri = createProceduralAudioTrack;
 // live in the iz-vibe folder — included separately below.
 
 // Scan iz-extras in both public/assets-bg/iz-extras and assets-bg/iz-extras
-const extraImports = import.meta.glob(
-  [
-    '../../public/assets-bg/iz-extras/**/*.{jpg,jpeg,png,webp,gif,avif,JPG,JPEG,PNG,WEBP,GIF}',
-    '../../assets-bg/iz-extras/**/*.{jpg,jpeg,png,webp,gif,avif,JPG,JPEG,PNG,WEBP,GIF}',
-  ],
-  { eager: true }
-);
-
 const baseMediaItems = [
   // ─── IZ-MIDNIGHT  (frames 001-014 in iz-midnight folder) ───
   ...Array.from({ length: 14 }, (_, i) => {
@@ -147,6 +139,8 @@ const baseMediaItems = [
   }),
 ];
 
+import discoveredAssets from './discoveredAssets.json';
+
 // Track all existing URLs and filenames so nothing doubles
 const seenFilenames = new Set();
 const seenIds = new Set();
@@ -160,35 +154,15 @@ baseMediaItems.forEach((item) => {
 });
 
 const extraMediaItems = [];
-Object.entries(extraImports).forEach(([path, mod]) => {
-  const filename = path.split('/').pop();
+(discoveredAssets || []).forEach((item) => {
+  if (!item?.url) return;
+  const filename = item.url.split('/').pop();
   if (!filename) return;
   const lowerFn = filename.toLowerCase();
   if (seenFilenames.has(lowerFn)) return; // Prevent doubling!
   seenFilenames.add(lowerFn);
 
-  const baseName = filename.replace(/\.[^.]+$/, '');
-  let id = `extra-${baseName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`;
-  if (seenIds.has(id)) {
-    id = `${id}-${Math.random().toString(36).slice(2, 6)}`;
-  }
-  seenIds.add(id);
-
-  // If in public directory, standard static url is ./${rel}; otherwise Vite module
-  let url = `./assets-bg/iz-extras/${filename}`;
-  if (path.includes('/public/')) {
-    const rel = path.split('/public/')[1];
-    url = `./${rel}`;
-  } else if (mod) {
-    url = typeof mod === 'string' ? mod : mod.default || url;
-  }
-
-  extraMediaItems.push({
-    id,
-    name: `Extra: ${baseName.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`,
-    url,
-    mediaType: 'image',
-  });
+  extraMediaItems.push(item);
 });
 
 export const DEFAULT_MEDIA_ITEMS = [...baseMediaItems, ...extraMediaItems];

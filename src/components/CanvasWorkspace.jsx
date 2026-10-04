@@ -1610,7 +1610,8 @@ export function CanvasWorkspace({
   const useTimelineView = isPlaying && selectedStyle === 'timeline' && videoClips.length > 0;
 
 
-  const activeLyric = lyricSegments.find(
+  // Only display lyrics during active playback
+  const activeLyric = isPlaying && lyricSegments.find(
     (seg) => currentTime >= seg.start && currentTime <= (seg.end || seg.start + 4)
   );
 
