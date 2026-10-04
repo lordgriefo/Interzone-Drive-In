@@ -2,40 +2,7 @@
 // Procedural SVG, Default Artwork, and Built-in Audio Track for Instant Startup
 
 export function createProceduralTestCard() {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
-    <rect width="1280" height="720" fill="#000000"/>
-    <!-- SMPTE Color Bars -->
-    <rect x="0" y="0" width="182.8" height="480" fill="#C0C0C0"/>
-    <rect x="182.8" y="0" width="182.8" height="480" fill="#C0C000"/>
-    <rect x="365.6" y="0" width="182.8" height="480" fill="#00C0C0"/>
-    <rect x="548.4" y="0" width="182.8" height="480" fill="#00C000"/>
-    <rect x="731.2" y="0" width="182.8" height="480" fill="#C000C0"/>
-    <rect x="914.0" y="0" width="182.8" height="480" fill="#C00000"/>
-    <rect x="1096.8" y="0" width="183.2" height="480" fill="#0000C0"/>
-
-    <!-- Middle Cast Block -->
-    <rect x="0" y="480" width="182.8" height="60" fill="#0000C0"/>
-    <rect x="182.8" y="480" width="182.8" height="60" fill="#131313"/>
-    <rect x="365.6" y="480" width="182.8" height="60" fill="#C000C0"/>
-    <rect x="548.4" y="480" width="182.8" height="60" fill="#131313"/>
-    <rect x="731.2" y="480" width="182.8" height="60" fill="#00C0C0"/>
-    <rect x="914.0" y="480" width="182.8" height="60" fill="#131313"/>
-    <rect x="1096.8" y="480" width="183.2" height="60" fill="#C0C0C0"/>
-
-    <!-- Bottom Strip -->
-    <rect x="0" y="540" width="228" height="180" fill="#082A46"/>
-    <rect x="228" y="540" width="228" height="180" fill="#FFFFFF"/>
-    <rect x="456" y="540" width="228" height="180" fill="#32006A"/>
-    <rect x="684" y="540" width="368" height="180" fill="#131313"/>
-    <rect x="1052" y="540" width="228" height="180" fill="#1D1D1D"/>
-
-    <!-- Text banner -->
-    <rect x="240" y="275" width="800" height="100" fill="#000000" rx="8" opacity="0.9"/>
-    <text x="640" y="325" fill="#FF6B00" font-family="'Courier New', monospace" font-size="34" font-weight="900" text-anchor="middle" letter-spacing="6">INTERZONE DRIVE-IN</text>
-    <text x="640" y="358" fill="#00E5FF" font-family="'Courier New', monospace" font-size="16" font-weight="700" text-anchor="middle" letter-spacing="4">KINET-O-CHOP · DROP MEDIA TO BEGIN</text>
-  </svg>`;
-
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 }
 
 // ── Built-in 32s Procedural 120 BPM Synth Track (Kick, Hats, Sub Drone) ──
@@ -109,16 +76,16 @@ export const createProceduralAudioDataUri = createProceduralAudioTrack;
 // Some overflow frames from midnight (015, 016) and greenglow (024) also
 // live in the iz-vibe folder — included separately below.
 
-export const DEFAULT_MEDIA_ITEMS = [
+// Scan iz-extras in both public/assets-bg/iz-extras and assets-bg/iz-extras
+const extraImports = import.meta.glob(
+  [
+    '../../public/assets-bg/iz-extras/**/*.{jpg,jpeg,png,webp,gif,avif,JPG,JPEG,PNG,WEBP,GIF}',
+    '../../assets-bg/iz-extras/**/*.{jpg,jpeg,png,webp,gif,avif,JPG,JPEG,PNG,WEBP,GIF}',
+  ],
+  { eager: true }
+);
 
-  // ─── SMPTE test card (always first) ───
-  {
-    id: 'default-test-card',
-    name: 'Interzone Test Card',
-    url: createProceduralTestCard(),
-    mediaType: 'image',
-  },
-
+const baseMediaItems = [
   // ─── IZ-MIDNIGHT  (frames 001-014 in iz-midnight folder) ───
   ...Array.from({ length: 14 }, (_, i) => {
     const n = String(i + 1).padStart(3, '0');
@@ -179,3 +146,49 @@ export const DEFAULT_MEDIA_ITEMS = [
     };
   }),
 ];
+
+// Track all existing URLs and filenames so nothing doubles
+const seenFilenames = new Set();
+const seenIds = new Set();
+
+baseMediaItems.forEach((item) => {
+  if (item.id) seenIds.add(item.id.toLowerCase());
+  if (item.url) {
+    const fn = item.url.split('/').pop().toLowerCase();
+    seenFilenames.add(fn);
+  }
+});
+
+const extraMediaItems = [];
+Object.entries(extraImports).forEach(([path, mod]) => {
+  const filename = path.split('/').pop();
+  if (!filename) return;
+  const lowerFn = filename.toLowerCase();
+  if (seenFilenames.has(lowerFn)) return; // Prevent doubling!
+  seenFilenames.add(lowerFn);
+
+  const baseName = filename.replace(/\.[^.]+$/, '');
+  let id = `extra-${baseName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`;
+  if (seenIds.has(id)) {
+    id = `${id}-${Math.random().toString(36).slice(2, 6)}`;
+  }
+  seenIds.add(id);
+
+  // If in public directory, standard static url is ./${rel}; otherwise Vite module
+  let url = `./assets-bg/iz-extras/${filename}`;
+  if (path.includes('/public/')) {
+    const rel = path.split('/public/')[1];
+    url = `./${rel}`;
+  } else if (mod) {
+    url = typeof mod === 'string' ? mod : mod.default || url;
+  }
+
+  extraMediaItems.push({
+    id,
+    name: `Extra: ${baseName.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`,
+    url,
+    mediaType: 'image',
+  });
+});
+
+export const DEFAULT_MEDIA_ITEMS = [...baseMediaItems, ...extraMediaItems];

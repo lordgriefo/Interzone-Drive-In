@@ -21,6 +21,7 @@ import { PlaylistPanel }      from './components/PlaylistPanel';
 import { interpolateAutomation } from './utils/timelineCrossfade';
 import { evaluateCssEffect }     from './constants/cssEffectLibrary';
 import { DEFAULT_MEDIA_ITEMS, createProceduralAudioTrack, createProceduralAudioDataUri } from './constants/initialMedia';
+import { parseLrcString } from './utils/lrcParser';
 
 
 
@@ -318,7 +319,7 @@ export default function App() {
   const lastAudioFileRef = useRef(DEFAULT_TRACK_URL);
   const hasAudioLoaded   = Boolean(lastAudioFileRef.current);
 
-  // Auto-load Excavating Neverland on startup so duration & waveform are populated immediately
+  // Auto-load Excavating Neverland track + synced LRC lyrics on startup
   useEffect(() => {
     try {
       loadAudioTrack(DEFAULT_TRACK_URL);
@@ -327,6 +328,18 @@ export default function App() {
     } catch (err) {
       console.warn('[App] Default audio track init warning:', err);
     }
+
+    // Auto-load synchronized LRC lyrics
+    fetch('./assets-bg/excavating-neverland.lrc')
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((raw) => {
+        const segs = parseLrcString(raw);
+        if (segs.length > 0) setLyricSegments(segs);
+      })
+      .catch((err) => console.warn('[App] Default LRC lyrics load info:', err));
   }, [loadAudioTrack]);
 
 

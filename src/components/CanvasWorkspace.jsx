@@ -16,50 +16,7 @@ import { usePuppetEngine } from '../hooks/usePuppetEngine';
 // Falls back to a 1×1 transparent PNG if canvas is unavailable (Firefox
 // restricted environments, SSR, etc.) — never returns empty string.
 const TRANSPARENT_1PX = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-
-function createSmpteDataUrl() {
-  try {
-    const W = 480, H = 270;
-    const canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return TRANSPARENT_1PX;
-
-    // Top 75% — classic 7 SMPTE colour bars
-    const bars = [
-      '#C0C0C0', '#C0C000', '#00C0C0', '#00C000',
-      '#C000C0', '#C00000', '#0000C0',
-    ];
-    const bW = W / bars.length;
-    bars.forEach((col, i) => {
-      ctx.fillStyle = col;
-      ctx.fillRect(i * bW, 0, bW, H * 0.75);
-    });
-
-    // Bottom strip — black / white / PLUGE-style tones
-    const bottom = ['#000010', '#FFFFFF', '#1a1a1a', '#000000', '#090909', '#1c1c1c', '#000014'];
-    bottom.forEach((col, i) => {
-      ctx.fillStyle = col;
-      ctx.fillRect(i * bW, H * 0.75, bW, H * 0.25);
-    });
-
-    // Orange / cyan label
-    ctx.fillStyle = 'rgba(0,0,0,0.65)';
-    ctx.fillRect(0, H * 0.36, W, 30);
-    ctx.fillStyle = '#FF6B00';
-    ctx.font = 'bold 14px "Courier New", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('INTERZONE DRIVE-IN  ·  DROP MEDIA TO BEGIN', W / 2, H * 0.36 + 19);
-
-    const dataUrl = canvas.toDataURL('image/png');
-    // Paranoia check — some browsers return 'data:,' on a tainted/blocked canvas
-    return dataUrl && dataUrl.length > 100 ? dataUrl : TRANSPARENT_1PX;
-  } catch (_) {
-    return TRANSPARENT_1PX;
-  }
-}
-
-const SMPTE_FALLBACK_URL = createSmpteDataUrl();
+const SMPTE_FALLBACK_URL = TRANSPARENT_1PX;
 
 
 
@@ -1273,8 +1230,14 @@ export function CanvasWorkspace({
     ? puppetActiveUrl
     : currentAssetUrl;
 
-  // Fall back to SMPTE test-card if no asset URL or image failed to load
-  const displayUrl = (rawDisplayUrl && !failedUrls[rawDisplayUrl]) ? rawDisplayUrl : SMPTE_FALLBACK_URL;
+  // Fall back to first working image (or transparent 1px) if asset URL is missing or failed
+  const firstWorkingUrl = assets?.find((a) => {
+    const u = typeof a === 'string' ? a : a?.url;
+    return u && !failedUrls[u] && u !== SMPTE_FALLBACK_URL;
+  })?.url;
+  const displayUrl = (rawDisplayUrl && !failedUrls[rawDisplayUrl] && rawDisplayUrl !== SMPTE_FALLBACK_URL)
+    ? rawDisplayUrl
+    : (firstWorkingUrl || TRANSPARENT_1PX);
 
   const renderBurroughsCutUp = () => {
     if (!assets || assets.length === 0) return null;
