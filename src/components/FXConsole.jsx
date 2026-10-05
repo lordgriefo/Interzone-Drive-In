@@ -182,7 +182,7 @@ function parseLrcFile(file, setSegments) {
         id: i,
         text: item.text,
         start: item.t,
-        end: timed[i + 1] ? timed[i + 1].t : item.t + 4,
+        end: timed[i + 1] ? timed[i + 1].t : item.t + 30,
       }));
       setSegments(segs);
     } catch (err) {
@@ -294,6 +294,13 @@ export function FXConsole({
   currentTrackTitle = '',
   currentDuration = 0,
   getCurrentAudio = () => null,
+  // Auto DJ
+  autoDJEnabled = false,
+  setAutoDJEnabled = () => {},
+  autoDJMode = 'full_random',
+  setAutoDJMode = () => {},
+  autoDJInterval = 12,
+  setAutoDJInterval = () => {},
 }) {
 
 
@@ -799,6 +806,68 @@ export function FXConsole({
             onChange={(e) => setRubeDecay(parseInt(e.target.value))}
             style={{ ...rangeStyle, accentColor: 'var(--accent-blue)' }}
           />
+        </div>
+      </div>
+
+
+      {/* ── AUTO DJ — random style/era/rube mutations ── */}
+      <div style={{
+        ...panelSection,
+        border: `1px solid ${autoDJEnabled ? '#a78bfa' : 'var(--border-dim)'}`,
+        boxShadow: autoDJEnabled ? '0 0 12px rgba(167, 139, 250, 0.3)' : 'none',
+        transition: 'box-shadow 0.2s, border-color 0.2s',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <label style={sectionLabel('#a78bfa')}>🎲 AUTO DJ</label>
+          <ToggleSwitch
+            enabled={autoDJEnabled}
+            onChange={setAutoDJEnabled}
+            label={autoDJEnabled ? 'ON' : 'OFF'}
+            accentVar="#a78bfa"
+          />
+        </div>
+
+        <span style={{ fontSize: 8, color: 'var(--text-dim)', lineHeight: 1.4, marginBottom: 4 }}>
+          Auto-randomizes edit style, era, and rube chain in the flow of the music.
+          Strong transients trigger changes. {autoDJEnabled ? '⚡ ACTIVE' : ''}
+        </span>
+
+        {/* Mode */}
+        <select
+          value={autoDJMode}
+          onChange={(e) => setAutoDJMode(e.target.value)}
+          disabled={!autoDJEnabled}
+          style={{ ...selectStyle, opacity: autoDJEnabled ? 1 : 0.5 }}
+        >
+          <option value="full_random">🎰 Full Random — shuffles everything</option>
+          <option value="mood_drift">🌊 Mood Drift — coherent style groupings</option>
+          <option value="era_only">🎬 Era Only — only changes era</option>
+          <option value="style_only">✂ Style Only — only changes edit style</option>
+        </select>
+
+        {/* Interval */}
+        <div>
+          <label style={{
+            color: autoDJEnabled ? '#a78bfa' : 'var(--text-dim)',
+            fontSize: 9,
+            fontWeight: 700,
+          }}>
+            ⏱ CHANGE INTERVAL: {autoDJInterval}s
+          </label>
+          <input
+            type="range"
+            min="4"
+            max="60"
+            step="2"
+            value={autoDJInterval}
+            onChange={(e) => setAutoDJInterval(Number(e.target.value))}
+            disabled={!autoDJEnabled}
+            style={{ ...rangeStyle, accentColor: '#a78bfa' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 7, color: 'var(--text-dim)' }}>
+            <span>4s (hyper)</span>
+            <span>60s (slow)</span>
+          </div>
         </div>
       </div>
 

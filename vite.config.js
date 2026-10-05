@@ -70,6 +70,28 @@ function mediaScannerPlugin() {
       } catch (_) {}
     }
 
+    // Ensure any files in root assets-bg are mirrored into public/assets-bg so Vite/Vercel can serve them
+    const syncDir = (src, dest) => {
+      if (!fs.existsSync(src)) return;
+      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+      try {
+        const entries = fs.readdirSync(src, { withFileTypes: true });
+        for (const entry of entries) {
+          const srcItem = path.join(src, entry.name);
+          const destItem = path.join(dest, entry.name);
+          if (entry.isDirectory()) {
+            syncDir(srcItem, destItem);
+          } else if (entry.isFile()) {
+            if (!fs.existsSync(destItem)) {
+              fs.copyFileSync(srcItem, destItem);
+            }
+          }
+        }
+      } catch (_) {}
+    };
+
+    syncDir(path.resolve(root, 'assets-bg'), path.resolve(root, 'public/assets-bg'));
+
     try {
       fs.writeFileSync(manifestPath, JSON.stringify(items, null, 2), 'utf-8');
       console.log(`[mediaScannerPlugin] Discovered ${items.length} media items from iz-extras & iz-webms`);

@@ -11,35 +11,57 @@ import { createProceduralAudioTrack } from '../constants/initialMedia';
 
 const MEYDA_BUFFER_SIZE = 512;
 
-// ── Waveform peak extraction for timeline visualisation ──────────────────
+// ── Waveform peak extraction for timeline visualisation (cached & deduplicated) ──
+const peaksCache = new Map();
+const inFlightDecodes = new Map();
+
 async function decodeWaveformPeaks(fileOrUrl, sampleCount = 200) {
   try {
-    let arrayBuffer;
-    if (typeof fileOrUrl === 'string') {
-      const resp = await fetch(fileOrUrl);
-      arrayBuffer = await resp.arrayBuffer();
-    } else if (fileOrUrl?.arrayBuffer) {
-      arrayBuffer = await fileOrUrl.arrayBuffer();
-    } else {
-      return [];
+    const cacheKey = typeof fileOrUrl === 'string' ? fileOrUrl : (fileOrUrl?.name || null);
+    if (cacheKey && peaksCache.has(cacheKey)) {
+      return peaksCache.get(cacheKey);
     }
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const decoded = await ctx.decodeAudioData(arrayBuffer.slice(0));
-    await ctx.close();
+    if (cacheKey && inFlightDecodes.has(cacheKey)) {
+      return await inFlightDecodes.get(cacheKey);
+    }
 
-    const ch = decoded.getChannelData(0);
-    const blockSize = Math.floor(ch.length / sampleCount);
-    const peaks = [];
-    for (let i = 0; i < sampleCount; i++) {
-      let sum = 0;
-      const start = i * blockSize;
-      for (let j = 0; j < blockSize; j++) sum += Math.abs(ch[start + j] || 0);
-      peaks.push(sum / blockSize);
-    }
-    const max = Math.max(...peaks, 0.001);
-    return peaks.map((p) => p / max);
-  } catch {
-    return [];
+    const decodePromise = (async () => {
+      let arrayBuffer;
+      if (typeof fileOrUrl === 'string') {
+        const resp = await fetch(fileOrUrl);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        arrayBuffer = await resp.arrayBuffer();
+      } else if (fileOrUrl?.arrayBuffer) {
+        arrayBuffer = await fileOrUrl.arrayBuffer();
+      } else {
+        return [];
+      }
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const decoded = await ctx.decodeAudioData(arrayBuffer.slice(0));
+      await ctx.close().catch(() => {});
+
+      const ch = decoded.getChannelData(0);
+      const blockSize = Math.floor(ch.length / sampleCount);
+      const peaks = [];
+      for (let i = 0; i < sampleCount; i++) {
+        let sum = 0;
+        const start = i * blockSize;
+        for (let j = 0; j < blockSize; j++) sum += Math.abs(ch[start + j] || 0);
+        peaks.push(sum / blockSize);
+      }
+      const max = Math.max(...peaks, 0.001);
+      const result = peaks.map((p) => p / max);
+      if (cacheKey) peaksCache.set(cacheKey, result);
+      return result;
+    })();
+
+    if (cacheKey) inFlightDecodes.set(cacheKey, decodePromise);
+    const res = await decodePromise;
+    if (cacheKey) inFlightDecodes.delete(cacheKey);
+    return res;
+  } catch (err) {
+    console.warn('[useAudioEngine] decodeWaveformPeaks fallback:', err);
+    return Array.from({ length: sampleCount }, (_, i) => 0.2 + 0.25 * Math.sin(i * 0.1));
   }
 }
 
@@ -120,7 +142,7 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     if (!audioRef.current) {
       const el = new Audio();
       el.crossOrigin = 'anonymous';
-      el.preload     = 'auto';
+      el.preload     = 'metadata';
       audioRef.current = el;
 
       // Duration discovery
@@ -163,19 +185,6 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
         setAudioSignals(zeroSignals());
         transportClock.resetClock();
       });
-
-      // Auto-load default track (Excavating Neverland) so duration & waveform are populated immediately
-      try {
-        const defaultTrackUrl = './assets-bg/excavating-neverland.mp3';
-        el.src = defaultTrackUrl;
-        el.load();
-        decodeWaveformPeaks(defaultTrackUrl).then(setWaveformPeaks);
-      } catch (_) {
-        try {
-          const url = createProceduralAudioTrack(32, bpm);
-          if (url) { el.src = url; el.load(); }
-        } catch (_) {}
-      }
     }
 
     return () => {
@@ -363,12 +372,16 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
 
     const url = typeof fileOrUrl === 'string' ? fileOrUrl : URL.createObjectURL(fileOrUrl);
     el.src = url;
+    el.preload = 'metadata';
     el.load();
 
     setWaveformPeaks([]);
     setTransientMarkers([]);
 
-    decodeWaveformPeaks(fileOrUrl).then(setWaveformPeaks);
+    // Defer waveform peak decode so browser finishes DOM paint and layout first
+    setTimeout(() => {
+      decodeWaveformPeaks(fileOrUrl).then(setWaveformPeaks);
+    }, 150);
   }, []);
 
   // ── togglePlay ─────────────────────────────────────────────────────────
@@ -380,7 +393,10 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     if (!el.src || el.src === window.location.href || el.src === '') {
       const defaultTrackUrl = './assets-bg/excavating-neverland.mp3';
       el.src = defaultTrackUrl;
+      el.preload = 'auto';
       el.load();
+    } else {
+      el.preload = 'auto';
     }
 
     ensureAudioGraph();

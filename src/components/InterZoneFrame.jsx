@@ -4,6 +4,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { InterzoneBackground } from './InterzoneBackground.jsx';
+import { isElectronEnvironment } from '../utils/exportPipeline';
+import { DESKTOP_EXE_DOWNLOAD_URL } from '../constants/urls';
 
 const TIMELINE_MIN_H = 100;
 const TIMELINE_MAX_H = 600;
@@ -157,6 +159,84 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
           moonVariant={moonVariant || 'classic_halo'}
           moonFilter={moonFilter || 'silent_silver'}
         />
+      )}
+
+      {/* ── UPPER-LEFT STARFIELD: MÉLIÈS MOON DESKTOP APP LINK ── */}
+      {!cinemaMode && !isElectronEnvironment() && (
+        <a
+          href={DESKTOP_EXE_DOWNLOAD_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Download Standalone Windows Desktop App (.exe / .zip)"
+          style={{
+            position: 'absolute',
+            top: 10,
+            left: 14,
+            zIndex: 35,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            transition: 'transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.08)';
+            e.currentTarget.style.filter = 'drop-shadow(0 0 12px rgba(255, 180, 0, 0.9))';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1.0)';
+            e.currentTarget.style.filter = 'drop-shadow(0 0 6px rgba(255, 180, 0, 0.45))';
+          }}
+        >
+          {/* Circular Cropped Video — scale(1.24) eliminates outer circular outline */}
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#000',
+              boxShadow: '0 0 12px rgba(255, 180, 0, 0.5), inset 0 0 8px rgba(0,0,0,0.85)',
+              border: '1px solid rgba(255, 180, 0, 0.4)',
+            }}
+          >
+            <video
+              src="./assets-bg/moon_trip-round.webm"
+              autoPlay
+              loop
+              muted
+              playsInline
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transform: 'scale(1.24)', // Zoom in 24% to push the outer border ring outside the circular crop!
+                display: 'block',
+              }}
+            />
+          </div>
+
+          {/* Small 'get desktop app' label underneath */}
+          <span
+            style={{
+              marginTop: 4,
+              fontFamily: "'Syncopate', var(--font-mono, monospace)",
+              fontSize: 7.5,
+              fontWeight: 800,
+              letterSpacing: '0.8px',
+              textTransform: 'uppercase',
+              color: 'var(--accent-orange, #ff6b00)',
+              textShadow: '0 0 8px var(--accent-orange-glow, rgba(255,107,0,0.85)), 0 1px 3px #000',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            GET DESKTOP APP
+          </span>
+        </a>
       )}
 
       {/* ── INTERZONE DRIVE-IN BANNER ── */}

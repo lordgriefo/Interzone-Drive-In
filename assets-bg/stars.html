@@ -2,41 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>THE STRANGELET LOUNGE // B984-25</title>
-    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
-    
+    <title>Starfield Sigil Layer</title>
     <style>
-        :root {
-            --deep-black: #020202;
-            --lapis-void: #081a2e;
-            --vegas-gold: #D4AF37;
-            --neon-pink: #FF007F;
-        }
-
-        body { 
-            background: linear-gradient(to bottom, var(--deep-black) 75%, var(--lapis-void) 100%);
-            color: var(--vegas-gold);
+        /* All backgrounds are pure matte black — zero green/blue bleed */
+        html, body {
+            background: #020202;
             margin: 0;
             overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; 
-            padding-top: 14vh; /* The Atomic Lift */
-            font-family: sans-serif;
+            width: 100%;
+            height: 100%;
         }
-
-        h1 {
-            font-family: 'Major Mono Display', monospace;
-            font-size: 3rem;
-            letter-spacing: 15px;
-            text-shadow: 0 0 15px var(--neon-pink), 0 0 30px rgba(255, 0, 127, 0.4);
-            z-index: 10;
-            pointer-events: none;
-            margin: 0;
-        }
-
         .star {
             position: absolute;
             background: white;
@@ -45,78 +20,96 @@
             pointer-events: none;
             z-index: 1;
         }
-
+        /* Sigils use orange + pink only — no green */
         .sigil {
             position: absolute;
             font-family: serif;
-            color: var(--vegas-gold);
-            text-shadow: 0 0 12px var(--vegas-gold), 0 0 25px var(--neon-pink);
+            color: #D4AF37;
+            text-shadow: 0 0 12px #D4AF37, 0 0 25px #FF007F;
             pointer-events: none;
             z-index: 5;
             opacity: 0;
         }
-
+        /* Occasional blue-white comet streak */
+        .comet {
+            position: absolute;
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0,229,255,0.7));
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+        }
         @keyframes pop-in {
-            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-            50% { transform: scale(1.6) rotate(10deg); opacity: 1; }
+            0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+            50%  { transform: scale(1.6) rotate(10deg); opacity: 1; }
             100% { transform: scale(1.2) rotate(20deg); opacity: 0; }
+        }
+        @keyframes comet-fly {
+            0%   { opacity: 0; transform: translateX(0) translateY(0); }
+            20%  { opacity: 0.8; }
+            100% { opacity: 0; transform: translateX(200px) translateY(80px); }
         }
     </style>
 </head>
 <body>
+<script>
+    // Interzone sigil characters — alchemical / Enochian / Sumerian fragments
+    const sigils = ['☿','♄','⊕','⊗','✦','⟁','⧖','⌬','⍟','⊛','⌘','☽','⊹','⁂','⌖'];
 
-    <h1>tHe STrAnGeLeT kInET-O-cHoP</h1>
+    // Spawn 150 white stars — sizes weighted toward tiny (more realistic)
+    for (let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = (Math.random() * 1.5 + 0.3).toFixed(1) + 'px';
+        star.style.width  = size;
+        star.style.height = size;
+        star.style.left   = Math.random() * 100 + 'vw';
+        star.style.top    = Math.random() * 100 + 'vh';
+        star.style.opacity = (Math.random() * 0.6 + 0.2).toFixed(2);
+        document.body.appendChild(star);
+    }
 
-    <script>
-        // Added the Atom (⚛) several times to increase its frequency!
-        const sigils = [
-            '⚛', '⚛', '⚛', // The Atom Pop
-            '⌬', '⏣', '⚗', // Molecular Rings & Flasks
-            '✧', '❂', '◈', // Celestial Radiance
-            '☉', '☿', '⛤', // Alchemical Gold/Mercury/Star
-            '⚙', '𐎟', '𐎠'  // Gears & Sumerian Phonetics
-nbpm
-        function initStars() {
-            for (let i = 0; i < 150; i++) {
-                let star = document.createElement('div');
-                star.className = 'star';
-                let size = Math.random() * 2 + 'px';
-                star.style.width = size;
-                star.style.height = size;
-                star.style.left = Math.random() * 100 + 'vw';
-                star.style.top = Math.random() * 100 + 'vh';
-                star.style.opacity = Math.random();
-                document.body.appendChild(star);
-            }
-        }
+    // Sigil pop-in on audio transient or timer
+    function triggerPop() {
+        const p = document.createElement('div');
+        p.className  = 'sigil';
+        p.innerText  = sigils[Math.floor(Math.random() * sigils.length)];
+        p.style.left = Math.random() * 90 + 'vw';
+        p.style.top  = (Math.random() * 65 + 15) + 'vh';
+        p.style.fontSize  = (Math.random() * 38 + 18) + 'px';
+        p.style.animation = 'pop-in 0.8s ease-out forwards';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 900);
+    }
 
-        function triggerPop() {
-            let p = document.createElement('div');
-            p.className = 'sigil';
-            p.innerText = sigils[Math.floor(Math.random() * sigils.length)];
-            p.style.left = Math.random() * 100 + 'vw';
-            // Keeping them in the lower 2/3 of the screen
-            p.style.top = (Math.random() * 65 + 20) + 'vh'; 
-            p.style.fontSize = (Math.random() * 40 + 20) + 'px';
-            p.style.animation = "pop-in 0.8s ease-out forwards";
-            document.body.appendChild(p);
-            setTimeout(() => { p.remove(); }, 900);
-        }
+    // Occasional comet streak in blue-white only
+    function triggerComet() {
+        const c = document.createElement('div');
+        c.className  = 'comet';
+        c.style.left = Math.random() * 80 + 'vw';
+        c.style.top  = Math.random() * 60 + 'vh';
+        c.style.transform = `rotate(${Math.random() * 40 + 10}deg)`;
+        c.style.animation = 'comet-fly 0.9s ease-out forwards';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 950);
+    }
 
-        initStars();
-        
-        // Sudden pops to keep the energy high
-        setInterval(() => {
-            if(Math.random() > 0.6) triggerPop();
-        }, 350);
+    // Auto-trigger at low rate — mostly ambient, not distracting
+    setInterval(() => { if (Math.random() > 0.65) triggerPop(); }, 400);
+    setInterval(() => { if (Math.random() > 0.85) triggerComet(); }, 2200);
 
-        // Twinkle
-        setInterval(() => {
-            let allStars = document.querySelectorAll('.star');
-            let randomStar = allStars[Math.floor(Math.random() * allStars.length)];
-            if(randomStar) randomStar.style.opacity = Math.random();
-        }, 200);
-    </script>
+    // Twinkle: randomly vary star opacity for life
+    setInterval(() => {
+        const allStars = document.querySelectorAll('.star');
+        const s = allStars[Math.floor(Math.random() * allStars.length)];
+        if (s) s.style.opacity = (Math.random() * 0.7 + 0.1).toFixed(2);
+    }, 180);
 
+    // React to audio transients from parent frame
+    window.addEventListener('message', (e) => {
+        if (e.data === 'sigil-pop') triggerPop();
+    });
+</script>
 </body>
 </html>

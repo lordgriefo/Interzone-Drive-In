@@ -1,7 +1,7 @@
 // src/components/AssetBin.jsx
 // Media Bin — thumbnail grid, lightbox preview, Synchro-Vox puppet slot tagging
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { PUPPET_SLOTS, getSlotsForMode } from '../hooks/usePuppetEngine';
 
 // All supported media types the bin can load
@@ -15,24 +15,116 @@ const MEDIA_ACCEPT = [
   '.mp4', '.webm', '.mov', '.mkv',
 ].join(',');
 
+// Lightweight lazy loader so 150+ offscreen thumbnails do not bombard network connections on startup
+function LazyAssetThumbnail({ asset, isVideo }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {isVisible ? (
+        isVideo ? (
+          <video
+            src={asset.url}
+            muted
+            playsInline
+            preload="metadata"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
+          />
+        ) : (
+          <img
+            src={asset.url}
+            alt={asset.name}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
+          />
+        )
+      ) : (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'var(--bg-secondary)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <span style={{ fontSize: 10, color: 'var(--text-dim)', opacity: 0.35 }}>
+            {isVideo ? '🎬' : '🖼'}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AssetBin({
-  assets,
-  onAddAssets,
-  onRemoveAsset,
-  onClearAll,
-  selectedAssetIndex,
-  onSelectAsset,
+  assets = [],
+  onAddAssets = () => {},
+  onRemoveAsset = () => {},
+  onClearAll = () => {},
+  selectedAssetIndex = 0,
+  onSelectAsset = () => {},
   puppetSlots = {},
-  setPuppetSlots,
+  setPuppetSlots = () => {},
   puppetMode = '2',
-  setPuppetMode,
+  setPuppetMode = () => {},
   puppetEnabled = true,
-  setPuppetEnabled,
+  setPuppetEnabled = () => {},
   puppetDisplayMode = 'overlay',
-  setPuppetDisplayMode,
+  setPuppetDisplayMode = () => {},
   activeSlot,
   isPlaying = false,
+  onReorderAssets = () => {},
+  onDuplicateAsset = () => {},
+  onRenameAsset = () => {},
+  onAddToTimeline = () => {},
 }) {
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [renameText, setRenameText] = useState('');
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  const selectedAsset = assets[selectedAssetIndex] || null;
+  const selectedIsVideo = selectedAsset?.mediaType === 'video' || selectedAsset?.type === 'video' || selectedAsset?.url?.endsWith('.webm') || selectedAsset?.url?.endsWith('.mp4');
+
+  // Lightbox keyboard navigation (Escape = close, Left/Right = cycle)
+  useEffect(() => {
+    if (lightboxIndex == null) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setLightboxIndex(null);
+      } else if (e.key === 'ArrowLeft') {
+        setLightboxIndex((curr) => (curr > 0 ? curr - 1 : assets.length - 1));
+      } else if (e.key === 'ArrowRight') {
+        setLightboxIndex((curr) => (curr < assets.length - 1 ? curr + 1 : 0));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxIndex, assets.length]);
+
   // Toggle a puppet slot: clicking the same slot clears it; clicking a new one assigns it exclusively
   const handleSlotToggle = (slotKey, assetId) => {
     setPuppetSlots((prev) => ({
@@ -65,7 +157,7 @@ export function AssetBin({
 
   return (
     <div style={{
-      width: 250,
+      width: 310,
       backgroundColor: 'var(--bg-panel)',
       borderRight: '1px solid var(--border-dim)',
       padding: 14,
@@ -153,7 +245,282 @@ export function AssetBin({
         🗑 CLEAR ALL / RESET
       </button>
 
-      {/* ── ASSET GRID ── */}
+      {/* ── SELECTED ASSET PREVIEW PANEL ── */}
+      {selectedAsset && (
+        <div style={{
+          backgroundColor: 'var(--bg-secondary)',
+          border: '1px solid var(--border-bright)',
+          borderRadius: 6,
+          padding: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+        }}>
+          {/* Header row: Index counter & Name / Inline rename */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+            <span style={{
+              fontSize: 8,
+              color: 'var(--accent-orange)',
+              fontFamily: 'var(--font-mono, monospace)',
+              fontWeight: 800,
+            }}>
+              #{selectedAssetIndex + 1}/{assets.length}
+            </span>
+
+            {isRenaming ? (
+              <input
+                autoFocus
+                type="text"
+                value={renameText}
+                onChange={(e) => setRenameText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    onRenameAsset(selectedAsset.id, renameText);
+                    setIsRenaming(false);
+                  } else if (e.key === 'Escape') {
+                    setIsRenaming(false);
+                  }
+                }}
+                onBlur={() => {
+                  onRenameAsset(selectedAsset.id, renameText);
+                  setIsRenaming(false);
+                }}
+                style={{
+                  flex: 1,
+                  background: 'var(--bg-panel)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--accent-orange)',
+                  borderRadius: 3,
+                  fontSize: 9,
+                  padding: '1px 4px',
+                }}
+              />
+            ) : (
+              <span
+                onDoubleClick={() => {
+                  setRenameText(selectedAsset.name || '');
+                  setIsRenaming(true);
+                }}
+                title="Double-click to rename"
+                style={{
+                  flex: 1,
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  cursor: 'text',
+                }}
+              >
+                {selectedAsset.name || 'Untitled Asset'}
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                if (isRenaming) {
+                  onRenameAsset(selectedAsset.id, renameText);
+                  setIsRenaming(false);
+                } else {
+                  setRenameText(selectedAsset.name || '');
+                  setIsRenaming(true);
+                }
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                fontSize: 9,
+                padding: '0 2px',
+              }}
+              title="Rename asset"
+            >
+              ✎
+            </button>
+          </div>
+
+          {/* Large media display */}
+          <div
+            onClick={() => setLightboxIndex(selectedAssetIndex)}
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: 125,
+              backgroundColor: '#000',
+              borderRadius: 4,
+              overflow: 'hidden',
+              cursor: 'zoom-in',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid var(--border-dim)',
+            }}
+            title="Click to view full lightbox"
+          >
+            {selectedIsVideo ? (
+              <video
+                src={selectedAsset.url}
+                controls
+                loop
+                muted
+                playsInline
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              <img
+                src={selectedAsset.url}
+                alt={selectedAsset.name}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            )}
+
+            <span style={{
+              position: 'absolute',
+              top: 4,
+              right: 4,
+              background: 'rgba(0,0,0,0.7)',
+              color: '#fff',
+              fontSize: 8,
+              padding: '2px 4px',
+              borderRadius: 2,
+              pointerEvents: 'none',
+            }}>
+              🔍 ENLARGE
+            </span>
+          </div>
+
+          {/* Action buttons: Reorder ◀ ▶, Dupe, + Timeline, Delete */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <button
+              type="button"
+              disabled={selectedAssetIndex <= 0}
+              onClick={() => onReorderAssets(selectedAssetIndex, selectedAssetIndex - 1)}
+              style={{
+                flex: 1,
+                background: 'var(--bg-panel-alt)',
+                border: '1px solid var(--border-mid)',
+                color: selectedAssetIndex <= 0 ? 'var(--text-dim)' : 'var(--text-primary)',
+                borderRadius: 3,
+                padding: '3px 0',
+                fontSize: 9,
+                fontWeight: 700,
+                cursor: selectedAssetIndex <= 0 ? 'not-allowed' : 'pointer',
+              }}
+              title="Move earlier in Media Bin (and update timeline order)"
+            >
+              ◀
+            </button>
+            <button
+              type="button"
+              disabled={selectedAssetIndex >= assets.length - 1}
+              onClick={() => onReorderAssets(selectedAssetIndex, selectedAssetIndex + 1)}
+              style={{
+                flex: 1,
+                background: 'var(--bg-panel-alt)',
+                border: '1px solid var(--border-mid)',
+                color: selectedAssetIndex >= assets.length - 1 ? 'var(--text-dim)' : 'var(--text-primary)',
+                borderRadius: 3,
+                padding: '3px 0',
+                fontSize: 9,
+                fontWeight: 700,
+                cursor: selectedAssetIndex >= assets.length - 1 ? 'not-allowed' : 'pointer',
+              }}
+              title="Move later in Media Bin (and update timeline order)"
+            >
+              ▶
+            </button>
+            <button
+              type="button"
+              onClick={() => onDuplicateAsset(selectedAsset.id)}
+              style={{
+                background: 'var(--bg-panel-alt)',
+                border: '1px solid var(--border-mid)',
+                color: 'var(--text-primary)',
+                borderRadius: 3,
+                padding: '3px 5px',
+                fontSize: 8,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+              title="Duplicate this asset in the bin (so you can assign it to multiple Synchro-Vox phoneme slots)"
+            >
+              ⧉ DUPE
+            </button>
+            <button
+              type="button"
+              onClick={() => onAddToTimeline(selectedAsset.id)}
+              style={{
+                background: 'var(--accent-orange-dim)',
+                border: '1px solid var(--accent-orange)',
+                color: 'var(--accent-orange)',
+                borderRadius: 3,
+                padding: '3px 5px',
+                fontSize: 8,
+                fontWeight: 800,
+                cursor: 'pointer',
+              }}
+              title="Drop this item onto the timeline at current playhead"
+            >
+              + TL
+            </button>
+            <button
+              type="button"
+              onClick={() => onRemoveAsset(selectedAsset.id)}
+              style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid #ef4444',
+                color: '#fca5a5',
+                borderRadius: 3,
+                padding: '3px 5px',
+                fontSize: 9,
+                cursor: 'pointer',
+              }}
+              title="Delete asset from bin"
+            >
+              🗑
+            </button>
+          </div>
+
+          {/* Quick Synchro-Vox Mouth Shape Assigner */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 2 }}>
+            <span style={{ fontSize: 7, color: 'var(--text-dim)', letterSpacing: 0.5, fontWeight: 700 }}>
+              ASSIGN MOUTH SHAPE:
+            </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+              {visibleSlots.map(({ key, label, color }) => {
+                const isTagged = puppetSlots?.[key] === selectedAsset.id;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleSlotToggle(key, selectedAsset.id)}
+                    style={{
+                      background: isTagged ? color : 'rgba(0,0,0,0.5)',
+                      color: isTagged ? '#fff' : 'var(--text-dim)',
+                      border: isTagged ? `1px solid ${color}` : '1px solid var(--border-mid)',
+                      borderRadius: 3,
+                      padding: '2px 5px',
+                      fontSize: 8,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: isTagged ? `0 0 6px ${color}` : 'none',
+                      transition: 'all 0.1s',
+                    }}
+                    title={`Assign this asset as mouth shape: ${label}`}
+                  >
+                    {isTagged ? `✓ ${label}` : label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── ASSET GRID (Drag & drop reorder + quick shift buttons) ── */}
       <div style={{
         flexGrow: 1,
         overflowY: 'auto',
@@ -164,12 +531,37 @@ export function AssetBin({
       }}>
         {assets.map((asset, index) => {
           const isSelected = selectedAssetIndex === index;
-          const isVideo    = asset.mediaType === 'video';
+          const isVideo    = asset.mediaType === 'video' || asset.type === 'video' || asset.url?.endsWith('.webm') || asset.url?.endsWith('.mp4');
+          const isDropTarget = dragOverIndex === index;
 
           return (
             <div
               key={asset.id}
+              draggable={true}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('application/x-kinet-asset-index', String(index));
+                e.dataTransfer.setData('application/x-kinet-asset', asset.id);
+                e.dataTransfer.effectAllowed = 'copyMove';
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (dragOverIndex !== index) setDragOverIndex(index);
+              }}
+              onDragLeave={() => {
+                if (dragOverIndex === index) setDragOverIndex(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOverIndex(null);
+                const rawIdx = e.dataTransfer.getData('application/x-kinet-asset-index');
+                const fromIdx = parseInt(rawIdx, 10);
+                if (!Number.isNaN(fromIdx) && fromIdx !== index) {
+                  onReorderAssets?.(fromIdx, index);
+                }
+              }}
               onClick={() => onSelectAsset(index)}
+              onDoubleClick={() => setLightboxIndex(index)}
               style={{
                 position: 'relative',
                 aspectRatio: '1',
@@ -177,34 +569,47 @@ export function AssetBin({
                 overflow: 'hidden',
                 border: isSelected
                   ? '2px solid var(--clip-selected-border)'
-                  : '1px solid var(--border-dim)',
-                cursor: 'pointer',
+                  : isDropTarget
+                    ? '2px dashed var(--accent-orange)'
+                    : '1px solid var(--border-dim)',
+                cursor: 'grab',
                 backgroundColor: 'var(--bg-secondary)',
-                boxShadow: isSelected ? '0 0 8px var(--accent-orange-glow)' : 'none',
-                transition: 'box-shadow 0.12s, border-color 0.12s',
+                boxShadow: isSelected
+                  ? '0 0 8px var(--accent-orange-glow)'
+                  : isDropTarget
+                    ? '0 0 10px var(--accent-orange)'
+                    : 'none',
+                transform: isDropTarget ? 'scale(1.04)' : 'none',
+                transition: 'box-shadow 0.12s, border-color 0.12s, transform 0.12s',
               }}
+              title={`${asset.name} (Drag to reorder or drop on timeline · Double-click to enlarge)`}
             >
-              {/* Thumbnail — image or video poster */}
-              {isVideo ? (
-                <video
-                  src={asset.url}
-                  muted
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
-                />
-              ) : (
-                <img
-                  src={asset.url}
-                  alt={asset.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              )}
+              {/* Thumbnail — lazy loaded image or video poster */}
+              <LazyAssetThumbnail asset={asset} isVideo={isVideo} />
+
+              {/* Order index badge */}
+              <span style={{
+                position: 'absolute',
+                top: 2,
+                left: 2,
+                background: 'rgba(0,0,0,0.75)',
+                color: isSelected ? 'var(--accent-orange)' : 'var(--text-dim)',
+                fontSize: 7,
+                padding: '1px 3px',
+                borderRadius: 2,
+                pointerEvents: 'none',
+                fontFamily: 'var(--font-mono, monospace)',
+                fontWeight: 700,
+              }}>
+                {index + 1}
+              </span>
 
               {/* Video badge */}
               {isVideo && (
                 <span style={{
                   position: 'absolute',
                   top: 2,
-                  left: 2,
+                  left: 18,
                   background: 'rgba(0,0,0,0.75)',
                   color: 'var(--accent-blue)',
                   fontSize: 7,
@@ -219,6 +624,7 @@ export function AssetBin({
 
               {/* DELETE */}
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemoveAsset(asset.id);
@@ -235,7 +641,9 @@ export function AssetBin({
                   cursor: 'pointer',
                   padding: '1px 4px',
                   lineHeight: 1,
+                  zIndex: 3,
                 }}
+                title="Remove asset"
               >
                 ✕
               </button>
@@ -249,12 +657,14 @@ export function AssetBin({
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: 2,
+                zIndex: 3,
               }}>
                 {visibleSlots.map(({ key, label, color }) => {
                   const isActive = puppetSlots?.[key] === asset.id;
                   return (
                     <button
                       key={key}
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSlotToggle(key, asset.id);
@@ -482,6 +892,125 @@ export function AssetBin({
           Click any photo to bring it into view. Tag mouth shapes below to lip-sync.
         </div>
       </div>
+
+      {/* ── LIGHTBOX MODAL ── */}
+      {lightboxIndex != null && assets[lightboxIndex] && (
+        <div
+          onClick={() => setLightboxIndex(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.88)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(8px)',
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '85vw',
+              maxHeight: '82vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              backgroundColor: '#0d0d12',
+              border: '1px solid var(--border-bright)',
+              borderRadius: 8,
+              padding: 12,
+              boxShadow: '0 0 32px rgba(0,0,0,0.9)',
+            }}
+          >
+            {/* Header */}
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, gap: 10 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-orange)', fontFamily: 'var(--font-mono)' }}>
+                #{lightboxIndex + 1} · {assets[lightboxIndex].name}
+              </span>
+              <button
+                type="button"
+                onClick={() => setLightboxIndex(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: 16,
+                  cursor: 'pointer',
+                  lineHeight: 1,
+                  padding: '2px 6px',
+                }}
+                title="Close (Esc)"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Media */}
+            <div style={{ maxWidth: '80vw', maxHeight: '65vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {(assets[lightboxIndex].mediaType === 'video' || assets[lightboxIndex].url?.endsWith('.webm') || assets[lightboxIndex].url?.endsWith('.mp4')) ? (
+                <video
+                  src={assets[lightboxIndex].url}
+                  controls
+                  autoPlay
+                  loop
+                  style={{ maxWidth: '100%', maxHeight: '65vh', borderRadius: 4 }}
+                />
+              ) : (
+                <img
+                  src={assets[lightboxIndex].url}
+                  alt=""
+                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: 4 }}
+                />
+              )}
+            </div>
+
+            {/* Navigation footer */}
+            <div style={{ display: 'flex', gap: 12, marginTop: 10, alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setLightboxIndex((curr) => (curr > 0 ? curr - 1 : assets.length - 1))}
+                style={{
+                  background: 'var(--bg-panel-alt)',
+                  border: '1px solid var(--border-mid)',
+                  color: '#fff',
+                  borderRadius: 4,
+                  padding: '4px 12px',
+                  fontSize: 11,
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                }}
+                title="Previous (Left Arrow)"
+              >
+                ◀ PREV
+              </button>
+              <span style={{ fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                {lightboxIndex + 1} / {assets.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setLightboxIndex((curr) => (curr < assets.length - 1 ? curr + 1 : 0))}
+                style={{
+                  background: 'var(--bg-panel-alt)',
+                  border: '1px solid var(--border-mid)',
+                  color: '#fff',
+                  borderRadius: 4,
+                  padding: '4px 12px',
+                  fontSize: 11,
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                }}
+                title="Next (Right Arrow)"
+              >
+                NEXT ▶
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -25,6 +25,6 @@ export function parseLrcString(raw) {
     id: i,
     text: item.text,
     start: item.t,
-    end: timed[i + 1] ? timed[i + 1].t : item.t + 4,
+    end: timed[i + 1] ? timed[i + 1].t : item.t + 30,
   }));
 }

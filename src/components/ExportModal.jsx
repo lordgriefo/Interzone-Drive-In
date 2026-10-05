@@ -9,6 +9,7 @@ import { isElectronEnvironment, startWebExport, runDeterministicOfflineExport, i
 import { decodeAudioSource } from '../utils/offlineAudioAnalyzer';
 import { QUALITY_PRESETS } from '../hooks/useVideoRecorder';
 import { createProceduralAudioTrack } from '../constants/initialMedia';
+import { DESKTOP_EXE_DOWNLOAD_URL } from '../constants/urls';
 
 export function ExportModal({
   isOpen = false,
@@ -38,6 +39,7 @@ export function ExportModal({
 
   // Electron mode state
   const [isRendering, setIsRendering] = useState(false);
+  const [isStopping, setIsStopping] = useState(false);
   const [electronFormat, setElectronFormat] = useState('mp4'); // 'mp4' | 'webm'
   const [electronFps, setElectronFps] = useState(60);
   const [ffmpegStatus, setFfmpegStatus] = useState(null);
@@ -45,6 +47,7 @@ export function ExportModal({
   const [renderResult, setRenderResult] = useState(null);
   const [renderError, setRenderError] = useState(null);
   const abortControllerRef = useRef(null);
+  const stopRequestedRef = useRef(false);
 
   useEffect(() => {
     if (isElectron && window.electronAPI?.getStatus) {
@@ -105,6 +108,8 @@ export function ExportModal({
     if (!isElectron) return;
 
     setIsRendering(true);
+    setIsStopping(false);
+    stopRequestedRef.current = false;
     setRenderError(null);
     setRenderResult(null);
     setRenderProgress({ currentFrame: 0, totalFrames: 0, percent: 0, currentTime: 0 });
@@ -162,15 +167,18 @@ export function ExportModal({
         format: electronFormat,
         sensitivity,
         renderFrameSnapshot,
+        shouldStop: () => stopRequestedRef.current,
         onProgress: (p) => setRenderProgress(p),
         onComplete: (res) => {
           setRenderResult(res);
           setIsRendering(false);
+          setIsStopping(false);
           onRenderEnd?.();
         },
         onError: (err) => {
           setRenderError(err.message);
           setIsRendering(false);
+          setIsStopping(false);
           onRenderEnd?.();
         },
         abortController: abortControllerRef.current,
@@ -178,15 +186,24 @@ export function ExportModal({
 
       if (result?.canceled) {
         setIsRendering(false);
+        setIsStopping(false);
         onRenderEnd?.();
       }
     } catch (err) {
       setRenderError(err.message);
       setIsRendering(false);
+      setIsStopping(false);
       onRenderEnd?.();
     }
   };
 
+  // Gracefully stop rendering right now and finalize the video file with all frames captured so far
+  const handleStopElectronRender = () => {
+    stopRequestedRef.current = true;
+    setIsStopping(true);
+  };
+
+  // Hard cancel and discard the render without saving
   const handleCancelElectronRender = async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -195,6 +212,7 @@ export function ExportModal({
       await window.electronAPI.cancelExport();
     }
     setIsRendering(false);
+    setIsStopping(false);
     onRenderEnd?.();
   };
 
@@ -247,23 +265,50 @@ export function ExportModal({
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, color: '#a1a1aa' }}>
           <span>
-            Frame {renderProgress.currentFrame} / {renderProgress.totalFrames} ({renderProgress.currentTime.toFixed(2)}s)
+            {isStopping ? (
+              <span style={{ color: '#10b981', fontWeight: 700 }}>Finalizing video up to frame {renderProgress.currentFrame}…</span>
+            ) : (
+              `Frame ${renderProgress.currentFrame} / ${renderProgress.totalFrames} (${renderProgress.currentTime.toFixed(2)}s)`
+            )}
           </span>
-          <button
-            onClick={handleCancelElectronRender}
-            style={{
-              padding: '4px 10px',
-              backgroundColor: '#ef4444',
-              border: 'none',
-              borderRadius: 3,
-              color: '#fff',
-              fontSize: 9,
-              fontWeight: 800,
-              cursor: 'pointer',
-            }}
-          >
-            CANCEL
-          </button>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={handleStopElectronRender}
+              disabled={isStopping}
+              style={{
+                padding: '4px 10px',
+                backgroundColor: isStopping ? '#3f3f46' : '#10b981',
+                border: 'none',
+                borderRadius: 3,
+                color: isStopping ? '#a1a1aa' : '#000',
+                fontSize: 9,
+                fontWeight: 800,
+                cursor: isStopping ? 'wait' : 'pointer',
+                boxShadow: isStopping ? 'none' : '0 0 8px rgba(16,185,129,0.3)',
+              }}
+              title="Stop rendering right now and save whatever has been encoded so far"
+            >
+              {isStopping ? 'SAVING…' : '■ STOP & SAVE'}
+            </button>
+            <button
+              onClick={handleCancelElectronRender}
+              disabled={isStopping}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#ef4444',
+                border: 'none',
+                borderRadius: 3,
+                color: '#fff',
+                fontSize: 9,
+                fontWeight: 800,
+                cursor: isStopping ? 'not-allowed' : 'pointer',
+                opacity: isStopping ? 0.5 : 1,
+              }}
+              title="Abort and discard without saving"
+            >
+              ✕ CANCEL
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -604,6 +649,28 @@ export function ExportModal({
                     <div>
                       Mode B requires direct access to system processes to spawn local FFmpeg and pipe raw frame buffers. In your browser tab, please use <strong>Mode A (Quick Web Export)</strong> which records directly using high-bitrate MediaRecorder.
                     </div>
+                    <div style={{ marginTop: 10 }}>
+                      <a
+                        href={DESKTOP_EXE_DOWNLOAD_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '6px 12px',
+                          backgroundColor: '#a855f7',
+                          color: '#fff',
+                          borderRadius: 4,
+                          fontWeight: 700,
+                          fontSize: 11,
+                          textDecoration: 'none',
+                          boxShadow: '0 0 10px rgba(168,85,247,0.4)',
+                        }}
+                      >
+                        ⬇ DOWNLOAD KINET-O-CHOP DESKTOP (.EXE)
+                      </a>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -708,23 +775,50 @@ export function ExportModal({
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
                         <span style={{ fontSize: 10, color: '#888' }}>
-                          Timeline step: {renderProgress.currentTime.toFixed(2)}s
+                          {isStopping ? (
+                            <span style={{ color: '#10b981', fontWeight: 700 }}>Finalizing video up to frame {renderProgress.currentFrame}…</span>
+                          ) : (
+                            `Timeline step: ${renderProgress.currentTime.toFixed(2)}s`
+                          )}
                         </span>
-                        <button
-                          onClick={handleCancelElectronRender}
-                          style={{
-                            padding: '4px 10px',
-                            backgroundColor: '#ef4444',
-                            border: 'none',
-                            borderRadius: 4,
-                            color: '#fff',
-                            fontSize: 10,
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          CANCEL RENDER
-                        </button>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            onClick={handleStopElectronRender}
+                            disabled={isStopping}
+                            style={{
+                              padding: '5px 12px',
+                              backgroundColor: isStopping ? '#3f3f46' : '#10b981',
+                              border: 'none',
+                              borderRadius: 4,
+                              color: isStopping ? '#a1a1aa' : '#000',
+                              fontSize: 10,
+                              fontWeight: 800,
+                              cursor: isStopping ? 'wait' : 'pointer',
+                              boxShadow: isStopping ? 'none' : '0 0 8px rgba(16,185,129,0.3)',
+                            }}
+                            title="Stop rendering right now and save whatever has been encoded so far"
+                          >
+                            {isStopping ? 'SAVING…' : '■ STOP & SAVE'}
+                          </button>
+                          <button
+                            onClick={handleCancelElectronRender}
+                            disabled={isStopping}
+                            style={{
+                              padding: '5px 10px',
+                              backgroundColor: '#ef4444',
+                              border: 'none',
+                              borderRadius: 4,
+                              color: '#fff',
+                              fontSize: 10,
+                              fontWeight: 700,
+                              cursor: isStopping ? 'not-allowed' : 'pointer',
+                              opacity: isStopping ? 0.5 : 1,
+                            }}
+                            title="Abort and discard without saving"
+                          >
+                            ✕ CANCEL
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ) : (

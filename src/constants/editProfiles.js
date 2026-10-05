@@ -3,6 +3,12 @@
 
 export const EDIT_PROFILES = [
   {
+    id: 'timeline',
+    label: '★ Timeline Edit (plays YOUR clip order)',
+    description: 'The viewport plays exactly what is on the timeline: clip order, trims, reverse, mirror, crossfade overlaps. Edit with the timeline tools; the audio-reactive FX still apply on top.',
+    category: 'Your Edit',
+  },
+  {
     id: 'third_mind',
     label: '1. Burroughs Cut-Up (Third Mind)',
     description: 'Spliced 3-column montage with beat-synced cut-up typography.',

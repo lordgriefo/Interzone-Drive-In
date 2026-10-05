@@ -18,6 +18,76 @@ import { usePuppetEngine } from '../hooks/usePuppetEngine';
 const TRANSPARENT_1PX = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
 const SMPTE_FALLBACK_URL = TRANSPARENT_1PX;
 
+// ── TIMELINE CLIP MEDIA ─────────────────────────────────────────────────────
+// Renders one timeline clip and applies its edit flags:
+//   • reversed  → video plays BACKWARDS (HTML video cannot natively, so we scrub
+//                 currentTime from the timeline clock). Stills are mirrored instead,
+//                 matching the ⇄ look of the timeline thumbnail.
+//   • mirrored  → horizontal flip for any clip.
+//   • inPoint   → trimmed-off head of a video clip is skipped.
+// Video time is locked to the timeline clock so a clip always begins at its own
+// in-point when the playhead enters it (instead of looping freely from page load).
+function TimelineClipMedia({ url, name, clip, localTime, isPlaying, isVideo, isOfflineRendering = false, mediaStyle, onError }) {
+  const videoRef = useRef(null);
+  const [metaReady, setMetaReady] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!isVideo || !v || !metaReady || !v.duration || Number.isNaN(v.duration)) return;
+
+    const dur = v.duration;
+    const inPt = clip.inPoint || 0;
+    const clipLocal = Math.max(0, Math.min(clip.duration, localTime));
+    let target = clip.reversed ? inPt + clip.duration - clipLocal : inPt + clipLocal;
+    target = ((target % dur) + dur) % dur;
+
+    const circularDiff = () => {
+      const d = Math.abs(v.currentTime - target);
+      return Math.min(d, dur - d);
+    };
+
+    if (clip.reversed || !isPlaying || isOfflineRendering) {
+      // Scrub / Offline Render: video must stay paused and seek precisely to target timestamp per frame
+      if (!v.paused) v.pause();
+      if (circularDiff() > 0.01) v.currentTime = target;
+    } else {
+      // Forward playback: let the browser play, but correct drift
+      if (circularDiff() > 0.3 && !v.seeking) v.currentTime = target;
+      if (v.paused) v.play().catch(() => {});
+    }
+  }, [isVideo, metaReady, localTime, isPlaying, isOfflineRendering, clip.reversed, clip.inPoint, clip.duration]);
+
+  const flip = clip.mirrored || (clip.reversed && !isVideo);
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        transform: flip ? 'scaleX(-1)' : 'none',
+        pointerEvents: 'none',
+      }}
+    >
+      {isVideo ? (
+        <video
+          ref={videoRef}
+          src={url}
+          crossOrigin="anonymous"
+          playsInline
+          muted
+          loop
+          preload="auto"
+          style={mediaStyle}
+          onLoadedMetadata={() => setMetaReady(true)}
+          onError={onError}
+        />
+      ) : (
+        <img src={url} alt={name} style={mediaStyle} onError={onError} />
+      )}
+    </div>
+  );
+}
+
 
 
 // ── BURROUGHS CUT-UP TEXT ENGINE ────────────────────────────────────────────
@@ -163,6 +233,7 @@ export function CanvasWorkspace({
   // Era Lock State & Cooldown
   isEraLocked = false,
   eraChangeCooldown = 8000,
+  isOfflineRendering = false,
 }) {
 
 
@@ -443,13 +514,14 @@ export function CanvasWorkspace({
   };
 
 
-  const getStyleExtras = () => {
+  const getRawStyleExtras = () => {
     // Always run when playing — audio signals default to 0 so baseline motion still works
     if (!isPlaying) return {};
 
     const bass = Number(audioSignals?.bass) || 0;
     const mid  = Number(audioSignals?.mid)  || 0;
-    const t    = Date.now() * 0.001;
+    // Lock animation clock to the audio timeline timestamp so motion never speeds up during offline renders
+    const t    = currentTime;
 
     // ── Beat math helpers ──
     const beatsPerSec   = bpm / 60;
@@ -519,7 +591,7 @@ export function CanvasWorkspace({
 
       // ── MONTAGE: Eisenstein collision — hold snap for 130ms so it's actually visible ──
       case 'montage': {
-        const now = Date.now();
+        const now = isOfflineRendering ? (currentTime * 1000) : Date.now();
         if (!audioSignals?.isTransient) {
           // Return held snap if within hold window
           if (now < montageSnapRef.current.until) {
@@ -899,6 +971,14 @@ export function CanvasWorkspace({
     }
   };
 
+  const getStyleExtras = () => {
+    const res = getRawStyleExtras();
+    if (isOfflineRendering && res && typeof res === 'object') {
+      return { ...res, transition: 'none' };
+    }
+    return res;
+  };
+
   // Transient chop — only while playing
   // Text overlays are BPM-beat-synced: display duration = one beat at master BPM (clamped 120–600ms)
   useEffect(() => {
@@ -931,15 +1011,16 @@ export function CanvasWorkspace({
       };
       const currentStyle = (selectedStyle || selectedEra || '').toLowerCase();
       const minHold = CHILL_MIN_HOLD_MS[currentStyle] ?? 0; // 0 = no throttle for hi-nrg styles
-      const now = performance.now();
+      // In offline render mode, use song timeline milliseconds so cuts don't speed up with render loop
+      const now = isOfflineRendering ? (currentTime * 1000) : performance.now();
       const sinceLastAdvance = now - lastSlideAdvanceRef.current;
 
-      if (sinceLastAdvance >= minHold) {
+      if (sinceLastAdvance >= minHold || sinceLastAdvance < 0) {
         advanceSlide();
         lastSlideAdvanceRef.current = now;
 
-        // ── Beat flash: skip for chill styles (no white strobe punch) ──
-        if (!CHILL_STYLES.has(currentStyle) && beatFlashRef.current) {
+        // ── Beat flash: skip for chill styles or offline render ──
+        if (!isOfflineRendering && !CHILL_STYLES.has(currentStyle) && beatFlashRef.current) {
           if (beatFlashRafRef.current) cancelAnimationFrame(beatFlashRafRef.current);
           beatFlashRef.current.style.opacity = '0.38';
           const flashStart = performance.now();
@@ -1041,7 +1122,7 @@ export function CanvasWorkspace({
       }
     }
     previousTransientRef.current = isTransient;
-  }, [audioSignals?.isTransient, assets, selectedStyle, selectedEra, isPlaying, bpm, advanceSlide]);
+  }, [audioSignals?.isTransient, assets, selectedStyle, selectedEra, isPlaying, bpm, advanceSlide, currentTime, isOfflineRendering]);
 
   // Halt animation + reset when paused/stopped
   useEffect(() => {
@@ -1537,7 +1618,8 @@ export function CanvasWorkspace({
 
   const renderTimelineComposite = () => {
     const active = getActiveClipsAtTime(videoClips, currentTime);
-    if (active.length === 0) return renderMainImage();
+    // Gap in the edit: black while playing (a real edit has gaps), selected media when paused
+    if (active.length === 0) return isPlaying ? null : renderMainImage();
 
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -1565,35 +1647,19 @@ export function CanvasWorkspace({
             ...styleExtras,
           };
 
-          if (isVideo) {
-            return (
-              <video
-                key={clip.id}
-                src={clipUrl}
-                crossOrigin="anonymous"
-                playsInline
-                muted
-                loop
-                autoPlay={isPlaying}
-                style={sharedStyle}
-                onLoadedMetadata={(e) => { if (isPlaying) e.target.play().catch(() => {}); }}
-                onError={(e) => {
-                  console.warn('[Timeline] video clip load error', clip.id, e);
-                  if (clipUrl !== SMPTE_FALLBACK_URL) {
-                    setFailedUrls(prev => ({ ...prev, [clipUrl]: true }));
-                  }
-                }}
-              />
-            );
-          }
-
           return (
-            <img
+            <TimelineClipMedia
               key={clip.id}
-              src={clipUrl}
-              alt={asset.name}
-              style={sharedStyle}
+              url={clipUrl}
+              name={asset.name}
+              clip={clip}
+              localTime={currentTime - clip.startTime}
+              isPlaying={isPlaying}
+              isVideo={isVideo}
+              isOfflineRendering={isOfflineRendering}
+              mediaStyle={sharedStyle}
               onError={() => {
+                console.warn('[Timeline] clip load error', clip.id);
                 if (clipUrl !== SMPTE_FALLBACK_URL) {
                   setFailedUrls(prev => ({ ...prev, [clipUrl]: true }));
                 }
@@ -1605,9 +1671,10 @@ export function CanvasWorkspace({
     );
   };
 
-  // Use timeline composite during playback when clips exist AND timeline style is active;
-  // otherwise show the active Media Bin selection / montage / synchro-vox directly
-  const useTimelineView = isPlaying && selectedStyle === 'timeline' && videoClips.length > 0;
+  // Timeline composite is active whenever the "Timeline Edit" style is selected and clips exist —
+  // playing OR paused — so scrubbing and every timeline edit previews live in the viewport.
+  // Any other style shows the active Media Bin selection / montage / synchro-vox directly.
+  const useTimelineView = selectedStyle === 'timeline' && videoClips.length > 0;
 
 
   // Only display lyrics during active playback
@@ -1860,10 +1927,28 @@ export function CanvasWorkspace({
             textAlign: lyricAlign,
             textShadow: '0 0 12px rgba(6,182,212,0.9), 0 2px 8px rgba(0,0,0,0.95)',
             maxWidth: '85%',
-            pointerEvents: 'none',
+            pointerEvents: activeLyric.text?.includes('http') ? 'auto' : 'none',
             lineHeight: 1.4,
           }}>
-            {activeLyric.text}
+            {activeLyric.text?.includes('http') ? (
+              <a
+                href={activeLyric.text.match(/https?:\/\/[^\s]+/)?.[0] || activeLyric.text}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: 'var(--accent-orange, #ff6b00)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '4px',
+                  pointerEvents: 'auto',
+                  cursor: 'pointer',
+                  textShadow: '0 0 16px rgba(255,107,0,0.85), 0 2px 8px rgba(0,0,0,0.95)',
+                }}
+              >
+                {activeLyric.text}
+              </a>
+            ) : (
+              activeLyric.text
+            )}
           </div>
         );
       })()}

@@ -168,6 +168,7 @@ export function InterzoneBackground({
         loop
         muted
         playsInline
+        preload="metadata"
         src={MOON_SOURCES[moonVariant] || MOON_SOURCES.classic_halo}
         style={{
           position: 'absolute',

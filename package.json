@@ -3,27 +3,33 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Audio-reactive kinetic montage engine and vintage cinema synthesizer",
+  "author": "Interzone Drive-In",
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "electron electron/main.cjs",
+    "electron:dev": "electron electron/main.cjs --dev",
     "electron:start": "electron electron/main.cjs",
-    "build:electron": "vite build && electron electron/main.cjs"
+    "build:electron": "vite build && electron electron/main.cjs --prod",
+    "package:exe": "vite build && electron-builder --win",
+    "package:portable": "vite build && electron-builder --win portable",
+    "package:zip": "vite build && electron-builder --win zip"
   },
   "dependencies": {
     "clsx": "^2.1.0",
+    "ffmpeg-static": "^5.3.0",
     "gsap": "^3.15.0",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.344.0",
     "meyda": "^5.6.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-powerglitch": "^1.1.0",
     "three": "^0.185.1",
-    "tone": "^15.1.22",
-    "jszip": "^3.10.1"
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
@@ -31,11 +37,46 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "electron": "^44.3.0",
+    "electron-builder": "^24.13.3",
     "ffmpeg": "^1.1.3",
-    "ffmpeg-static": "^5.3.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "vite": "^5.1.6"
+  },
+  "build": {
+    "appId": "com.strangelet.kinetochop",
+    "productName": "Kinet-O-Chop",
+    "copyright": "Copyright © 2026 Interzone Drive-In",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/ffmpeg-static/**/*"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable",
+        "zip"
+      ],
+      "sign": null,
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Kinet-O-Chop",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    }
   },
   "allowScripts": {
     "esbuild@0.21.5": true,

@@ -27,3 +27,14 @@ Thumbs.db
 .env.*
 !.env.example
 
+# Electron release & binary packages (do NOT commit to Git; upload to GitHub Releases instead)
+release/
+dist-electron/
+*.exe
+*.dmg
+*.app
+*.deb
+*.rpm
+*.AppImage
+*.blockmap
+

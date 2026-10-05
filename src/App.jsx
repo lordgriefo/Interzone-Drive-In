@@ -6,6 +6,7 @@ import { useTimelineState }  from './hooks/useTimelineState';
 import { useDepthTextureLoader } from './hooks/useDepthTextureLoader';
 import { useWebMVideoTexture } from './hooks/useWebMVideoTexture';
 import { usePuppetEngine } from './hooks/usePuppetEngine';
+import { useAutoDJ } from './hooks/useAutoDJ';
 
 import { AppProvider }        from './AppContext';
 
@@ -176,6 +177,27 @@ export default function App() {
   const [rubeDecay,     setRubeDecay]     = useState(800);
   const [trackTitle,    setTrackTitle]    = useState('Excavating Neverland by The Magic Static Society');
 
+  // ── Auto DJ ──
+  const [autoDJEnabled,  setAutoDJEnabled]  = useState(false);
+  const [autoDJMode,     setAutoDJMode]     = useState('full_random');
+  const [autoDJInterval, setAutoDJInterval] = useState(12);
+
+  useAutoDJ({
+    enabled: autoDJEnabled,
+    mode: autoDJMode,
+    changeInterval: autoDJInterval,
+    audioSignals,
+    isPlaying,
+    currentTime,
+    currentEra: selectedEra,
+    currentStyle: selectedStyle,
+    currentRube: selectedRube,
+    setEra: setSelectedEra,
+    setStyle: setSelectedStyle,
+    setRube: setSelectedRube,
+    bpm,
+  });
+
   const [moonVariant, setMoonVariant] = useState('classic_halo');
   const [moonFilter,  setMoonFilter]  = useState('silent_silver');
   const [lyricAlign,  setLyricAlign]  = useState('center');
@@ -300,12 +322,12 @@ export default function App() {
     webmOverlay.syncPlayback(isPlaying);
   }, [isPlaying, depthLoader, webmOverlay]);
 
-  // Auto-bind active asset from Media Bin to 2.5D Depth Engine
+  // Auto-bind active asset from Media Bin to 2.5D Depth Engine (only when 3D is active)
   useEffect(() => {
-    if (assets.length > 0 && assets[selectedAssetIndex]?.url) {
+    if (depth3dEnabled && assets.length > 0 && assets[selectedAssetIndex]?.url) {
       depthLoader.loadColorSource(assets[selectedAssetIndex].url);
     }
-  }, [assets, selectedAssetIndex]);
+  }, [depth3dEnabled, assets, selectedAssetIndex]);
 
 
   // ── Rube Goldberg stage reporter (CanvasWorkspace → FXConsole LED strip) ──
@@ -343,20 +365,83 @@ export default function App() {
   }, [loadAudioTrack]);
 
 
-  // ── Timeline state (includes editing ops) ──
+  // ── Timeline state (includes full editing operations & undo/redo) ──
   const {
     videoClips,
+    setVideoClips,
     updateClipStart,
+    updateClip,
     clearVideoClips,
     splitClipAtTime,
+    splitAtTime,
     toggleClipReverse,
+    toggleClipMirror,
     duplicateClip,
+    deleteClip,
+    moveClipInOrder,
+    packClips,
+    shuffleClips,
+    sortClipsByAssetOrder,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    addClipFromAsset,
+    beginClipEdit,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     automationKeyframes,
     setAutomationKeyframes,
     addAutomationKeyframe,
     updateAutomationKeyframe,
     removeAutomationKeyframe,
   } = useTimelineState(assets, duration || 60, bpm, setBpm);
+
+  // Consolidated editing operations bundle passed down to timeline and toolbar
+  const timelineEdit = useMemo(() => ({
+    beginClipEdit,
+    updateClip,
+    toggleClipReverse,
+    toggleClipMirror,
+    duplicateClip,
+    deleteClip,
+    moveClipInOrder,
+    packClips,
+    shuffleClips,
+    sortClipsByAssetOrder,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    addClipFromAsset,
+    splitAtTime,
+    splitClipAtTime,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  }), [
+    beginClipEdit,
+    updateClip,
+    toggleClipReverse,
+    toggleClipMirror,
+    duplicateClip,
+    deleteClip,
+    moveClipInOrder,
+    packClips,
+    shuffleClips,
+    sortClipsByAssetOrder,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    addClipFromAsset,
+    splitAtTime,
+    splitClipAtTime,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  ]);
 
   // ── Modular CSS Automation Effect ──
   const [selectedCssEffect, setSelectedCssEffect] = useState('solarize_invert');
@@ -395,26 +480,50 @@ export default function App() {
   }, [chaosEnabled, automationKeyframes, effectiveCurrentTime, chaosLevel, effectiveIsPlaying, fxEnvelopeDepth, fxMarkers]);
 
 
-  // ── Global hotkeys: S / R / Ctrl+D ──
+  // ── Global editing hotkeys ──
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
-      // S — Blade split at playhead
-      if (e.key === 's' || e.key === 'S') {
+      // Undo / Redo: Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
         e.preventDefault();
-        if (selectedClipId) {
-          splitClipAtTime(selectedClipId, currentTime);
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
         }
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault();
+        redo();
+        return;
+      }
+
+      // S — Blade split at playhead
+      if ((e.key === 's' || e.key === 'S') && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        const res = splitAtTime(currentTime, selectedClipId);
+        if (res?.rightId) setSelectedClipId(res.rightId);
         return;
       }
 
       // R — Reverse selected clip
-      if (e.key === 'r' || e.key === 'R') {
+      if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         if (selectedClipId) {
           toggleClipReverse(selectedClipId);
+        }
+        return;
+      }
+
+      // M — Mirror selected clip
+      if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (selectedClipId) {
+          toggleClipMirror(selectedClipId);
         }
         return;
       }
@@ -423,7 +532,49 @@ export default function App() {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
         e.preventDefault();
         if (selectedClipId) {
-          duplicateClip(selectedClipId);
+          const newId = duplicateClip(selectedClipId);
+          if (newId) setSelectedClipId(newId);
+        }
+        return;
+      }
+
+      // Ctrl+C — Copy clip
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
+        if (selectedClipId) {
+          e.preventDefault();
+          copyClip(selectedClipId);
+        }
+        return;
+      }
+
+      // Ctrl+V — Paste clip at playhead
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
+        if (hasClipboard()) {
+          e.preventDefault();
+          const newId = pasteClip(currentTime);
+          if (newId) setSelectedClipId(newId);
+        }
+        return;
+      }
+
+      // [ / ] — Move earlier / later in playback order
+      if (e.key === '[' && selectedClipId) {
+        e.preventDefault();
+        moveClipInOrder(selectedClipId, -1);
+        return;
+      }
+      if (e.key === ']' && selectedClipId) {
+        e.preventDefault();
+        moveClipInOrder(selectedClipId, 1);
+        return;
+      }
+
+      // Delete / Backspace — Delete clip (or Shift+Delete for ripple delete)
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedClipId) {
+          e.preventDefault();
+          deleteClip(selectedClipId, e.shiftKey);
+          setSelectedClipId(null);
         }
         return;
       }
@@ -431,7 +582,21 @@ export default function App() {
 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selectedClipId, currentTime, splitClipAtTime, toggleClipReverse, duplicateClip]);
+  }, [
+    selectedClipId,
+    currentTime,
+    splitAtTime,
+    toggleClipReverse,
+    toggleClipMirror,
+    duplicateClip,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    moveClipInOrder,
+    deleteClip,
+    undo,
+    redo,
+  ]);
 
   // ── Handlers ──
   const handleEraMutate = useCallback((era, isManualOrSection = false) => {
@@ -520,6 +685,70 @@ export default function App() {
     setSelectedClipId(null);
   };
 
+  // Reorder assets in Media Bin and automatically re-sequence timeline clips
+  const handleReorderAssets = useCallback((fromIndex, toIndex) => {
+    setAssets((prev) => {
+      if (fromIndex < 0 || fromIndex >= prev.length || toIndex < 0 || toIndex >= prev.length) {
+        return prev;
+      }
+      const updated = [...prev];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+
+      // Re-sequence timeline clips to follow the new Media Bin order
+      sortClipsByAssetOrder(updated);
+      return updated;
+    });
+
+    // Keep selectedAssetIndex following the moved asset
+    setSelectedAssetIndex((curr) => {
+      if (curr === fromIndex) return toIndex;
+      if (fromIndex < toIndex && curr > fromIndex && curr <= toIndex) return curr - 1;
+      if (fromIndex > toIndex && curr >= toIndex && curr < fromIndex) return curr + 1;
+      return curr;
+    });
+  }, [sortClipsByAssetOrder]);
+
+  // Reorder Media Bin to match the timeline clip playback sequence
+  const handleReorderAssetsByClips = useCallback(() => {
+    if (videoClips.length === 0 || assets.length === 0) return;
+    const firstSeen = new Map();
+    [...videoClips].sort((a, b) => a.startTime - b.startTime).forEach((c) => {
+      if (!firstSeen.has(c.assetId)) firstSeen.set(c.assetId, c.startTime);
+    });
+
+    setAssets((prev) => {
+      return [...prev].sort((a, b) => {
+        const tA = firstSeen.get(a.id) ?? 1e9;
+        const tB = firstSeen.get(b.id) ?? 1e9;
+        return tA - tB;
+      });
+    });
+  }, [videoClips, assets.length]);
+
+  // Duplicate an asset in the Media Bin so it can be tagged for different mouth shapes or cut differently
+  const handleDuplicateAsset = useCallback((assetId) => {
+    const src = assets.find((a) => a.id === assetId);
+    if (!src) return;
+    const newAsset = {
+      ...src,
+      id: Math.random().toString(36).substring(2, 9),
+      name: `${src.name} (copy)`,
+    };
+    setAssets((prev) => {
+      const idx = prev.findIndex((a) => a.id === assetId);
+      const updated = [...prev];
+      updated.splice(idx + 1, 0, newAsset);
+      return updated;
+    });
+  }, [assets]);
+
+  // Rename an asset
+  const handleRenameAsset = useCallback((assetId, newName) => {
+    if (!newName?.trim()) return;
+    setAssets((prev) => prev.map((a) => (a.id === assetId ? { ...a, name: newName.trim() } : a)));
+  }, []);
+
   const handleAudioUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -582,6 +811,13 @@ export default function App() {
           setPuppetDisplayMode={setPuppetDisplayMode}
           activeSlot={puppetActiveSlot}
           isPlaying={isPlaying}
+          onReorderAssets={handleReorderAssets}
+          onDuplicateAsset={handleDuplicateAsset}
+          onRenameAsset={handleRenameAsset}
+          onAddToTimeline={(assetId) => {
+            const newId = addClipFromAsset(assetId, currentTime);
+            if (newId) setSelectedClipId(newId);
+          }}
         />
         )}
 
@@ -628,6 +864,13 @@ export default function App() {
               onUpdateFxMarker={handleUpdateFxMarker}
               bpm={bpm}
               onSeek={seekTo}
+              edit={timelineEdit}
+              selectedStyle={selectedStyle}
+              onUseTimelineStyle={() => setSelectedStyle('timeline')}
+              onReorderAssetsByClips={handleReorderAssetsByClips}
+              onTogglePlay={togglePlay}
+              onStop={stopEngine}
+              onToggleLoop={() => setIsLooping((v) => !v)}
             />
           )}
           transportBar={(
@@ -704,6 +947,7 @@ export default function App() {
               cssEffectStyle={liveCssEffectStyle}
               isEraLocked={isEraLocked}
               eraChangeCooldown={eraChangeCooldown}
+              isOfflineRendering={isOfflineRendering}
             />
           </div>
 
@@ -803,6 +1047,12 @@ export default function App() {
           currentTrackTitle={trackTitle}
           currentDuration={duration}
           getCurrentAudio={() => lastAudioFileRef.current}
+          autoDJEnabled={autoDJEnabled}
+          setAutoDJEnabled={setAutoDJEnabled}
+          autoDJMode={autoDJMode}
+          setAutoDJMode={setAutoDJMode}
+          autoDJInterval={autoDJInterval}
+          setAutoDJInterval={setAutoDJInterval}
         />
         )}
 

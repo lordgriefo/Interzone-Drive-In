@@ -314,6 +314,7 @@ export async function runDeterministicOfflineExport({
   onComplete = () => {},
   onError = (err) => console.error(err),
   abortController = null,
+  shouldStop = () => false,
 }) {
   if (!isElectronEnvironment()) {
     const err = new Error('Deterministic offline render requires the Electron desktop environment.');
@@ -364,6 +365,12 @@ export async function runDeterministicOfflineExport({
       }
 
       const t = k * dt;
+
+      // Early graceful stop: user clicked Stop & Save
+      if (shouldStop && shouldStop()) {
+        console.info(`[exportPipeline] Early stop requested at frame ${k}/${totalFrames} (${t.toFixed(2)}s). Finalizing video stream…`);
+        break;
+      }
 
       // Extract deterministic audio signals for this frame tick
       const signals = analyzer.extractAtTime(t);

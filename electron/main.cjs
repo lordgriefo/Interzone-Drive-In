@@ -17,9 +17,12 @@ function getFfmpegPath() {
     return process.env.FFMPEG_PATH;
   }
   try {
-    const ffmpegStatic = require('ffmpeg-static');
-    if (ffmpegStatic && fs.existsSync(ffmpegStatic)) {
-      return ffmpegStatic;
+    let ffmpegStatic = require('ffmpeg-static');
+    if (ffmpegStatic) {
+      // In packaged Electron apps, binaries in app.asar must be run from app.asar.unpacked
+      const unpackedPath = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
+      if (fs.existsSync(unpackedPath)) return unpackedPath;
+      if (fs.existsSync(ffmpegStatic)) return ffmpegStatic;
     }
   } catch (_) {}
   return 'ffmpeg';
@@ -36,30 +39,50 @@ function cleanupTempAudio() {
   }
 }
 
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
 function createWindow() {
+  const iconPath = path.join(__dirname, '../build/icon.ico');
+
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
     minWidth: 1024,
     minHeight: 720,
     backgroundColor: '#0a0a0c',
+    ...(fs.existsSync(iconPath) ? { icon: iconPath } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
+      webSecurity: false, // Allows fetch() on local media files and audio/video blobs
+      allowRunningInsecureContent: true,
     },
   });
 
   const devUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
-  const prodIndex = path.join(__dirname, '../dist/index.html');
 
-  if (fs.existsSync(prodIndex) && process.env.NODE_ENV !== 'development') {
-    mainWindow.loadFile(prodIndex);
+  if (app.isPackaged) {
+    // Standalone packaged app (installer or portable exe): load bundled dist/index.html
+    const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
+    mainWindow.loadFile(indexPath).catch((err) => {
+      console.error('[Electron] Failed to load from appPath, trying fallback:', err);
+      mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html')).catch(() => {});
+    });
+  } else if (process.argv.includes('--prod')) {
+    // Local test of built production assets
+    mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html')).catch(() => {});
   } else {
+    // Development mode: connect to live Vite dev server with fallback
     mainWindow.loadURL(devUrl).catch(() => {
-      if (fs.existsSync(prodIndex)) mainWindow.loadFile(prodIndex);
+      console.log('[Electron] Dev server at http://localhost:5173 not found, falling back to dist/index.html');
+      mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html')).catch(() => {});
     });
   }
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`[Electron] Page failed to load: ${errorDescription} (${errorCode}) for URL: ${validatedURL}`);
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -170,9 +193,9 @@ ipcMain.handle('export:init', async (event, options = {}) => {
   // Input PNG image sequence piped from stdin
   const ffmpegArgs = [
     '-y',
+    '-framerate', String(fps),
     '-f', 'image2pipe',
     '-vcodec', 'png',
-    '-r', String(fps),
     '-i', '-', // Stream from stdin
   ];
 
@@ -190,12 +213,23 @@ ipcMain.handle('export:init', async (event, options = {}) => {
   // Ensure output dimensions are always even (divisible by 2) to prevent libx264/yuv420p errors
   ffmpegArgs.push('-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2');
 
+  // Stream mapping
+  if (audioInputFile && fs.existsSync(audioInputFile)) {
+    ffmpegArgs.push('-map', '0:v:0', '-map', '1:a:0');
+  } else {
+    ffmpegArgs.push('-map', '0:v:0');
+  }
+
+  // Force constant frame rate sync so every frame maps 1:1 to timeline dt
+  ffmpegArgs.push('-vsync', '1');
+
   // Configure Video Stream Codec
   if (isWebM) {
     // Native VP9 encoding for WebM
     ffmpegArgs.push(
       '-c:v', 'libvpx-vp9',
       '-pix_fmt', 'yuv420p',
+      '-r', String(fps),
       '-b:v', '0',
       '-crf', '24',
       '-deadline', 'realtime',
@@ -207,6 +241,7 @@ ipcMain.handle('export:init', async (event, options = {}) => {
     ffmpegArgs.push(
       '-c:v', 'libx264',
       '-pix_fmt', 'yuv420p',
+      '-r', String(fps),
       '-preset', 'fast',
       '-crf', '17' // Near-lossless visual quality
     );
