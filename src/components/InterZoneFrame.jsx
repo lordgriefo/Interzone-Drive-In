@@ -298,7 +298,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
               textTransform: 'uppercase',
               fontWeight: 700,
             }}>
-              STRANGELET · KINET-O-CHOP
+              STRANGELET · KINETO-CUT
             </div>
           </div>
 
@@ -619,7 +619,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
             width: '100%',
             maxWidth: 980,
             flexShrink: 0,
-            zIndex: 10,
+            zIndex: 1000,
             marginTop: 6,
           }}
         >

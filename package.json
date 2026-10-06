@@ -44,8 +44,8 @@
     "vite": "^5.1.6"
   },
   "build": {
-    "appId": "com.strangelet.kinetochop",
-    "productName": "Kinet-O-Chop",
+    "appId": "com.strangelet.kinetocut",
+    "productName": "Strangelet Kineto-Cut",
     "copyright": "Copyright © 2026 Interzone Drive-In",
     "directories": {
       "output": "release"
@@ -73,7 +73,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Kinet-O-Chop",
+      "shortcutName": "Strangelet Kineto-Cut",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico"
     }

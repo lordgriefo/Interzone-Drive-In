@@ -1,4 +1,4 @@
-# 📽️ Interzone Drive-In — The Kinet-O-Chop
+# 📽️ The Strangelet — Strangelet Kineto-Cut
 
 An audio-reactive kinetic montage engine, multi-track visual sequencer, and vintage cinema synthesizer for live VJing, music video creation, and procedural film-chopping — in your browser or as a standalone desktop app.
 
@@ -11,7 +11,7 @@ An audio-reactive kinetic montage engine, multi-track visual sequencer, and vint
 
 ## What It Does
 
-Load images, AI-generated video clips, or webcam stills into the **Media Bin**. Drop in a song. The Kinet-O-Chop analyses the audio in real time — bass, mids, treble, transients, BPM — and uses those signals to drive a constantly-shifting visual composition: cutting between images on the beat, applying era-specific colour grading, triggering Rube Goldberg chain-reaction glitch cascades, and rendering everything through one of **37 cinematic editing styles** ranging from Stan Brakhage emulsion scratches to psychedelic DMT hyperspace breakthroughs and beat-locked music video flash cuts.
+Load images, AI-generated video clips, or webcam stills into the **Media Bin**. Drop in a song. Strangelet Kineto-Cut analyses the audio in real time — bass, mids, treble, transients, BPM — and uses those signals to drive a constantly-shifting visual composition: cutting between images on the beat, applying era-specific colour grading, triggering Rube Goldberg chain-reaction glitch cascades, and rendering everything through one of **37 cinematic editing styles** ranging from Stan Brakhage emulsion scratches to psychedelic DMT hyperspace breakthroughs and beat-locked music video flash cuts.
 
 You can let the **Auto DJ** randomly shift styles, eras, and effects in the flow of the music, or take full manual control with the **multi-track timeline editor** to sequence clips, trim, reverse, mirror, and crossfade your own edit.
 
@@ -187,7 +187,7 @@ npm run package:zip
 
 Output goes to `release/`.
 
-> **Note:** Close any running instance of Kinet-O-Chop before building, or the build may fail with "Access is denied" on locked DLLs.
+> **Note:** Close any running instance of Strangelet Kineto-Cut before building, or the build may fail with "Access is denied" on locked DLLs.
 
 ---
 

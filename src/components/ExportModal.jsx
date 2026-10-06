@@ -668,7 +668,7 @@ export function ExportModal({
                           boxShadow: '0 0 10px rgba(168,85,247,0.4)',
                         }}
                       >
-                        ⬇ DOWNLOAD KINET-O-CHOP DESKTOP (.EXE)
+                        ⬇ DOWNLOAD STRANGELET KINETO-CUT DESKTOP (.EXE)
                       </a>
                     </div>
                   </div>

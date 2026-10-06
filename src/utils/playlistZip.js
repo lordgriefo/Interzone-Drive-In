@@ -129,7 +129,7 @@ export async function exportPlaylistZip(playlist, assets = []) {
     audioSource: e.file || e.url,
     audioName: e.file?.name || e.title,
   }));
-  return buildZip(entries, 'kinet-o-chop-playlist');
+  return buildZip(entries, 'strangelet-kinetocut-playlist');
 }
 
 /**
@@ -146,7 +146,7 @@ export async function exportCurrentSongZip({ title, audioSource, duration, prese
     audioSource,
     audioName: audioSource?.name || title,
   };
-  return buildZip([entry], `kinet-o-chop-${safe(title, 40)}`);
+  return buildZip([entry], `strangelet-kinetocut-${safe(title, 40)}`);
 }
 
 /**
@@ -157,7 +157,7 @@ export async function importPlaylistZip(zipFile) {
   const zip = await JSZip.loadAsync(zipFile);
 
   const manifestFile = zip.file('playlist.json');
-  if (!manifestFile) throw new Error('Invalid Kinet-O-Chop zip: missing playlist.json');
+  if (!manifestFile) throw new Error('Invalid Strangelet Kineto-Cut zip: missing playlist.json');
   const manifest = JSON.parse(await manifestFile.async('text'));
   if (!Array.isArray(manifest)) throw new Error('Invalid playlist.json: expected an array');
 

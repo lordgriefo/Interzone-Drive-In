@@ -139,7 +139,7 @@ ipcMain.handle('export:init', async (event, options = {}) => {
     format = 'mp4',
     audioSourcePath = null,
     audioData = null,
-    defaultFileName = format === 'webm' ? 'interzone-export.webm' : 'interzone-export.mp4',
+    defaultFileName = format === 'webm' ? 'strangelet-kinetocut-export.webm' : 'strangelet-kinetocut-export.mp4',
   } = options;
 
   cleanupTempAudio();

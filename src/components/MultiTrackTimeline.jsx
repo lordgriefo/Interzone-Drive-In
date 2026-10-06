@@ -1,4 +1,5 @@
 import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { interpolateAutomation } from '../utils/timelineCrossfade';
 import { TimelineAutomationLane } from './TimelineAutomationLane';
 
@@ -168,7 +169,7 @@ export function MultiTrackTimeline({
   // Auto-MV Cut Menu dropdown state & positioning
   const [showMvCutMenu, setShowMvCutMenu] = useState(false);
   const mvButtonRef = useRef(null);
-  const [menuPos, setMenuPos] = useState({ bottom: 0, left: 0 });
+  const [menuPos, setMenuPos] = useState({ bottom: 0, left: 0, maxH: 420 });
   const cutFileInputRef = useRef(null);
 
   // Position popup above the button and dismiss on outside click
@@ -176,9 +177,11 @@ export function MultiTrackTimeline({
     if (!showMvCutMenu) return;
     if (mvButtonRef.current) {
       const rect = mvButtonRef.current.getBoundingClientRect();
+      const spaceAbove = rect.top - 16;
       setMenuPos({
         bottom: Math.max(10, window.innerHeight - rect.top + 6),
         left: Math.max(8, Math.min(window.innerWidth - 290, rect.left)),
+        maxH: Math.min(460, Math.max(240, spaceAbove)),
       });
     }
     const handleDocClick = () => setShowMvCutMenu(false);
@@ -875,7 +878,7 @@ export function MultiTrackTimeline({
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `kinet-cut-template-${Date.now()}.json`;
+            a.download = `strangelet-kinetocut-template-${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(url);
           }}
@@ -962,24 +965,24 @@ export function MultiTrackTimeline({
             <span style={{ fontSize: 7, opacity: 0.8 }}>{showMvCutMenu ? '▲' : '▼'}</span>
           </button>
 
-          {showMvCutMenu && (
+          {showMvCutMenu && typeof document !== 'undefined' && createPortal(
             <div
               className="timeline-mv-cut-menu"
               style={{
                 position: 'fixed',
                 bottom: menuPos.bottom,
                 left: menuPos.left,
-                zIndex: 99999,
+                zIndex: 999999,
                 backgroundColor: 'var(--bg-panel, #18181b)',
                 border: '1px solid #a855f7',
                 borderRadius: 5,
-                boxShadow: '0 10px 36px rgba(0,0,0,0.98), 0 0 20px rgba(168,85,247,0.45)',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.98), 0 0 24px rgba(168,85,247,0.5)',
                 padding: '6px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 2,
                 width: 275,
-                maxHeight: 'min(480px, 75vh)',
+                maxHeight: menuPos.maxH || 420,
                 overflowY: 'auto',
                 scrollbarWidth: 'thin',
                 scrollbarColor: '#a855f7 rgba(0,0,0,0.6)',
@@ -1374,7 +1377,8 @@ export function MultiTrackTimeline({
                 <span style={{ fontWeight: 700, color: '#22d3ee' }}>🎬 Full Clip Native (Play Entire Length)</span>
                 <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>100% Full Video Duration · Plays each video from 0 to end without cuts</span>
               </button>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
 
