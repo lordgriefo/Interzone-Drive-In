@@ -234,6 +234,16 @@ export function CanvasWorkspace({
   isEraLocked = false,
   eraChangeCooldown = 8000,
   isOfflineRendering = false,
+  // MilkDrop & Psychedelic MV Visual Tricks
+  liquidWarpEnabled = false,
+  liquidWarpIntensity = 0.7,
+  kaleidoscopeMode = 'none',
+  phosphorTrails = false,
+  chromaticPunch = false,
+  fractalMode = 'none',
+  alienBeam = false,
+  warpDrive = false,
+  lyricAnim = 'pulse_slam',
 }) {
 
 
@@ -966,6 +976,75 @@ export function CanvasWorkspace({
         };
       }
 
+      // ── DMT HYPERSPACE BREAKTHROUGH: sacred geometry shift, hyperbolic zooming, transient solarize ──
+      case 'dmt_breakthrough': {
+        const dmtBass = Number(audioSignals?.bass) || 0;
+        const dmtTreb = Number(audioSignals?.treble) || 0;
+        const dmtRot  = Math.sin(t * 0.4) * (8 + dmtTreb * 22);
+        const beatFrac = (currentTime * (bpm / 60)) % 1;
+        const hyperZoom = 1.0 + Math.exp(-beatFrac * 4) * 0.12 * dmtBass + (audioSignals?.isTransient ? 0.18 : 0);
+        const dmtHue = ((currentTime * 50) + dmtBass * 80) % 360;
+        const dmtBright = audioSignals?.isTransient ? 1.7 : (1.0 + dmtBass * 0.25);
+        const dmtSat = 2.4 + dmtTreb * 0.8;
+        const dmtInvert = audioSignals?.isTransient ? 'invert(0.7) ' : '';
+        return {
+          transform: `scale(${hyperZoom.toFixed(4)}) rotate(${dmtRot.toFixed(2)}deg)`,
+          filter: `${dmtInvert}hue-rotate(${dmtHue.toFixed(1)}deg) saturate(${dmtSat.toFixed(2)}) brightness(${dmtBright.toFixed(3)}) contrast(1.35)`,
+          transition: audioSignals?.isTransient ? 'none' : 'transform 0.12s ease-out, filter 0.1s ease-out',
+        };
+      }
+
+      // ── LSD ACID TRACERS: prismatic dispersion edge-melt, liquid undulating wave ──
+      case 'lsd_acid_melt': {
+        const acidBass = Number(audioSignals?.bass) || 0;
+        const acidMid  = Number(audioSignals?.mid)  || 0;
+        const waveX = Math.sin(t * 1.6) * 10 + Math.cos(t * 0.8) * 6;
+        const waveY = Math.cos(t * 1.3) * 8 + Math.sin(t * 0.5) * 4;
+        const acidScale = 1.02 + Math.sin(t * 1.1) * 0.04 + acidBass * 0.07;
+        const acidHue = (currentTime * 24) % 360;
+        const acidSat = 1.8 + acidMid * 0.6;
+        const acidBright = 1.06 + acidBass * 0.18;
+        return {
+          transform: `translate(${waveX.toFixed(2)}px, ${waveY.toFixed(2)}px) scale(${acidScale.toFixed(4)})`,
+          filter: `hue-rotate(${acidHue.toFixed(1)}deg) saturate(${acidSat.toFixed(2)}) brightness(${acidBright.toFixed(3)}) drop-shadow(-6px 0 10px rgba(255,0,128,0.65)) drop-shadow(6px 0 10px rgba(0,229,255,0.65))`,
+          transition: audioSignals?.isTransient ? 'none' : 'transform 1.2s ease-in-out, filter 0.4s ease-out',
+        };
+      }
+
+      // ── PSILOCYBIN BREATHING: deep organic breathing walls, warm earth saturation ──
+      case 'psilocybin_breath': {
+        const shroomBass = Number(audioSignals?.bass) || 0;
+        const shroomRms  = Number(audioSignals?.rms)  || 0;
+        const lungCycle = Math.sin(currentTime * 1.79);
+        const breathScale = 1.0 + lungCycle * 0.055 + shroomBass * 0.08;
+        const breathDriftY = Math.cos(currentTime * 0.8) * 4;
+        const warmHue = Math.sin(currentTime * 0.3) * 16;
+        const warmSat = 1.45 + lungCycle * 0.15 + shroomBass * 0.35;
+        const warmBright = 1.02 + shroomRms * 0.14;
+        return {
+          transform: `translate(0, ${breathDriftY.toFixed(2)}px) scale(${breathScale.toFixed(4)})`,
+          filter: `hue-rotate(${warmHue.toFixed(1)}deg) sepia(0.18) saturate(${warmSat.toFixed(3)}) brightness(${warmBright.toFixed(3)}) contrast(1.12)`,
+          transition: 'transform 1.8s ease-in-out, filter 1.2s ease-in-out',
+        };
+      }
+
+      // ── AYAHUASCA SHAMANIC: emerald/gold visionary snake, bio-geometric pulses ──
+      case 'ayahuasca_vision': {
+        const ayaBass = Number(audioSignals?.bass) || 0;
+        const ayaMid  = Number(audioSignals?.mid)  || 0;
+        const ayaSerpentX = Math.sin(currentTime * 1.5) * (12 + ayaBass * 10);
+        const ayaSerpentY = Math.cos(currentTime * 0.9) * 7;
+        const ayaScale = 1.01 + Math.sin(currentTime * 0.7) * 0.03 + ayaBass * 0.06;
+        const ayaHue = 75 + Math.sin(currentTime * 0.6) * 40;
+        const ayaBright = audioSignals?.isTransient ? 1.75 : (1.0 + ayaMid * 0.2);
+        const ayaSat = 1.9 + ayaBass * 0.5;
+        return {
+          transform: `translate(${ayaSerpentX.toFixed(2)}px, ${ayaSerpentY.toFixed(2)}px) scale(${ayaScale.toFixed(4)})`,
+          filter: `sepia(0.28) hue-rotate(${ayaHue.toFixed(1)}deg) saturate(${ayaSat.toFixed(2)}) brightness(${ayaBright.toFixed(3)}) contrast(1.22)`,
+          transition: audioSignals?.isTransient ? 'none' : 'transform 2s ease-in-out, filter 0.6s ease-in-out',
+        };
+      }
+
       default:
         return {};
     }
@@ -991,7 +1070,7 @@ export function CanvasWorkspace({
     if (isTransient && !previousTransientRef.current) {
       // ── Per-style minimum hold between slide advances ──
       // Chill styles use a long hold so slides linger instead of flicking rapidly.
-      const CHILL_STYLES = new Set(['ambient_drift', 'lo_fi_flicker', 'slow_dissolve', 'dreamscape', 'deren_meshes', 'marker_jetee', 'warhol_screen', 'debord_detourne', 'lynch_redroom', 'lynch_eraserhead', 'mv_long_cut', 'mv_slow_burn', 'mv_flash_cut', 'mv_cinematic_glide', 'mv_hypnotic_drift']);
+      const CHILL_STYLES = new Set(['ambient_drift', 'lo_fi_flicker', 'slow_dissolve', 'dreamscape', 'deren_meshes', 'marker_jetee', 'warhol_screen', 'debord_detourne', 'lynch_redroom', 'lynch_eraserhead', 'mv_long_cut', 'mv_slow_burn', 'mv_flash_cut', 'mv_cinematic_glide', 'mv_hypnotic_drift', 'dmt_breakthrough', 'lsd_acid_melt', 'psilocybin_breath', 'ayahuasca_vision']);
       const CHILL_MIN_HOLD_MS = {
         ambient_drift: 8000,   // new slide every ~8s minimum — very languid
         lo_fi_flicker: 2500,   // every ~2.5s — lo-fi groove, mid-tempo rhythm
@@ -1008,6 +1087,10 @@ export function CanvasWorkspace({
         mv_flash_cut:  2000,   // 2 second minimum hold (2–4 beat feel)
         mv_cinematic_glide: 6000, // 6 second hold
         mv_hypnotic_drift:  8000, // 8 second hold
+        dmt_breakthrough: 2200,   // rapid psychedelic geometry cut
+        lsd_acid_melt:    4500,   // melting flow
+        psilocybin_breath: 7000,  // deep organic wall breathing hold
+        ayahuasca_vision: 6000,   // visionary shamanic hold
       };
       const currentStyle = (selectedStyle || selectedEra || '').toLowerCase();
       const minHold = CHILL_MIN_HOLD_MS[currentStyle] ?? 0; // 0 = no throttle for hi-nrg styles
@@ -1149,13 +1232,22 @@ export function CanvasWorkspace({
       'deren_meshes', 'anger_scorpio', 'mekas_diary', 'marker_jetee',
       'warhol_screen', 'jarman_super8', 'debord_detourne', 'smith_flaming', 'schneemann_fuses',
       'lynch_redroom', 'lynch_eraserhead', 'mv_long_cut', 'mv_slow_burn', 'mv_flash_cut',
-      'mv_cinematic_glide', 'mv_hypnotic_drift'
+      'mv_cinematic_glide', 'mv_hypnotic_drift',
+      'dmt_breakthrough', 'lsd_acid_melt', 'psilocybin_breath', 'ayahuasca_vision'
     ]);
     const needsAnimation =
       isPlaying &&
       (chaosLevel > 0 ||
        // Arm RAF for ANY active Rube preset — don't gate on rubeStage (async state lag)
        selectedRube !== 'none' ||
+       liquidWarpEnabled ||
+       kaleidoscopeMode !== 'none' ||
+       phosphorTrails ||
+       chromaticPunch ||
+       fractalMode !== 'none' ||
+       alienBeam ||
+       warpDrive ||
+       lyricAnim !== 'clean' ||
        ANIMATED_STYLES.has(selectedStyle));
 
     if (!needsAnimation) {
@@ -1171,7 +1263,7 @@ export function CanvasWorkspace({
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [chaosLevel, selectedRube, rubeStage, isPlaying, selectedStyle]);
+  }, [chaosLevel, selectedRube, rubeStage, isPlaying, selectedStyle, liquidWarpEnabled, kaleidoscopeMode, phosphorTrails, chromaticPunch, fractalMode, alienBeam, warpDrive, lyricAnim]);
 
   // WebGL safety listeners on workspace canvas
   useEffect(() => {
@@ -1234,6 +1326,9 @@ export function CanvasWorkspace({
     const chaosJitter = chaosLevel > 0 ? (Math.random() - 0.5) * chaosLevel * 10 : 0;
 
     let scale = 1 + bass * 0.1 + (chaosLevel > 0 ? chaosLevel * 0.05 : 0);
+    if (chromaticPunch && audioSignals?.isTransient && bass > 0.35) {
+      scale *= 1.08;
+    }
     let rotate = (mid - 0.5) * 3 + chaosJitter;
     let translateY = 0;
 
@@ -1676,6 +1771,77 @@ export function CanvasWorkspace({
   // Any other style shows the active Media Bin selection / montage / synchro-vox directly.
   const useTimelineView = selectedStyle === 'timeline' && videoClips.length > 0;
 
+  // Active media renderer based on editing style
+  const renderActiveMediaContent = () => {
+    if (selectedStyle === 'third_mind') return renderBurroughsCutUp();
+    if (selectedStyle === 'venetian') return renderVenetian();
+    if (rubeVisuals.chromaOffset > 0) return renderChromaOffset();
+    if (useTimelineView) return renderTimelineComposite();
+    return renderMainImage();
+  };
+
+  // Kaleidoscope mandala wrapper (MilkDrop style radial mirror)
+  const renderWithKaleidoscope = (child) => {
+    if (kaleidoscopeMode === 'none') return child;
+    const rot = (currentTime * 10 + (Number(audioSignals?.treble) || 0) * 16) % 360;
+    const bassZoom = 1.04 + (Number(audioSignals?.bass) || 0) * 0.12;
+
+    return (
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {/* 4-way mirrored quadrant mandala */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          transform: `rotate(${rot.toFixed(1)}deg) scale(${bassZoom.toFixed(3)})`,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gridTemplateRows: '1fr 1fr',
+          transformOrigin: 'center center',
+          pointerEvents: 'none',
+        }}>
+          <div style={{ overflow: 'hidden', position: 'relative' }}>{child}</div>
+          <div style={{ overflow: 'hidden', position: 'relative', transform: 'scaleX(-1)' }}>{child}</div>
+          <div style={{ overflow: 'hidden', position: 'relative', transform: 'scaleY(-1)' }}>{child}</div>
+          <div style={{ overflow: 'hidden', position: 'relative', transform: 'scale(-1, -1)' }}>{child}</div>
+        </div>
+
+        {/* 8-way: add diagonal cross layer */}
+        {kaleidoscopeMode === '8way' && (
+          <div style={{
+            position: 'absolute',
+            top: '-50%',
+            left: '-50%',
+            width: '200%',
+            height: '200%',
+            transform: `rotate(${(rot + 45).toFixed(1)}deg) scale(${bassZoom.toFixed(3)})`,
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gridTemplateRows: '1fr 1fr',
+            transformOrigin: 'center center',
+            mixBlendMode: 'difference',
+            opacity: 0.65,
+            pointerEvents: 'none',
+          }}>
+            <div style={{ overflow: 'hidden', position: 'relative' }}>{child}</div>
+            <div style={{ overflow: 'hidden', position: 'relative', transform: 'scaleX(-1)' }}>{child}</div>
+            <div style={{ overflow: 'hidden', position: 'relative', transform: 'scaleY(-1)' }}>{child}</div>
+            <div style={{ overflow: 'hidden', position: 'relative', transform: 'scale(-1, -1)' }}>{child}</div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Only display lyrics during active playback
   const activeLyric = isPlaying && lyricSegments.find(
@@ -1779,19 +1945,232 @@ export function CanvasWorkspace({
               justifyContent: 'center',
               transform: getTransform(),
               transition: chaosLevel > 0 || !isPlaying ? 'none' : 'transform 0.08s ease-out',
+              filter: liquidWarpEnabled ? 'url(#liquid-warp-filter)' : undefined,
             }}>
-              {selectedStyle === 'third_mind'
-                ? renderBurroughsCutUp()
-                : selectedStyle === 'venetian'
-                  ? renderVenetian()
-                  : rubeVisuals.chromaOffset > 0
-                    ? renderChromaOffset()
-                    : useTimelineView
-                      ? renderTimelineComposite()
-                      : renderMainImage()}
+              {renderWithKaleidoscope(renderActiveMediaContent())}
             </div>
           </div>
       </GlitchLayer>
+
+      {/* ── MILKDROP SVG LIQUID OIL-WARP FILTER ── */}
+      <svg
+        style={{
+          position: 'absolute',
+          width: 0,
+          height: 0,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id="liquid-warp-filter" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency={`${(0.012 + (Number(audioSignals?.mid) || 0) * 0.018).toFixed(4)} ${(0.018 + (Number(audioSignals?.treble) || 0) * 0.022).toFixed(4)}`}
+              numOctaves="2"
+              result="noise"
+              seed={Math.floor(currentTime * 3) % 100}
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale={liquidWarpEnabled ? ((Number(audioSignals?.bass) || 0) * 55 * liquidWarpIntensity + (audioSignals?.isTransient ? 38 * liquidWarpIntensity : 5 * liquidWarpIntensity)) : 0}
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
+      {/* ── MILKDROP PHOSPHOR GHOST TRAILS OVERLAY ── */}
+      {phosphorTrails && displayUrl && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 6,
+            mixBlendMode: 'screen',
+            opacity: audioSignals?.isTransient ? 0.8 : 0.42,
+            transform: `scale(${1.03 + (Number(audioSignals?.bass) || 0) * 0.04}) rotate(${(Math.sin(currentTime * 1.8) * 1.5).toFixed(1)}deg)`,
+            filter: `hue-rotate(${((currentTime * 35) % 360).toFixed(0)}deg) saturate(2.2) contrast(1.25)`,
+            transition: audioSignals?.isTransient ? 'none' : 'opacity 0.25s ease-out, transform 0.2s ease-out',
+          }}
+        >
+          <img
+            src={displayUrl}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </div>
+      )}
+
+      {/* ── MILKDROP CHROMATIC BASS PUNCH OVERLAY ── */}
+      {chromaticPunch && audioSignals?.isTransient && displayUrl && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 7,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            filter: 'drop-shadow(-8px 0 0 rgba(255, 20, 60, 0.75)) drop-shadow(8px 0 0 rgba(0, 230, 255, 0.75))',
+            transform: 'scale(1.04)',
+            transition: 'none',
+          }}
+        >
+          <img
+            src={displayUrl}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.55, mixBlendMode: 'screen' }}
+          />
+        </div>
+      )}
+
+      {/* ── MILKDROP FRACTAL SPIRAL OVERLAY ── */}
+      {fractalMode === 'spiral' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '-50%',
+            left: '-50%',
+            width: '200%',
+            height: '200%',
+            pointerEvents: 'none',
+            zIndex: 6,
+            background: `repeating-conic-gradient(from ${(currentTime * 24 + (Number(audioSignals?.treble) || 0) * 36).toFixed(1)}deg at 50% 50%, rgba(217, 70, 239, 0.22) 0deg 12deg, transparent 12deg 24deg, rgba(6, 182, 212, 0.22) 24deg 36deg, transparent 36deg 48deg)`,
+            mixBlendMode: 'screen',
+            transform: `scale(${(1.0 + (Number(audioSignals?.bass) || 0) * 0.22).toFixed(3)})`,
+            filter: 'blur(1px)',
+            transition: 'transform 0.08s ease-out',
+          }}
+        />
+      )}
+
+      {/* ── MILKDROP FRACTAL TUNNEL OVERLAY ── */}
+      {fractalMode === 'tunnel' && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 6,
+            background: `repeating-radial-gradient(circle at 50% 50%, transparent 0px, transparent 16px, rgba(168, 85, 247, 0.24) 17px, rgba(6, 182, 212, 0.24) 28px, transparent 32px)`,
+            backgroundSize: `${(60 + (Number(audioSignals?.bass) || 0) * 45 + (currentTime * 45) % 60).toFixed(0)}px ${(60 + (Number(audioSignals?.bass) || 0) * 45 + (currentTime * 45) % 60).toFixed(0)}px`,
+            backgroundPosition: 'center center',
+            mixBlendMode: 'screen',
+            filter: 'contrast(1.3) brightness(1.2)',
+          }}
+        />
+      )}
+
+      {/* ── ALIEN SCANLINE BEAM / XENOTROPE TRACTOR OVERLAY ── */}
+      {alienBeam && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: '28%',
+            right: '28%',
+            pointerEvents: 'none',
+            zIndex: 6,
+            background: `linear-gradient(180deg, rgba(34, 197, 94, 0.4) 0%, rgba(6, 182, 212, 0.28) 50%, rgba(34, 197, 94, 0.45) 100%), repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0, 255, 128, 0.28) 3px, rgba(0, 255, 128, 0.28) 5px)`,
+            mixBlendMode: 'screen',
+            opacity: audioSignals?.isTransient ? 0.95 : (0.45 + (Number(audioSignals?.mid) || 0) * 0.4),
+            filter: 'blur(1.5px) drop-shadow(0 0 24px #22c55e)',
+            transform: `scaleX(${(1.0 + (Number(audioSignals?.bass) || 0) * 0.28 + (audioSignals?.isTransient ? 0.22 : 0)).toFixed(3)})`,
+            transition: audioSignals?.isTransient ? 'none' : 'opacity 0.2s ease-out, transform 0.15s ease-out',
+          }}
+        />
+      )}
+
+      {/* ── SCI-FI WARP DRIVE HYPERSPACE STREAK OVERLAY ── */}
+      {warpDrive && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '-25%',
+            left: '-25%',
+            width: '150%',
+            height: '150%',
+            pointerEvents: 'none',
+            zIndex: 6,
+            background: `repeating-conic-gradient(from ${(currentTime * 5).toFixed(1)}deg at 50% 50%, rgba(255, 255, 255, 0.3) 0deg 2deg, transparent 2deg 10deg, rgba(0, 229, 255, 0.35) 10deg 12deg, transparent 12deg 20deg)`,
+            mixBlendMode: 'screen',
+            opacity: audioSignals?.isTransient ? 0.92 : (0.28 + (Number(audioSignals?.bass) || 0) * 0.45),
+            transform: `scale(${(1.0 + (Number(audioSignals?.bass) || 0) * 0.35 + (audioSignals?.isTransient ? 0.3 : 0)).toFixed(3)})`,
+            filter: 'blur(0.5px) drop-shadow(0 0 14px #00e5ff)',
+            transition: audioSignals?.isTransient ? 'none' : 'opacity 0.16s ease-out, transform 0.14s ease-out',
+          }}
+        />
+      )}
+
+      {/* ── PSYCHONAUT: DMT HYPERSPACE SACRED GEOMETRY OVERLAY ── */}
+      {selectedStyle === 'dmt_breakthrough' && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 6,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mixBlendMode: 'screen',
+            opacity: audioSignals?.isTransient ? 0.95 : (0.45 + (Number(audioSignals?.bass) || 0) * 0.4),
+            transform: `scale(${(1.0 + (Number(audioSignals?.bass) || 0) * 0.28 + (audioSignals?.isTransient ? 0.25 : 0)).toFixed(3)}) rotate(${((currentTime * 32) + (Number(audioSignals?.treble) || 0) * 45).toFixed(1)}deg)`,
+            transition: audioSignals?.isTransient ? 'none' : 'transform 0.1s ease-out, opacity 0.12s ease-out',
+          }}
+        >
+          <svg viewBox="0 0 400 400" style={{ width: '85%', height: '85%', filter: 'drop-shadow(0 0 16px #f43f5e) drop-shadow(0 0 30px #a855f7)' }}>
+            <circle cx="200" cy="200" r="180" fill="none" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="4 8" opacity="0.7" />
+            <circle cx="200" cy="200" r="140" fill="none" stroke="#fbbf24" strokeWidth="1.5" opacity="0.8" />
+            <circle cx="200" cy="200" r="95" fill="none" stroke="#a855f7" strokeWidth="2" strokeDasharray="12 4" />
+            <circle cx="200" cy="200" r="50" fill="none" stroke="#00e5ff" strokeWidth="1.8" />
+            {/* Hexagram & Metatron tessellation vectors */}
+            <polygon points="200,60 321,270 79,270" fill="none" stroke="#f43f5e" strokeWidth="1.5" opacity="0.85" />
+            <polygon points="200,340 321,130 79,130" fill="none" stroke="#38bdf8" strokeWidth="1.5" opacity="0.85" />
+            <polygon points="200,80 304,140 304,260 200,320 96,260 96,140" fill="none" stroke="#fbbf24" strokeWidth="1.2" opacity="0.75" />
+            <line x1="200" y1="20" x2="200" y2="380" stroke="#a855f7" strokeWidth="0.8" opacity="0.5" />
+            <line x1="20" y1="200" x2="380" y2="200" stroke="#a855f7" strokeWidth="0.8" opacity="0.5" />
+          </svg>
+        </div>
+      )}
+
+      {/* ── PSYCHONAUT: LSD ACID PRISMATIC WAVE OVERLAY ── */}
+      {selectedStyle === 'lsd_acid_melt' && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 6,
+            background: `radial-gradient(ellipse at ${(50 + Math.sin(currentTime * 1.5) * 20).toFixed(1)}% ${(50 + Math.cos(currentTime * 1.2) * 20).toFixed(1)}%, rgba(244, 63, 94, 0.22) 0%, rgba(168, 85, 247, 0.25) 35%, rgba(6, 182, 212, 0.2) 70%, transparent 100%)`,
+            mixBlendMode: 'screen',
+            opacity: 0.75 + (Number(audioSignals?.mid) || 0) * 0.25,
+            filter: 'blur(2px)',
+          }}
+        />
+      )}
+
+      {/* ── PSYCHONAUT: AYAHUASCA SHAMANIC EMERALD/GOLD VISION OVERLAY ── */}
+      {selectedStyle === 'ayahuasca_vision' && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 6,
+            background: `repeating-conic-gradient(from ${(currentTime * 8).toFixed(1)}deg at 50% 50%, rgba(234, 179, 8, 0.18) 0deg 15deg, transparent 15deg 30deg, rgba(16, 185, 129, 0.22) 30deg 45deg, transparent 45deg 60deg)`,
+            mixBlendMode: 'screen',
+            opacity: audioSignals?.isTransient ? 0.9 : 0.55,
+            filter: 'blur(1px) drop-shadow(0 0 18px #eab308)',
+          }}
+        />
+      )}
 
       {/* WebM Alpha Loop / Celluloid Overlay Layer */}
       {overlayTexture?.image && (
@@ -1912,20 +2291,64 @@ export function CanvasWorkspace({
           verdana:         "Verdana, Geneva, sans-serif",
         };
         const fontFamily = LYRIC_FONTS[lyricFont] || LYRIC_FONTS.space_mono;
+
+        // ── Beat-Reactive Audio Signal Modulators ──
+        const bassVal = Number(audioSignals?.bass) || 0;
+        const trebleVal = Number(audioSignals?.treble) || 0;
+        const rmsVal = Number(audioSignals?.rms) || 0;
+        const isTransient = Boolean(audioSignals?.isTransient);
+        const beatPhase = (currentTime * (bpm / 60)) % 1;
+
+        let animTransform = lyricAlign === 'center' ? 'translateX(-50%)' : 'none';
+        let animTextShadow = '0 0 12px rgba(6,182,212,0.9), 0 2px 8px rgba(0,0,0,0.95)';
+        let animFilter = 'none';
+        let animTransition = isTransient ? 'none' : 'transform 0.12s ease-out, filter 0.15s ease-out';
+
+        if (lyricAnim === 'pulse_slam') {
+          // Sharp kinetic scale punch on drum kicks & transients with fast decay
+          const slamScale = 1.0 + bassVal * 0.22 + (isTransient ? 0.25 : 0);
+          const slamHop = isTransient ? -6 : 0;
+          animTransform = `${lyricAlign === 'center' ? 'translateX(-50%)' : ''} translateY(${slamHop}px) scale(${slamScale.toFixed(3)})`;
+          animTextShadow = isTransient
+            ? '0 0 28px rgba(255, 107, 0, 1), 0 0 55px rgba(6, 182, 212, 0.95), 0 2px 10px #000'
+            : `0 0 ${(12 + bassVal * 22).toFixed(0)}px rgba(6,182,212,${(0.7 + bassVal * 0.3).toFixed(2)}), 0 2px 8px rgba(0,0,0,0.95)`;
+        } else if (lyricAnim === 'karaoke_glow') {
+          // Glowing neon sweep in sync with the beat phase
+          animTransform = `${lyricAlign === 'center' ? 'translateX(-50%)' : ''} scale(${(1.0 + bassVal * 0.08).toFixed(3)})`;
+          animTextShadow = `0 0 18px rgba(244, 63, 94, 0.9), 0 0 35px rgba(168, 85, 247, 0.8), 0 2px 8px #000`;
+          animFilter = `drop-shadow(0 0 ${(8 + Math.sin(beatPhase * Math.PI) * 14).toFixed(0)}px rgba(236, 72, 153, 0.9))`;
+        } else if (lyricAnim === 'glitch_pop') {
+          // RGB split glitch jitter on snare rolls & kicks
+          const jitterX = isTransient ? (Math.random() - 0.5) * 14 : 0;
+          const jitterRot = isTransient ? (Math.random() - 0.5) * 4 : 0;
+          animTransform = `${lyricAlign === 'center' ? 'translateX(-50%)' : ''} translate(${jitterX.toFixed(1)}px, 0) rotate(${jitterRot.toFixed(1)}deg) scale(${(1.0 + (isTransient ? 0.14 : 0)).toFixed(3)})`;
+          animTextShadow = isTransient
+            ? '-4px 0 rgba(255, 0, 85, 0.95), 4px 0 rgba(0, 240, 255, 0.95), 0 0 16px #fff'
+            : '0 0 10px rgba(0, 240, 255, 0.7), 0 2px 6px #000';
+        } else if (lyricAnim === 'floating_drift') {
+          // Hypnotic drifting wave & RMS breathing glow
+          const driftY = Math.sin(currentTime * 2.5) * 8 + bassVal * 4;
+          const driftRot = Math.cos(currentTime * 1.8) * 1.8;
+          animTransform = `${lyricAlign === 'center' ? 'translateX(-50%)' : ''} translateY(${driftY.toFixed(1)}px) rotate(${driftRot.toFixed(2)}deg) scale(${(1.02 + rmsVal * 0.15).toFixed(3)})`;
+          animTextShadow = `0 0 ${(14 + rmsVal * 30).toFixed(0)}px rgba(168, 85, 247, 0.9), 0 0 30px rgba(6, 182, 212, 0.7), 0 2px 8px #000`;
+        }
+
         return (
           <div style={{
             position: 'absolute',
             bottom: '12%',
             left: lyricAlign === 'left' ? '8%' : lyricAlign === 'right' ? 'auto' : '50%',
             right: lyricAlign === 'right' ? '8%' : 'auto',
-            transform: lyricAlign === 'center' ? 'translateX(-50%)' : 'none',
+            transform: animTransform,
+            transition: animTransition,
+            filter: animFilter,
             zIndex: 12,
             color: '#fff',
             fontFamily,
             fontSize: `${lyricSize}rem`,
             letterSpacing: (lyricFont === 'space_mono' || lyricFont === 'major_mono') ? '2px' : '0.5px',
             textAlign: lyricAlign,
-            textShadow: '0 0 12px rgba(6,182,212,0.9), 0 2px 8px rgba(0,0,0,0.95)',
+            textShadow: animTextShadow,
             maxWidth: '85%',
             pointerEvents: activeLyric.text?.includes('http') ? 'auto' : 'none',
             lineHeight: 1.4,

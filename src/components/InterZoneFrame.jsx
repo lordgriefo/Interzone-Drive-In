@@ -668,7 +668,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
           {/* ─ TIMELINE CONTENT ─ */}
           <div
             className={`timeline-pane${isCollapsed ? ' collapsed' : ''}`}
-            style={{ height: effectiveTimelineH, overflow: 'hidden' }}
+            style={{ height: effectiveTimelineH, overflow: isCollapsed ? 'hidden' : 'visible' }}
           >
             {/* Pass isCollapsed to timeline child */}
             {React.cloneElement(timeline, { isCollapsed })}

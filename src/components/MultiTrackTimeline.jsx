@@ -165,6 +165,27 @@ export function MultiTrackTimeline({
   const [snapEnabled, setSnapEnabled] = useState(true);
   const [snapGuide, setSnapGuide] = useState(null);
 
+  // Auto-MV Cut Menu dropdown state & positioning
+  const [showMvCutMenu, setShowMvCutMenu] = useState(false);
+  const mvButtonRef = useRef(null);
+  const [menuPos, setMenuPos] = useState({ bottom: 0, left: 0 });
+  const cutFileInputRef = useRef(null);
+
+  // Position popup above the button and dismiss on outside click
+  useEffect(() => {
+    if (!showMvCutMenu) return;
+    if (mvButtonRef.current) {
+      const rect = mvButtonRef.current.getBoundingClientRect();
+      setMenuPos({
+        bottom: Math.max(10, window.innerHeight - rect.top + 6),
+        left: Math.max(8, Math.min(window.innerWidth - 290, rect.left)),
+      });
+    }
+    const handleDocClick = () => setShowMvCutMenu(false);
+    window.addEventListener('click', handleDocClick);
+    return () => window.removeEventListener('click', handleDocClick);
+  }, [showMvCutMenu]);
+
   const timelineDuration = useMemo(() => {
     const clipEnd = videoClips.reduce((max, c) => Math.max(max, c.startTime + c.duration), 0);
     return Math.max(duration, clipEnd, 30);
@@ -806,6 +827,12 @@ export function MultiTrackTimeline({
               value={selectedClip.duration}
               onCommit={(val) => edit.updateClip?.(selectedClip.id, { duration: Math.max(MIN_CLIP_DUR, val) })}
             />
+            <ToolBtn
+              label="▶ Full Dur"
+              title="Snap selected clip duration to match its full natural video length"
+              color="#22c55e"
+              onClick={() => edit.fitClipToAssetDuration?.(selectedClip.id)}
+            />
             <ToolSep />
           </>
         )}
@@ -833,6 +860,523 @@ export function MultiTrackTimeline({
             onClick={onReorderAssetsByClips}
           />
         )}
+
+        <ToolSep />
+
+        {/* Project & Cut sequence templates */}
+        <ToolBtn
+          label="💾 Save Cut"
+          title="Save and export the current cut sequence as a reusable JSON template"
+          color="#06b6d4"
+          onClick={() => {
+            const data = edit.exportCutTemplate?.();
+            if (!data) return;
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kinet-cut-template-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+        />
+        <ToolBtn
+          label="📂 Load Cut"
+          title="Load a saved cut sequence template from JSON"
+          color="#06b6d4"
+          onClick={() => cutFileInputRef.current?.click()}
+        />
+        <ToolBtn
+          label="🎬 EDL"
+          title="Export standard CSV / EDL Edit Decision List for DaVinci Resolve or Premiere"
+          color="#f59e0b"
+          onClick={() => {
+            const clips = videoClips || [];
+            let csv = "Index,Clip Name,Start Time (s),Duration (s),End Time (s),In Point (s),Reversed,Mirrored\n";
+            clips.forEach((c, idx) => {
+              const a = assetMap[c.assetId];
+              const name = (a?.name || 'clip').replace(/,/g, '_');
+              csv += `${idx + 1},${name},${c.startTime.toFixed(2)},${c.duration.toFixed(2)},${(c.startTime + c.duration).toFixed(2)},${(c.inPoint || 0).toFixed(2)},${Boolean(c.reversed)},${Boolean(c.mirrored)}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kinet-edit-decision-list-${Date.now()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+        />
+        <input
+          ref={cutFileInputRef}
+          type="file"
+          accept=".json,application/json"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              try {
+                const json = JSON.parse(ev.target.result);
+                edit.loadCutTemplate?.(json);
+              } catch (err) {
+                alert('Could not load cut template: ' + err.message);
+              }
+            };
+            reader.readAsText(f);
+            e.target.value = '';
+          }}
+        />
+
+        <ToolSep />
+
+        {/* Smart MV Auto-Cutter dropdown */}
+        <div style={{ position: 'relative', display: 'inline-flex' }}>
+          <button
+            ref={mvButtonRef}
+            type="button"
+            title="Auto-generate a full beat-synced music video cut from your Media Bin"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMvCutMenu((prev) => !prev);
+            }}
+            style={{
+              background: showMvCutMenu ? 'rgba(168, 85, 247, 0.25)' : 'rgba(168, 85, 247, 0.12)',
+              border: '1px solid #a855f7',
+              color: '#d8b4fe',
+              borderRadius: 3,
+              padding: '2px 7px',
+              fontSize: 9,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-mono, monospace)',
+              letterSpacing: 0.3,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              transition: 'all 0.12s',
+            }}
+          >
+            <span>⚡ AUTO-MV CUT</span>
+            <span style={{ fontSize: 7, opacity: 0.8 }}>{showMvCutMenu ? '▲' : '▼'}</span>
+          </button>
+
+          {showMvCutMenu && (
+            <div
+              className="timeline-mv-cut-menu"
+              style={{
+                position: 'fixed',
+                bottom: menuPos.bottom,
+                left: menuPos.left,
+                zIndex: 99999,
+                backgroundColor: 'var(--bg-panel, #18181b)',
+                border: '1px solid #a855f7',
+                borderRadius: 5,
+                boxShadow: '0 10px 36px rgba(0,0,0,0.98), 0 0 20px rgba(168,85,247,0.45)',
+                padding: '6px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                width: 275,
+                maxHeight: 'min(480px, 75vh)',
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#a855f7 rgba(0,0,0,0.6)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <style>{`
+                .timeline-mv-cut-menu::-webkit-scrollbar {
+                  width: 7px;
+                }
+                .timeline-mv-cut-menu::-webkit-scrollbar-track {
+                  background: rgba(0, 0, 0, 0.5);
+                  border-radius: 4px;
+                }
+                .timeline-mv-cut-menu::-webkit-scrollbar-thumb {
+                  background: #a855f7;
+                  border-radius: 4px;
+                  border: 1px solid rgba(255, 255, 255, 0.15);
+                }
+                .timeline-mv-cut-menu::-webkit-scrollbar-thumb:hover {
+                  background: #c084fc;
+                }
+              `}</style>
+              <div style={{
+                fontSize: 8,
+                color: '#a855f7',
+                fontWeight: 800,
+                padding: '3px 6px',
+                letterSpacing: 0.6,
+                borderBottom: '1px solid rgba(168,85,247,0.3)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 3,
+              }}>
+                <span>AUTOCUT (SHORTEST → LONGEST):</span>
+                <span style={{ fontSize: 7, color: 'var(--text-dim, #a1a1aa)' }}>↕ 12 PROFILES</span>
+              </div>
+
+              {/* ── Group 1: Fast & Kinetic Micro-Cuts (< 1s) ── */}
+              <div style={{ fontSize: 7.5, color: '#ec4899', fontWeight: 800, padding: '3px 6px 1px', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                ⚡ Fast & Micro-Cuts (&lt; 1s)
+              </div>
+
+              {/* 1. Glitch Frenzy */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'glitch_frenzy', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(236,72,153,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#f472b6' }}>💥 Glitch Frenzy (Breakcore)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>1/4 to 1 Beat (~0.18–0.5s) · Micro-cuts, reverse & mirror flashes</span>
+              </button>
+
+              {/* 2. Punk & Speed Metal */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'punk_speed', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#f87171' }}>🎸 Punk & Speed Metal</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>1-Beat Downbeats (~0.5s) · Relentless high-voltage thrash cuts</span>
+              </button>
+
+              {/* 3. EDM Drop & Build */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'drop_buildup', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(245,158,11,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#fbbf24' }}>⚡ EDM Drop & Build</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>Accelerating 4 → 0.5 Beats · Build-up roll into drop impact</span>
+              </button>
+
+              {/* ── Group 2: Rhythmic Beat-Synced (1s – 4s) ── */}
+              <div style={{ fontSize: 7.5, color: '#f59e0b', fontWeight: 800, padding: '5px 6px 1px', letterSpacing: 0.5, textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 2 }}>
+                🥁 Rhythmic Beat-Synced (1s – 4s)
+              </div>
+
+              {/* 4. Beat-Locked */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'beat_locked', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700 }}>🥁 Beat-Locked (2–4 Beats)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>2–4 Beats (~1.0–2.0s) · Classic downbeat tempo cuts</span>
+              </button>
+
+              {/* 5. Energy Arc */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'energy_arc', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700 }}>🌊 Energy Arc (Verse / Chorus)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>Dynamic 1–8 Beats · Rapid chorus cuts, steady verses, 6-8s intro/outro</span>
+              </button>
+
+              {/* 6. Lo-Fi Chillhop */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'lofi_chillhop', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700 }}>☕ Lo-Fi Chillhop (4–8 Beats)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>4–8 Beats (~2.0–4.0s) · Smooth mellow pacing with gentle rhythm</span>
+              </button>
+
+              {/* ── Group 3: Atmospheric & Psychedelic (6s – 12s) ── */}
+              <div style={{ fontSize: 7.5, color: '#a855f7', fontWeight: 800, padding: '5px 6px 1px', letterSpacing: 0.5, textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 2 }}>
+                🌀 Atmospheric & Psychedelic (6s – 12s)
+              </div>
+
+              {/* 7. Cinematic Hold */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'cinematic', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700 }}>🎞️ Cinematic Hold (6–8s)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>6–8 Seconds Hold · Classic indie music video shot holds</span>
+              </button>
+
+              {/* 8. Psychonaut Voyage */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'psychonaut_voyage', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#c084fc' }}>🍄 Psychonaut Voyage (Entheogen)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>7–12s Breathing Holds · Alternates deep holds with 2-beat phase shifts</span>
+              </button>
+
+              {/* 9. Dream Pop & Shoegaze */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'dream_pop', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(168,85,247,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700 }}>☁️ Dream Pop & Shoegaze</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>8–16 Beats (~8–12s) · Lush, elongated floating atmospheric holds</span>
+              </button>
+
+              {/* ── Group 4: Long-Form AI & Full Clips (15s – Full Length) ── */}
+              <div style={{ fontSize: 7.5, color: '#00e5ff', fontWeight: 800, padding: '5px 6px 1px', letterSpacing: 0.5, textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 2 }}>
+                🤖 Long-Form AI & Full Clips (15s – Full)
+              </div>
+
+              {/* 10. Extended AI Video */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'ai_long_form', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,229,255,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#38bdf8' }}>🤖 Extended AI Video (15–30s Hold)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>15–30 Seconds Hold · Tuned for modern generative AI video shots</span>
+              </button>
+
+              {/* 11. Epic Cinema Take */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'epic_cinematic', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,229,255,0.2)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#38bdf8' }}>🌌 Epic Cinema Take (30–60s Hold)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>30–60 Seconds Hold · Slow-cinema meditative takes & narrative scenes</span>
+              </button>
+
+              {/* 12. Full Clip Native */}
+              <button
+                type="button"
+                onClick={() => {
+                  edit.generateAutoMvCut?.({ mode: 'full_clip_native', currentBpm: bpm, totalDuration: duration });
+                  onUseTimelineStyle?.();
+                  setShowMvCutMenu(false);
+                }}
+                style={{
+                  background: 'rgba(0, 229, 255, 0.08)',
+                  border: '1px solid rgba(0, 229, 255, 0.3)',
+                  color: 'var(--text-primary, #fff)',
+                  textAlign: 'left',
+                  padding: '5px 8px',
+                  borderRadius: 3,
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,229,255,0.25)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0, 229, 255, 0.08)'; }}
+              >
+                <span style={{ fontWeight: 700, color: '#22d3ee' }}>🎬 Full Clip Native (Play Entire Length)</span>
+                <span style={{ fontSize: 8, color: 'var(--text-dim, #a1a1aa)' }}>100% Full Video Duration · Plays each video from 0 to end without cuts</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Right side: Snapping & Zoom */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>

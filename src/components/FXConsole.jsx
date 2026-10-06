@@ -301,9 +301,28 @@ export function FXConsole({
   setAutoDJMode = () => {},
   autoDJInterval = 12,
   setAutoDJInterval = () => {},
+  // MilkDrop & Psychedelic MV Visual Tricks
+  liquidWarpEnabled = false,
+  setLiquidWarpEnabled = () => {},
+  liquidWarpIntensity = 0.7,
+  setLiquidWarpIntensity = () => {},
+  kaleidoscopeMode = 'none',
+  setKaleidoscopeMode = () => {},
+  phosphorTrails = false,
+  setPhosphorTrails = () => {},
+  chromaticPunch = false,
+  setChromaticPunch = () => {},
+  fractalMode = 'none',
+  setFractalMode = () => {},
+  alienBeam = false,
+  setAlienBeam = () => {},
+  warpDrive = false,
+  setWarpDrive = () => {},
+  lyricAnim = 'pulse_slam',
+  setLyricAnim = () => {},
 }) {
-
-
+  const [isVibesOpen, setIsVibesOpen] = useState(false);
+  const [activeVibeId, setActiveVibeId] = useState(null);
 
   return (
     <div style={{
@@ -610,6 +629,18 @@ export function FXConsole({
             <option value="verdana">Verdana — screen-optimised</option>
           </optgroup>
         </select>
+
+        {/* Beat-Reactive Lyric Animation */}
+        <label style={{ color: 'var(--accent-orange)', fontSize: 9, fontWeight: 700, marginTop: 2 }}>
+          ⚡ Beat-Reactive Lyric Animation
+        </label>
+        <select value={lyricAnim} onChange={(e) => setLyricAnim(e.target.value)} style={selectStyle}>
+          <option value="pulse_slam">💥 Bass Slam Pop (Downbeat punch + glow burst)</option>
+          <option value="karaoke_glow">🌊 Karaoke Glow Wave (Sweeping beat neon gradient)</option>
+          <option value="glitch_pop">⚡ Glitch Jitter & RGB Split (Transient kick pop)</option>
+          <option value="floating_drift">☁️ Floating Drift (Hypnotic wave & RMS bloom)</option>
+          <option value="clean">Clean (No beat modulation)</option>
+        </select>
       </div>
 
       {/* ── 3. ERA (THE LOOK) ── */}
@@ -698,6 +729,612 @@ export function FXConsole({
         })()}
       </div>
 
+      {/* ── MV VISUAL TRICKS / MILKDROP FX ── */}
+      <div style={{
+        ...panelSection,
+        border: (liquidWarpEnabled || kaleidoscopeMode !== 'none' || phosphorTrails || chromaticPunch)
+          ? '1px solid #d946ef'
+          : '1px solid var(--border-dim)',
+        boxShadow: (liquidWarpEnabled || kaleidoscopeMode !== 'none' || phosphorTrails || chromaticPunch)
+          ? '0 0 10px rgba(217, 70, 239, 0.25)'
+          : 'none',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+          <label style={sectionLabel('#d946ef')}>✨ MILKDROP / MV VISUAL TRICKS</label>
+          {(liquidWarpEnabled || kaleidoscopeMode !== 'none' || phosphorTrails || chromaticPunch) && (
+            <span style={{ fontSize: 8, color: '#d946ef', fontWeight: 700, letterSpacing: 0.5 }}>● ACTIVE</span>
+          )}
+        </div>
+
+        {/* 1. Liquid Oil-Warp (feTurbulence Displacement) */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <ToggleSwitch
+              enabled={liquidWarpEnabled}
+              onChange={() => setLiquidWarpEnabled(!liquidWarpEnabled)}
+              label="LIQUID OIL-WARP"
+              accentVar="#d946ef"
+            />
+            {liquidWarpEnabled && (
+              <span style={{ fontSize: 8, color: '#d946ef', fontFamily: 'var(--font-mono)' }}>
+                {(liquidWarpIntensity * 100).toFixed(0)}%
+              </span>
+            )}
+          </div>
+          {liquidWarpEnabled && (
+            <div style={{ marginTop: 4 }}>
+              <input
+                type="range"
+                min="0.2"
+                max="1.8"
+                step="0.05"
+                value={liquidWarpIntensity}
+                onChange={(e) => setLiquidWarpIntensity(parseFloat(e.target.value))}
+                style={{ ...rangeStyle, accentColor: '#d946ef' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 7, color: 'var(--text-dim)' }}>
+                <span>Subtle Fluid</span>
+                <span>Deep Ripple</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 2. Kaleidoscope Mandala */}
+        <div style={{ marginTop: 4 }}>
+          <label style={{ color: 'var(--text-dim)', fontSize: 9, display: 'block', marginBottom: 2 }}>
+            KALEIDOSCOPE MANDALA
+          </label>
+          <select
+            value={kaleidoscopeMode}
+            onChange={(e) => setKaleidoscopeMode(e.target.value)}
+            style={{
+              ...selectStyle,
+              border: kaleidoscopeMode !== 'none' ? '1px solid #d946ef' : '1px solid var(--border-mid)',
+            }}
+          >
+            <option value="none">Off (Single Viewport)</option>
+            <option value="4way">4-Way Radial Mandala</option>
+            <option value="8way">8-Way Crystal Prism</option>
+          </select>
+        </div>
+
+        {/* 3. Fractal Variations */}
+        <div style={{ marginTop: 4 }}>
+          <label style={{ color: 'var(--text-dim)', fontSize: 9, display: 'block', marginBottom: 2 }}>
+            FRACTAL VARIATIONS
+          </label>
+          <select
+            value={fractalMode}
+            onChange={(e) => setFractalMode(e.target.value)}
+            style={{
+              ...selectStyle,
+              border: fractalMode !== 'none' ? '1px solid #d946ef' : '1px solid var(--border-mid)',
+            }}
+          >
+            <option value="none">Off (No Fractal Overlay)</option>
+            <option value="spiral">🌀 Mandelbrot Light Spiral</option>
+            <option value="tunnel">🌌 Infinite Concentric Tunnel</option>
+          </select>
+        </div>
+
+        {/* 4. Phosphor Ghost Trails */}
+        <div style={{ marginTop: 4 }}>
+          <ToggleSwitch
+            enabled={phosphorTrails}
+            onChange={() => setPhosphorTrails(!phosphorTrails)}
+            label="PHOSPHOR GHOST TRAILS"
+            accentVar="#06b6d4"
+          />
+        </div>
+
+        {/* 5. Chromatic Bass Punch */}
+        <div style={{ marginTop: 4 }}>
+          <ToggleSwitch
+            enabled={chromaticPunch}
+            onChange={() => setChromaticPunch(!chromaticPunch)}
+            label="CHROMATIC BASS PUNCH"
+            accentVar="#f43f5e"
+          />
+        </div>
+
+        {/* 6. Alien Tractor Scan-Beam */}
+        <div style={{ marginTop: 4 }}>
+          <ToggleSwitch
+            enabled={alienBeam}
+            onChange={() => setAlienBeam(!alienBeam)}
+            label="👽 ALIEN TRACTOR SCAN-BEAM"
+            accentVar="#22c55e"
+          />
+        </div>
+
+        {/* 7. Sci-Fi Warp Drive Streaks */}
+        <div style={{ marginTop: 4 }}>
+          <ToggleSwitch
+            enabled={warpDrive}
+            onChange={() => setWarpDrive(!warpDrive)}
+            label="🚀 SCI-FI WARP DRIVE STREAKS"
+            accentVar="#00e5ff"
+          />
+        </div>
+
+        {/* ── STYLED INSTANT MV VIBES & MOODS DROPDOWN ── */}
+        <div style={{ marginTop: 8, paddingTop: 6, borderTop: '1px solid var(--border-dim)', position: 'relative' }}>
+          {(() => {
+            const VIBE_PRESETS = [
+              // ── PSYCHONAUT & ENTHEOGEN ──
+              {
+                id: 'dmt_breakthrough',
+                category: '🍄 Psychonaut & Entheogen',
+                name: 'DMT Hyperspace',
+                badge: 'SACRED GEOMETRY',
+                subtitle: 'Chanting sacred geometry, hyperbolic downbeat zooms & solarize inverts',
+                color: '#f43f5e',
+                glowColor: 'rgba(244, 63, 94, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(true);
+                  setLiquidWarpIntensity(0.85);
+                  setKaleidoscopeMode('8way');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(true);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('1960_psychedelic');
+                  setSelectedStyle('dmt_breakthrough');
+                  setSelectedRube('strangelet_event');
+                  setLyricAnim('glitch_pop');
+                },
+              },
+              {
+                id: 'lsd_acid_melt',
+                category: '🍄 Psychonaut & Entheogen',
+                name: 'LSD Acid Tracers',
+                badge: 'PRISMATIC MELT',
+                subtitle: 'Liquid wave breathing with trailing prismatic chromatic dispersion',
+                color: '#a855f7',
+                glowColor: 'rgba(168, 85, 247, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(true);
+                  setLiquidWarpIntensity(0.9);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(true);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('1960_psychedelic');
+                  setSelectedStyle('lsd_acid_melt');
+                  setSelectedRube('chromatic_prism');
+                  setLyricAnim('floating_drift');
+                },
+              },
+              {
+                id: 'psilocybin_breath',
+                category: '🍄 Psychonaut & Entheogen',
+                name: 'Psilocybin Breathe',
+                badge: 'LIVING WALLS',
+                subtitle: 'Deep organic spatial expansion/contraction, living walls on bass cycles',
+                color: '#10b981',
+                glowColor: 'rgba(16, 185, 129, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(true);
+                  setLiquidWarpIntensity(0.55);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('lynchian_interzone');
+                  setSelectedStyle('psilocybin_breath');
+                  setSelectedRube('soft_pulse');
+                  setLyricAnim('karaoke_glow');
+                },
+              },
+              {
+                id: 'ayahuasca_vision',
+                category: '🍄 Psychonaut & Entheogen',
+                name: 'Ayahuasca Shamanic',
+                badge: 'SERPENT VISION',
+                subtitle: 'Emerald and gold visionary pulses, serpent wave drifts & sacred geometry',
+                color: '#eab308',
+                glowColor: 'rgba(234, 179, 8, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(true);
+                  setLiquidWarpIntensity(0.7);
+                  setKaleidoscopeMode('4way');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('1960_psychedelic');
+                  setSelectedStyle('ayahuasca_vision');
+                  setSelectedRube('alchemical');
+                  setLyricAnim('floating_drift');
+                },
+              },
+
+              // ── COSMIC & SCI-FI ──
+              {
+                id: 'alien_signal',
+                category: '🌌 Cosmic & Sci-Fi',
+                name: 'Alien Signal',
+                badge: 'XENOTROPE',
+                subtitle: 'Cathode burn with extraterrestrial green tractor scan-beam',
+                color: '#22c55e',
+                glowColor: 'rgba(34, 197, 94, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(false);
+                  setAlienBeam(true);
+                  setWarpDrive(false);
+                  setSelectedEra('roswell_signal');
+                  setSelectedRube('cathode_burn');
+                  setLyricAnim('pulse_slam');
+                },
+              },
+              {
+                id: 'sci_fi_warp',
+                category: '🌌 Cosmic & Sci-Fi',
+                name: 'Sci-Fi Warp Drive',
+                badge: 'HYPERSPACE',
+                subtitle: 'Conic hyperspace star streaks, neon kicks & chromatic punches',
+                color: '#00e5ff',
+                glowColor: 'rgba(0, 229, 255, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(false);
+                  setChromaticPunch(true);
+                  setAlienBeam(false);
+                  setWarpDrive(true);
+                  setSelectedEra('2020_cyber');
+                  setSelectedRube('neon_pulse');
+                  setLyricAnim('pulse_slam');
+                },
+              },
+              {
+                id: 'fractal_spiral',
+                category: '🌌 Cosmic & Sci-Fi',
+                name: 'Fractal Spiral',
+                badge: 'MANDELBROT',
+                subtitle: 'Mandelbrot light spiral overlay with hypnotic drift & phosphor trails',
+                color: '#d946ef',
+                glowColor: 'rgba(217, 70, 239, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('spiral');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('1960_psychedelic');
+                  setSelectedStyle('mv_hypnotic_drift');
+                  setSelectedRube('chromatic_prism');
+                  setLyricAnim('karaoke_glow');
+                },
+              },
+
+              // ── CINEMA & MUSIC VIDEO ──
+              {
+                id: 'cyber_club',
+                category: '🎬 Cinema & Music Video',
+                name: 'Cyber Club',
+                badge: 'NEON BEAT',
+                subtitle: 'Phosphor trails, heavy chromatic bass punch & cyber 2020 grade',
+                color: '#06b6d4',
+                glowColor: 'rgba(6, 182, 212, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(true);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('2020_cyber');
+                  setSelectedRube('neon_pulse');
+                  setLyricAnim('glitch_pop');
+                },
+              },
+              {
+                id: 'grunge_mtv',
+                category: '🎬 Cinema & Music Video',
+                name: '90s Grunge MTV',
+                badge: 'VHS FLASH',
+                subtitle: '1980s VHS tracking jitter, rapid beat-locked flash cuts & tape distress',
+                color: '#f59e0b',
+                glowColor: 'rgba(245, 158, 11, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('1980_vhs');
+                  setSelectedStyle('mv_flash_cut');
+                  setSelectedRube('signal_dropout');
+                  setLyricAnim('pulse_slam');
+                },
+              },
+              {
+                id: 'slow_burn_mv',
+                category: '🎬 Cinema & Music Video',
+                name: 'Slow Burn MV',
+                badge: 'CINEMATIC HOLD',
+                subtitle: '10s cinematic holds, concentric tunnel depth & warm sepia glow',
+                color: '#ec4899',
+                glowColor: 'rgba(236, 72, 153, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('tunnel');
+                  setPhosphorTrails(false);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedEra('lynchian_interzone');
+                  setSelectedStyle('mv_slow_burn');
+                  setSelectedRube('gentle_sway');
+                  setLyricAnim('floating_drift');
+                },
+              },
+              {
+                id: 'lofi_chill',
+                category: '🎬 Cinema & Music Video',
+                name: 'Lo-Fi Chill',
+                badge: 'WARM NOIR',
+                subtitle: 'Soft floating lyric drift, subtle phosphor glow & 1940 noir grain',
+                color: '#a1a1aa',
+                glowColor: 'rgba(161, 161, 170, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(true);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setLyricAnim('floating_drift');
+                  setSelectedEra('1940_noir');
+                  setSelectedStyle('ambient_drift');
+                  setSelectedRube('soft_pulse');
+                },
+              },
+            ];
+
+            const activeVibe = VIBE_PRESETS.find((v) => v.id === activeVibeId);
+
+            return (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 8, color: 'var(--text-dim)', fontWeight: 700, letterSpacing: 0.5 }}>
+                    ⚡ INSTANT MV VIBES & MOODS
+                  </span>
+                  {activeVibe && (
+                    <span style={{ fontSize: 8, color: activeVibe.color, fontWeight: 700 }}>
+                      ● {activeVibe.badge}
+                    </span>
+                  )}
+                </div>
+
+                {/* Trigger button */}
+                <button
+                  type="button"
+                  onClick={() => setIsVibesOpen((prev) => !prev)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 9px',
+                    borderRadius: 4,
+                    border: `1px solid ${activeVibe ? activeVibe.color : 'var(--border-mid)'}`,
+                    background: activeVibe ? `${activeVibe.glowColor.replace('0.45', '0.12')}` : 'rgba(0,0,0,0.35)',
+                    boxShadow: activeVibe ? `0 0 10px ${activeVibe.glowColor}` : 'none',
+                    cursor: 'pointer',
+                    color: '#fff',
+                    fontSize: 10,
+                    fontFamily: 'var(--font-mono, monospace)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                    <span
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: '50%',
+                        backgroundColor: activeVibe ? activeVibe.color : '#a855f7',
+                        boxShadow: `0 0 6px ${activeVibe ? activeVibe.color : '#a855f7'}`,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span style={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {activeVibe ? activeVibe.name : '⚡ Select MV Vibe / Mood...'}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 8, color: 'var(--text-dim)', marginLeft: 4 }}>
+                    {isVibesOpen ? '▲' : '▼'}
+                  </span>
+                </button>
+
+                {/* Custom Styled Dropdown Menu */}
+                {isVibesOpen && (
+                  <div
+                    className="styled-vibes-menu"
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      marginTop: 4,
+                      zIndex: 9999,
+                      backgroundColor: 'var(--bg-panel, #18181b)',
+                      border: '1px solid #d946ef',
+                      borderRadius: 4,
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.95), 0 0 16px rgba(217,70,239,0.35)',
+                      padding: '4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 3,
+                      maxHeight: 280,
+                      overflowY: 'auto',
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: '#d946ef rgba(0,0,0,0.6)',
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <style>{`
+                      .styled-vibes-menu::-webkit-scrollbar {
+                        width: 6px;
+                      }
+                      .styled-vibes-menu::-webkit-scrollbar-track {
+                        background: rgba(0, 0, 0, 0.5);
+                        border-radius: 3px;
+                      }
+                      .styled-vibes-menu::-webkit-scrollbar-thumb {
+                        background: #d946ef;
+                        border-radius: 3px;
+                      }
+                      .styled-vibes-menu::-webkit-scrollbar-thumb:hover {
+                        background: #f0abfc;
+                      }
+                    `}</style>
+                    {(() => {
+                      const categories = [...new Set(VIBE_PRESETS.map((v) => v.category))];
+                      return categories.map((cat) => (
+                        <div key={cat} style={{ marginBottom: 4 }}>
+                          <div style={{
+                            fontSize: 8,
+                            fontWeight: 800,
+                            color: cat.includes('Psychonaut') ? '#f43f5e' : cat.includes('Cosmic') ? '#00e5ff' : '#ec4899',
+                            letterSpacing: 0.6,
+                            padding: '3px 5px',
+                            textTransform: 'uppercase',
+                            borderBottom: '1px solid rgba(255,255,255,0.08)',
+                            marginBottom: 2,
+                          }}>
+                            {cat}
+                          </div>
+                          {VIBE_PRESETS.filter((v) => v.category === cat).map((vibe) => {
+                            const isSelected = activeVibeId === vibe.id;
+                            return (
+                              <button
+                                key={vibe.id}
+                                type="button"
+                                onClick={() => {
+                                  vibe.apply();
+                                  setActiveVibeId(vibe.id);
+                                  setIsVibesOpen(false);
+                                }}
+                                style={{
+                                  width: '100%',
+                                  textAlign: 'left',
+                                  background: isSelected ? `${vibe.glowColor.replace('0.45', '0.2')}` : 'transparent',
+                                  border: `1px solid ${isSelected ? vibe.color : 'transparent'}`,
+                                  borderRadius: 3,
+                                  padding: '4px 6px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: 1,
+                                  transition: 'all 0.12s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.backgroundColor = `${vibe.glowColor.replace('0.45', '0.12')}`;
+                                    e.currentTarget.style.borderColor = vibe.color;
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                    e.currentTarget.style.borderColor = 'transparent';
+                                  }
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                    <span style={{
+                                      width: 6,
+                                      height: 6,
+                                      borderRadius: '50%',
+                                      backgroundColor: vibe.color,
+                                      boxShadow: `0 0 5px ${vibe.color}`,
+                                      flexShrink: 0,
+                                    }} />
+                                    <span style={{ fontSize: 9.5, fontWeight: 700, color: '#fff' }}>
+                                      {vibe.name}
+                                    </span>
+                                  </div>
+                                  <span style={{
+                                    fontSize: 7,
+                                    fontWeight: 700,
+                                    color: vibe.color,
+                                    background: `${vibe.glowColor.replace('0.45', '0.15')}`,
+                                    padding: '1px 4px',
+                                    borderRadius: 2,
+                                    border: `1px solid ${vibe.color}44`,
+                                  }}>
+                                    {vibe.badge}
+                                  </span>
+                                </div>
+                                <span style={{ fontSize: 7.5, color: 'var(--text-dim, #a1a1aa)', lineHeight: 1.25, paddingLeft: 11 }}>
+                                  {vibe.subtitle}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                )}
+
+                {/* Reset button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLiquidWarpEnabled(false);
+                    setLiquidWarpIntensity(0.7);
+                    setKaleidoscopeMode('none');
+                    setFractalMode('none');
+                    setPhosphorTrails(false);
+                    setChromaticPunch(false);
+                    setAlienBeam(false);
+                    setWarpDrive(false);
+                    setActiveVibeId(null);
+                  }}
+                  style={{
+                    width: '100%',
+                    marginTop: 4,
+                    background: 'transparent',
+                    border: '1px solid var(--border-mid)',
+                    color: 'var(--text-dim)',
+                    borderRadius: 3,
+                    padding: '3px',
+                    fontSize: 8,
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                  }}
+                >
+                  🔄 Reset Visual Tricks & Vibe
+                </button>
+              </>
+            );
+          })()}
+        </div>
+      </div>
 
       {/* ── 5. RUBE GOLDBERG CHAINS ── */}
       <div style={panelSection}>

@@ -109,6 +109,17 @@ export function AssetBin({
   const selectedAsset = assets[selectedAssetIndex] || null;
   const selectedIsVideo = selectedAsset?.mediaType === 'video' || selectedAsset?.type === 'video' || selectedAsset?.url?.endsWith('.webm') || selectedAsset?.url?.endsWith('.mp4');
 
+  // Preview cycle navigation (cycles backwards/forwards through media bin assets)
+  const handlePrevAsset = useCallback(() => {
+    if (assets.length === 0) return;
+    onSelectAsset((selectedAssetIndex - 1 + assets.length) % assets.length);
+  }, [assets.length, onSelectAsset, selectedAssetIndex]);
+
+  const handleNextAsset = useCallback(() => {
+    if (assets.length === 0) return;
+    onSelectAsset((selectedAssetIndex + 1) % assets.length);
+  }, [assets.length, onSelectAsset, selectedAssetIndex]);
+
   // Lightbox keyboard navigation (Escape = close, Left/Right = cycle)
   useEffect(() => {
     if (lightboxIndex == null) return;
@@ -143,12 +154,28 @@ export function AssetBin({
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
-    const newAssets = files.map((file) => ({
-      id: Math.random().toString(36).substring(2, 9),
-      name: file.name,
-      url: URL.createObjectURL(file),
-      mediaType: file.type.startsWith('video/') ? 'video' : 'image',
-    }));
+    const newAssets = files.map((file) => {
+      const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.webm') || file.name.endsWith('.mov');
+      const url = URL.createObjectURL(file);
+      const asset = {
+        id: Math.random().toString(36).substring(2, 9),
+        name: file.name,
+        url,
+        mediaType: isVideo ? 'video' : 'image',
+        duration: isVideo ? 0 : 5,
+      };
+      if (isVideo) {
+        const v = document.createElement('video');
+        v.preload = 'metadata';
+        v.src = url;
+        v.onloadedmetadata = () => {
+          if (v.duration && !Number.isNaN(v.duration)) {
+            asset.duration = v.duration;
+          }
+        };
+      }
+      return asset;
+    });
     onAddAssets(newAssets);
     e.target.value = '';
   };
@@ -258,14 +285,53 @@ export function AssetBin({
         }}>
           {/* Header row: Index counter & Name / Inline rename */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-            <span style={{
-              fontSize: 8,
-              color: 'var(--accent-orange)',
-              fontFamily: 'var(--font-mono, monospace)',
-              fontWeight: 800,
-            }}>
-              #{selectedAssetIndex + 1}/{assets.length}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <button
+                type="button"
+                onClick={handlePrevAsset}
+                style={{
+                  background: 'var(--bg-panel-alt)',
+                  border: '1px solid var(--border-mid)',
+                  color: 'var(--text-primary)',
+                  borderRadius: 3,
+                  padding: '1px 5px',
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  fontWeight: 800,
+                  lineHeight: 1.2,
+                }}
+                title="Preview previous media asset (‹)"
+              >
+                ‹
+              </button>
+              <span style={{
+                fontSize: 8,
+                color: 'var(--accent-orange)',
+                fontFamily: 'var(--font-mono, monospace)',
+                fontWeight: 800,
+                padding: '0 2px',
+              }}>
+                #{selectedAssetIndex + 1}/{assets.length}
+              </span>
+              <button
+                type="button"
+                onClick={handleNextAsset}
+                style={{
+                  background: 'var(--bg-panel-alt)',
+                  border: '1px solid var(--border-mid)',
+                  color: 'var(--text-primary)',
+                  borderRadius: 3,
+                  padding: '1px 5px',
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  fontWeight: 800,
+                  lineHeight: 1.2,
+                }}
+                title="Preview next media asset (›)"
+              >
+                ›
+              </button>
+            </div>
 
             {isRenaming ? (
               <input
@@ -342,9 +408,8 @@ export function AssetBin({
             </button>
           </div>
 
-          {/* Large media display */}
+          {/* Large media display with quick-cycle overlay arrows */}
           <div
-            onClick={() => setLightboxIndex(selectedAssetIndex)}
             style={{
               position: 'relative',
               width: '100%',
@@ -352,85 +417,196 @@ export function AssetBin({
               backgroundColor: '#000',
               borderRadius: 4,
               overflow: 'hidden',
-              cursor: 'zoom-in',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               border: '1px solid var(--border-dim)',
             }}
-            title="Click to view full lightbox"
           >
-            {selectedIsVideo ? (
-              <video
-                src={selectedAsset.url}
-                controls
-                loop
-                muted
-                playsInline
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            ) : (
-              <img
-                src={selectedAsset.url}
-                alt={selectedAsset.name}
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            )}
+            {/* Clickable media to open lightbox */}
+            <div
+              onClick={() => setLightboxIndex(selectedAssetIndex)}
+              style={{
+                width: '100%',
+                height: '100%',
+                cursor: 'zoom-in',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              title="Click to view full lightbox"
+            >
+              {selectedAsset?.url ? (
+                selectedIsVideo ? (
+                  <video
+                    key={selectedAsset.id || selectedAsset.url}
+                    src={selectedAsset.url}
+                    controls
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <img
+                    key={selectedAsset.id || selectedAsset.url}
+                    src={selectedAsset.url}
+                    alt={selectedAsset.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                )
+              ) : (
+                <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>No Media Selected</span>
+              )}
+            </div>
 
-            <span style={{
-              position: 'absolute',
-              top: 4,
-              right: 4,
-              background: 'rgba(0,0,0,0.7)',
-              color: '#fff',
-              fontSize: 8,
-              padding: '2px 4px',
-              borderRadius: 2,
-              pointerEvents: 'none',
-            }}>
+            {/* Overlay arrow: Previous */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePrevAsset();
+              }}
+              style={{
+                position: 'absolute',
+                left: 4,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'rgba(0,0,0,0.65)',
+                border: '1px solid rgba(255,255,255,0.25)',
+                color: '#fff',
+                fontSize: 14,
+                padding: '4px 6px',
+                borderRadius: 3,
+                cursor: 'pointer',
+                zIndex: 5,
+                lineHeight: 1,
+              }}
+              title="Previous file in media list (‹)"
+            >
+              ‹
+            </button>
+
+            {/* Overlay arrow: Next */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNextAsset();
+              }}
+              style={{
+                position: 'absolute',
+                right: 4,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'rgba(0,0,0,0.65)',
+                border: '1px solid rgba(255,255,255,0.25)',
+                color: '#fff',
+                fontSize: 14,
+                padding: '4px 6px',
+                borderRadius: 3,
+                cursor: 'pointer',
+                zIndex: 5,
+                lineHeight: 1,
+              }}
+              title="Next file in media list (›)"
+            >
+              ›
+            </button>
+
+            <span
+              onClick={() => setLightboxIndex(selectedAssetIndex)}
+              style={{
+                position: 'absolute',
+                top: 4,
+                right: 4,
+                background: 'rgba(0,0,0,0.7)',
+                color: '#fff',
+                fontSize: 8,
+                padding: '2px 4px',
+                borderRadius: 2,
+                cursor: 'zoom-in',
+                zIndex: 4,
+              }}
+            >
               🔍 ENLARGE
             </span>
           </div>
 
-          {/* Action buttons: Reorder ◀ ▶, Dupe, + Timeline, Delete */}
+          {/* Action buttons: Prev / Next preview, Reorder ⇦ ⇨, Dupe, + Timeline, Delete */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <button
+              type="button"
+              onClick={handlePrevAsset}
+              style={{
+                flex: 1,
+                background: 'var(--bg-panel-alt)',
+                border: '1px solid var(--border-mid)',
+                color: 'var(--text-primary)',
+                borderRadius: 3,
+                padding: '4px 0',
+                fontSize: 9,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+              title="Preview previous file in Media Bin"
+            >
+              ◀ PREV
+            </button>
+            <button
+              type="button"
+              onClick={handleNextAsset}
+              style={{
+                flex: 1,
+                background: 'var(--bg-panel-alt)',
+                border: '1px solid var(--border-mid)',
+                color: 'var(--text-primary)',
+                borderRadius: 3,
+                padding: '4px 0',
+                fontSize: 9,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+              title="Preview next file in Media Bin"
+            >
+              NEXT ▶
+            </button>
             <button
               type="button"
               disabled={selectedAssetIndex <= 0}
               onClick={() => onReorderAssets(selectedAssetIndex, selectedAssetIndex - 1)}
               style={{
-                flex: 1,
                 background: 'var(--bg-panel-alt)',
                 border: '1px solid var(--border-mid)',
                 color: selectedAssetIndex <= 0 ? 'var(--text-dim)' : 'var(--text-primary)',
                 borderRadius: 3,
-                padding: '3px 0',
-                fontSize: 9,
+                padding: '4px 4px',
+                fontSize: 8,
                 fontWeight: 700,
                 cursor: selectedAssetIndex <= 0 ? 'not-allowed' : 'pointer',
               }}
-              title="Move earlier in Media Bin (and update timeline order)"
+              title="Shift this item earlier in Media Bin & timeline sequence"
             >
-              ◀
+              ⇦ ORDER
             </button>
             <button
               type="button"
               disabled={selectedAssetIndex >= assets.length - 1}
               onClick={() => onReorderAssets(selectedAssetIndex, selectedAssetIndex + 1)}
               style={{
-                flex: 1,
                 background: 'var(--bg-panel-alt)',
                 border: '1px solid var(--border-mid)',
                 color: selectedAssetIndex >= assets.length - 1 ? 'var(--text-dim)' : 'var(--text-primary)',
                 borderRadius: 3,
-                padding: '3px 0',
-                fontSize: 9,
+                padding: '4px 4px',
+                fontSize: 8,
                 fontWeight: 700,
                 cursor: selectedAssetIndex >= assets.length - 1 ? 'not-allowed' : 'pointer',
               }}
-              title="Move later in Media Bin (and update timeline order)"
+              title="Shift this item later in Media Bin & timeline sequence"
             >
-              ▶
+              ORDER ⇨
             </button>
             <button
               type="button"
@@ -440,7 +616,7 @@ export function AssetBin({
                 border: '1px solid var(--border-mid)',
                 color: 'var(--text-primary)',
                 borderRadius: 3,
-                padding: '3px 5px',
+                padding: '4px 5px',
                 fontSize: 8,
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -457,7 +633,7 @@ export function AssetBin({
                 border: '1px solid var(--accent-orange)',
                 color: 'var(--accent-orange)',
                 borderRadius: 3,
-                padding: '3px 5px',
+                padding: '4px 5px',
                 fontSize: 8,
                 fontWeight: 800,
                 cursor: 'pointer',
@@ -474,7 +650,7 @@ export function AssetBin({
                 border: '1px solid #ef4444',
                 color: '#fca5a5',
                 borderRadius: 3,
-                padding: '3px 5px',
+                padding: '4px 5px',
                 fontSize: 9,
                 cursor: 'pointer',
               }}

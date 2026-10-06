@@ -317,6 +317,17 @@ export default function App() {
   // ── Phase 2: WebM Alpha Video Texture Pipeline & Grain Overlays ──
   const webmOverlay = useWebMVideoTexture();
 
+  // ── MilkDrop & Psychedelic MV Visual Tricks ──
+  const [liquidWarpEnabled, setLiquidWarpEnabled]     = useState(false);
+  const [liquidWarpIntensity, setLiquidWarpIntensity] = useState(0.7);
+  const [kaleidoscopeMode, setKaleidoscopeMode]       = useState('none'); // 'none' | '4way' | '8way'
+  const [phosphorTrails, setPhosphorTrails]           = useState(false);
+  const [chromaticPunch, setChromaticPunch]           = useState(false);
+  const [fractalMode, setFractalMode]                 = useState('none'); // 'none' | 'spiral' | 'tunnel'
+  const [alienBeam, setAlienBeam]                     = useState(false);
+  const [warpDrive, setWarpDrive]                     = useState(false);
+  const [lyricAnim, setLyricAnim]                     = useState('pulse_slam');
+
   useEffect(() => {
     depthLoader.syncPlayback(isPlaying);
     webmOverlay.syncPlayback(isPlaying);
@@ -386,6 +397,7 @@ export default function App() {
     pasteClip,
     hasClipboard,
     addClipFromAsset,
+    generateAutoMvCut,
     beginClipEdit,
     undo,
     redo,
@@ -414,6 +426,7 @@ export default function App() {
     pasteClip,
     hasClipboard,
     addClipFromAsset,
+    generateAutoMvCut,
     splitAtTime,
     splitClipAtTime,
     undo,
@@ -435,6 +448,7 @@ export default function App() {
     pasteClip,
     hasClipboard,
     addClipFromAsset,
+    generateAutoMvCut,
     splitAtTime,
     splitClipAtTime,
     undo,
@@ -948,6 +962,15 @@ export default function App() {
               isEraLocked={isEraLocked}
               eraChangeCooldown={eraChangeCooldown}
               isOfflineRendering={isOfflineRendering}
+              liquidWarpEnabled={liquidWarpEnabled}
+              liquidWarpIntensity={liquidWarpIntensity}
+              kaleidoscopeMode={kaleidoscopeMode}
+              phosphorTrails={phosphorTrails}
+              chromaticPunch={chromaticPunch}
+              fractalMode={fractalMode}
+              alienBeam={alienBeam}
+              warpDrive={warpDrive}
+              lyricAnim={lyricAnim}
             />
           </div>
 
@@ -1053,6 +1076,24 @@ export default function App() {
           setAutoDJMode={setAutoDJMode}
           autoDJInterval={autoDJInterval}
           setAutoDJInterval={setAutoDJInterval}
+          liquidWarpEnabled={liquidWarpEnabled}
+          setLiquidWarpEnabled={setLiquidWarpEnabled}
+          liquidWarpIntensity={liquidWarpIntensity}
+          setLiquidWarpIntensity={setLiquidWarpIntensity}
+          kaleidoscopeMode={kaleidoscopeMode}
+          setKaleidoscopeMode={setKaleidoscopeMode}
+          phosphorTrails={phosphorTrails}
+          setPhosphorTrails={setPhosphorTrails}
+          chromaticPunch={chromaticPunch}
+          setChromaticPunch={setChromaticPunch}
+          fractalMode={fractalMode}
+          setFractalMode={setFractalMode}
+          alienBeam={alienBeam}
+          setAlienBeam={setAlienBeam}
+          warpDrive={warpDrive}
+          setWarpDrive={setWarpDrive}
+          lyricAnim={lyricAnim}
+          setLyricAnim={setLyricAnim}
         />
         )}
 

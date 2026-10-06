@@ -378,6 +378,193 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
     setAutomationKeyframes((prev) => prev.filter((kf) => kf.id !== id));
   }, []);
 
+  // ── Auto MV Cut Generator ────────────────────────────────────────────────
+  // Generates a fully synced, rhythmic music video cut across the entire track
+  const generateAutoMvCut = useCallback((options = {}) => {
+    const {
+      mode = 'beat_locked',
+      currentBpm = externalBpm || 120,
+      totalDuration = duration || 60,
+    } = options;
+
+    if (!assets || assets.length === 0) return;
+
+    applyClips(() => {
+      const beatSec = Math.max(0.2, 60 / currentBpm);
+      const newClips = [];
+      let cursor = 0;
+      let assetIdx = 0;
+
+      while (cursor < totalDuration) {
+        const asset = assets[assetIdx % assets.length];
+        assetIdx++;
+
+        let clipDur;
+        let isReversed = Math.random() < 0.12;
+        let isMirrored = Math.random() < 0.10;
+
+        if (mode === 'full_clip_native') {
+          // Play full native video duration — lets each AI clip play completely through without cutoffs
+          const nativeDur = (asset.duration && asset.duration > 0.5)
+            ? asset.duration
+            : Math.max(10.0, 16 * beatSec);
+          clipDur = nativeDur;
+          isReversed = false;
+        } else if (mode === 'ai_long_form') {
+          // 15–30s extended holds tailored for modern long-form generative AI video clips
+          const nativeDur = (asset.duration && asset.duration >= 8) ? asset.duration : null;
+          clipDur = nativeDur || Math.min(30.0, Math.max(12.0, 24 * beatSec));
+        } else if (mode === 'epic_cinematic') {
+          // 30–60s ultra-long continuous takes for slow-cinema narrative and long AI scenes
+          const nativeDur = (asset.duration && asset.duration >= 20) ? asset.duration : null;
+          clipDur = nativeDur || Math.min(60.0, Math.max(25.0, 48 * beatSec));
+        } else if (mode === 'psychonaut_voyage') {
+          // Shifting entheogen rhythms: alternates 8–12s breathing hold with 2–4 beat phase shifts
+          const r = Math.random();
+          clipDur = r < 0.6 ? Math.max(7.0, 12 * beatSec) : (2 * beatSec);
+          isMirrored = Math.random() < 0.25;
+        } else if (mode === 'beat_locked') {
+          // Alternate 2-beat and 4-beat cuts with occasional 1-beat punch
+          const r = Math.random();
+          const beats = r < 0.25 ? 1 : r < 0.75 ? 2 : 4;
+          clipDur = beats * beatSec;
+        } else if (mode === 'energy_arc') {
+          const progress = cursor / Math.max(totalDuration, 1);
+          if (progress < 0.15 || progress > 0.85) {
+            // Intro or Outro: atmospheric holds (6-8s)
+            clipDur = Math.min(8.0, Math.max(4.0, 8 * beatSec));
+          } else if (progress >= 0.40 && progress <= 0.75) {
+            // Chorus / Climax: fast 1-2 beat cuts!
+            clipDur = (Math.random() < 0.5 ? 1 : 2) * beatSec;
+          } else {
+            // Verse: 3-4s holds
+            clipDur = Math.max(2.5, 4 * beatSec);
+          }
+        } else if (mode === 'drop_buildup') {
+          // 4-bar (16 beat) build and drop cycles
+          const phraseBeat = (cursor / beatSec) % 16;
+          if (phraseBeat < 8) {
+            // Early build: 4-beat holds
+            clipDur = 4 * beatSec;
+          } else if (phraseBeat < 12) {
+            // Mid build: 2-beat acceleration
+            clipDur = 2 * beatSec;
+          } else if (phraseBeat < 15) {
+            // Pre-drop snare roll: 1-beat cuts
+            clipDur = 1 * beatSec;
+          } else {
+            // Drop impact: 0.5 beat machine-gun cut
+            clipDur = Math.max(0.2, 0.5 * beatSec);
+            isReversed = true;
+          }
+        } else if (mode === 'glitch_frenzy') {
+          // Ultra-fast micro cuts with erratic mirrors and reverses
+          const r = Math.random();
+          const beats = r < 0.4 ? 0.5 : r < 0.8 ? 1 : 2;
+          clipDur = Math.max(0.18, beats * beatSec);
+          isReversed = Math.random() < 0.35;
+          isMirrored = Math.random() < 0.25;
+        } else if (mode === 'lofi_chillhop') {
+          // Relaxed, nostalgic 4-8 beat holds with smooth pacing
+          const r = Math.random();
+          const beats = r < 0.5 ? 4 : 8;
+          clipDur = beats * beatSec;
+          isReversed = Math.random() < 0.08;
+        } else if (mode === 'punk_speed') {
+          // Relentless downbeat thrash: 1-beat downbeats with occasional 2-beat holds
+          const beats = Math.random() < 0.65 ? 1 : 2;
+          clipDur = beats * beatSec;
+        } else if (mode === 'dream_pop') {
+          // Extended ethereal holds: 8-16 beats
+          const beats = Math.random() < 0.5 ? 8 : 16;
+          clipDur = beats * beatSec;
+          isMirrored = Math.random() < 0.15;
+        } else {
+          // 'cinematic': 5-8s long holds
+          clipDur = Math.max(4.5, Math.round(12 * beatSec));
+        }
+
+        // Clamp to not overshoot too far past duration
+        if (cursor + clipDur > totalDuration + 1) {
+          clipDur = Math.max(MIN_CLIP_DURATION, totalDuration - cursor);
+        }
+
+        newClips.push({
+          id: uid(`mv-${asset.id}`),
+          assetId: asset.id,
+          startTime: cursor,
+          duration: Math.max(MIN_CLIP_DURATION, clipDur),
+          inPoint: 0,
+          reversed: isReversed,
+          mirrored: isMirrored,
+        });
+
+        cursor += clipDur;
+      }
+
+      return newClips;
+    }, true);
+  }, [assets, externalBpm, duration, applyClips]);
+
+  // Fit selected clip duration to match its asset's native video duration
+  const fitClipToAssetDuration = useCallback((clipId) => {
+    applyClips((prev) => {
+      const clip = prev.find((c) => c.id === clipId);
+      if (!clip) return prev;
+      const asset = assets.find((a) => a.id === clip.assetId);
+      if (!asset) return prev;
+      const targetDur = (asset.duration && asset.duration > 0.5) ? asset.duration : DEFAULT_CLIP_DURATION * 4;
+      return prev.map((c) => (c.id === clipId ? { ...c, duration: targetDur, inPoint: 0 } : c));
+    }, true);
+  }, [assets, applyClips]);
+
+  // Export current cut sequence as a JSON template
+  const exportCutTemplate = useCallback(() => {
+    return {
+      version: 1,
+      createdAt: new Date().toISOString(),
+      bpm,
+      duration,
+      clips: clipsRef.current.map((c) => {
+        const asset = assets.find((a) => a.id === c.assetId);
+        return {
+          startTime: c.startTime,
+          duration: c.duration,
+          inPoint: c.inPoint || 0,
+          reversed: Boolean(c.reversed),
+          mirrored: Boolean(c.mirrored),
+          assetIndex: assets.findIndex((a) => a.id === c.assetId),
+          assetName: asset?.name || 'clip',
+        };
+      }),
+    };
+  }, [bpm, duration, assets]);
+
+  // Load a cut sequence from a JSON template
+  const loadCutTemplate = useCallback((templateData) => {
+    if (!templateData || !Array.isArray(templateData.clips) || templateData.clips.length === 0) return;
+    applyClips(() => {
+      return templateData.clips.map((c, i) => {
+        let matchedAsset = assets[c.assetIndex];
+        if (!matchedAsset && c.assetName) {
+          matchedAsset = assets.find((a) => a.name === c.assetName);
+        }
+        if (!matchedAsset) {
+          matchedAsset = assets[i % Math.max(assets.length, 1)];
+        }
+        return {
+          id: uid('imported-clip'),
+          assetId: matchedAsset ? matchedAsset.id : `asset-${i}`,
+          startTime: Number(c.startTime) || 0,
+          duration: Math.max(MIN_CLIP_DURATION, Number(c.duration) || DEFAULT_CLIP_DURATION),
+          inPoint: Number(c.inPoint) || 0,
+          reversed: Boolean(c.reversed),
+          mirrored: Boolean(c.mirrored),
+        };
+      });
+    }, true);
+  }, [assets, applyClips]);
+
   return {
     // Clip state
     videoClips,
@@ -400,6 +587,10 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
     pasteClip,
     hasClipboard,
     addClipFromAsset,
+    generateAutoMvCut,
+    fitClipToAssetDuration,
+    exportCutTemplate,
+    loadCutTemplate,
     // History
     beginClipEdit,
     undo,

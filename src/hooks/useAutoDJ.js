@@ -20,6 +20,7 @@ const STYLES = [
   'ambient_drift', 'lo_fi_flicker', 'slow_dissolve', 'dreamscape',
   'apple_kinetic', 'mv_long_cut', 'mv_slow_burn', 'mv_flash_cut',
   'mv_neon_strobe', 'mv_retro_grain', 'mv_hypnotic_drift',
+  'dmt_breakthrough', 'lsd_acid_melt', 'psilocybin_breath', 'ayahuasca_vision',
 ];
 
 const RUBES = [
@@ -31,11 +32,12 @@ const RUBES = [
 
 // ── Grouped style "moods" for more coherent randomization ────────────
 const MOOD_GROUPS = {
-  intense:   ['strobe', 'datamosh', 'glitch_highway', 'mv_flash_cut', 'mv_neon_strobe', 'brakhage_emulsion', 'anger_invocation'],
-  cinematic: ['ken_burns', 'fiona_voyeur', 'montage', 'slow_dissolve', 'dreamscape', 'mv_long_cut', 'mv_slow_burn', 'mv_hypnotic_drift', 'viola_passage'],
-  avantgarde:['third_mind', 'godard_jump', 'vertov_eye', 'debord_detourne', 'marker_jetee', 'deren_meshes', 'mekas_diary', 'jodorowsky_ritual'],
-  retro:     ['vinyl_crackle', 'solarize_invert', 'lo_fi_flicker', 'mv_retro_grain', 'warhol_screen'],
-  dreamy:    ['ambient_drift', 'lynch_redroom', 'lynch_eraserhead', 'apple_kinetic', 'dreamscape', 'mv_hypnotic_drift'],
+  intense:     ['strobe', 'datamosh', 'glitch_highway', 'mv_flash_cut', 'mv_neon_strobe', 'brakhage_emulsion', 'anger_invocation', 'dmt_breakthrough'],
+  cinematic:   ['ken_burns', 'fiona_voyeur', 'montage', 'slow_dissolve', 'dreamscape', 'mv_long_cut', 'mv_slow_burn', 'mv_hypnotic_drift', 'viola_passage'],
+  avantgarde:  ['third_mind', 'godard_jump', 'vertov_eye', 'debord_detourne', 'marker_jetee', 'deren_meshes', 'mekas_diary', 'jodorowsky_ritual'],
+  retro:       ['vinyl_crackle', 'solarize_invert', 'lo_fi_flicker', 'mv_retro_grain', 'warhol_screen'],
+  dreamy:      ['ambient_drift', 'lynch_redroom', 'lynch_eraserhead', 'apple_kinetic', 'dreamscape', 'mv_hypnotic_drift', 'psilocybin_breath'],
+  psychedelic: ['dmt_breakthrough', 'lsd_acid_melt', 'psilocybin_breath', 'ayahuasca_vision'],
 };
 const MOOD_KEYS = Object.keys(MOOD_GROUPS);
 

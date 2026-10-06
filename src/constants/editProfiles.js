@@ -164,6 +164,32 @@ export const EDIT_PROFILES = [
     description: 'Holds clips for ~8 seconds with dreamy slow hue-shifting, soft exposure breathing, and gentle Gaussian bloom on transients.',
     category: 'Music Video',
   },
+
+  // ── PSYCHONAUT / ENTHEOGEN STYLES ─────────────────────────────────────────
+  {
+    id: 'dmt_breakthrough',
+    label: '34. DMT Hyperspace (Sacred Geometry Shift)',
+    description: 'Rapid kaleidoscopic phase shift, hyperbolic scale expansion on downbeats, transient solarize inverts, and chanting geometric resonance. The 5-MeO / DMT breakthrough experience.',
+    category: 'Psychonaut',
+  },
+  {
+    id: 'lsd_acid_melt',
+    label: '35. LSD Acid Tracers (Prismatic Edge Melt)',
+    description: 'Liquid undulating breathing with trailing chromatic rainbow edge-dispersions and continuous fluid displacement melt. Classic bicycle-day acid visuals.',
+    category: 'Psychonaut',
+  },
+  {
+    id: 'psilocybin_breath',
+    label: '36. Psilocybin Breathing (Organic Wall Pulse)',
+    description: 'Deep organic spatial expansion/contraction, earthy warm saturation swells, undulating living wall breathing on bass cycles. Shroom-state organic presence.',
+    category: 'Psychonaut',
+  },
+  {
+    id: 'ayahuasca_vision',
+    label: '37. Ayahuasca Shamanic (Visionary Serpent)',
+    description: 'Emerald and gold visionary grading, serpentine horizontal wave drifts, sacred geometric flashes on transients, and entheogenic glow.',
+    category: 'Psychonaut',
+  },
 ];
 
 export const WEBM_LOOP_PRESETS = [
