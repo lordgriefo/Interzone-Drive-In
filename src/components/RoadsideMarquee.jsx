@@ -28,6 +28,7 @@ import {
   SYNTHESIZED_MONSTERS,
 } from '../constants/carnivalLore';
 import { carnivalSFX } from '../utils/carnivalAudioEffects';
+import { DesertGliderWorld } from './DesertGliderWorld';
 
 // ── 1930s PHONOGRAPH, GENERATOR & CALLIOPE SYNTHESIZER (Pure Web Audio) ─────
 class CarnivalAudioEngine {
@@ -211,6 +212,7 @@ export function RoadsideMarquee({ onEnterDeck }) {
   const [activeDialogueStep, setActiveDialogueStep] = useState(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [concessionBuff, setConcessionBuff] = useState(null); // { name, desc, filter }
+  const [gliderOpen, setGliderOpen] = useState(false);
 
   // ── Mojave Space State ───────────────────────────────────────────────────
   const [selectedBgIndex, setSelectedBgIndex] = useState(0);
@@ -680,6 +682,25 @@ export function RoadsideMarquee({ onEnterDeck }) {
           </button>
 
           <button
+            onClick={() => setGliderOpen(true)}
+            style={{
+              padding: '6px 14px',
+              backgroundColor: '#06b6d4',
+              color: '#000',
+              fontWeight: 800,
+              fontSize: 10,
+              fontFamily: "'Syncopate', sans-serif",
+              letterSpacing: 1,
+              borderRadius: 3,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 0 14px rgba(6, 182, 212, 0.65)',
+            }}
+          >
+            🛸 3D DESERT GLIDER (FREE ROAM)
+          </button>
+
+          <button
             onClick={onEnterDeck}
             style={{
               padding: '6px 14px',
@@ -852,6 +873,27 @@ export function RoadsideMarquee({ onEnterDeck }) {
                 The Las Vegas neon strip flickers like a distant mirage across the salt flats,
                 celestial planets morph into Sumerian sigils, and the window speaker box hums with 1950s drive-in intermission audio.
               </p>
+
+              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center', gap: 12 }}>
+                <button
+                  onClick={() => setGliderOpen(true)}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#06b6d4',
+                    color: '#000',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontWeight: 900,
+                    fontSize: 11,
+                    letterSpacing: 1.5,
+                    borderRadius: 4,
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 24px rgba(6, 182, 212, 0.75)',
+                  }}
+                >
+                  🛸 ENTER 3D OPEN-WORLD DESERT GLIDER (FREE ROAM) ➔
+                </button>
+              </div>
             </div>
 
             {/* Mojave Interactive Dashboard: Scene Selector + Drive-In Speaker + AM Radio */}
@@ -2412,6 +2454,19 @@ export function RoadsideMarquee({ onEnterDeck }) {
             </button>
           </div>
         </div>
+      {/* ── 5. 3D DESERT GLIDER FREE-ROAM MODAL ── */}
+      {gliderOpen && (
+        <DesertGliderWorld
+          onClose={() => setGliderOpen(false)}
+          onEnterDeck={onEnterDeck}
+          onOpenDenizen={(id) => {
+            const d = ALL_DENIZENS.find((x) => x.id === id);
+            if (d) startDialogue(d);
+            setGliderOpen(false);
+          }}
+          tokens={tokens}
+          onAddTokens={addTokens}
+        />
       )}
     </div>
   );
