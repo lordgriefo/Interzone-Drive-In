@@ -18,6 +18,8 @@ import { CanvasWorkspace }    from './components/CanvasWorkspace';
 import { TransportBar }       from './components/TransportBar';
 import { ExportModal }        from './components/ExportModal';
 import { PlaylistPanel }      from './components/PlaylistPanel';
+import { RoadsideMarquee }    from './components/RoadsideMarquee';
+import { isElectronEnvironment } from './utils/exportPipeline';
 
 import { interpolateAutomation } from './utils/timelineCrossfade';
 import { evaluateCssEffect }     from './constants/cssEffectLibrary';
@@ -29,6 +31,44 @@ import { parseLrcString } from './utils/lrcParser';
 
 export default function App() {
   const [sensitivity, setSensitivity] = useState(1.0);
+
+  // ── View Mode: 'marquee' (The Interzone Drive-In 1930s Carnival) is the primary world ──
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash === '#kineto-cut') {
+        return 'deck';
+      }
+    }
+    // Default directly to 'marquee' so The Interzone Drive-In is front and center!
+    return 'marquee';
+  });
+
+  // Keep URL hash in sync and handle browser Back/Forward
+  useEffect(() => {
+    const onHashChange = () => {
+      if (window.location.hash === '#kineto-cut') {
+        setViewMode('deck');
+      } else {
+        setViewMode('marquee');
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  const handleEnterDeck = useCallback(() => {
+    setViewMode('deck');
+    if (window.location.hash === '#carnival' || window.location.hash === '#lot') {
+      window.location.hash = '#kineto-cut';
+    }
+  }, []);
+
+  const handleExitToMarquee = useCallback(() => {
+    setViewMode('marquee');
+    if (window.location.hash !== '#carnival') {
+      window.location.hash = '#carnival';
+    }
+  }, []);
 
   // ── Master BPM from timeline ──
   const [bpm, setBpm] = useState(120);
@@ -798,14 +838,17 @@ export default function App() {
       setSelectedRube={setSelectedRube}
       assets={assets}
     >
-      <div style={{
-        display: 'flex',
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: cinemaMode ? '#000' : 'var(--bg-primary)',
-        overflow: 'hidden',
-        position: 'relative',
-      }}>
+      {viewMode === 'marquee' ? (
+        <RoadsideMarquee onEnterDeck={handleEnterDeck} />
+      ) : (
+        <div style={{
+          display: 'flex',
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: cinemaMode ? '#000' : 'var(--bg-primary)',
+          overflow: 'hidden',
+          position: 'relative',
+        }}>
 
         {!cinemaMode && (
           <AssetBin
@@ -838,6 +881,7 @@ export default function App() {
         <InterzoneFrame
           cinemaMode={cinemaMode}
           onToggleCinema={handleToggleCinema}
+          onExitToMarquee={handleExitToMarquee}
           isPlaying={isPlaying}
           trackTitle={trackTitle}
           audioSignals={audioSignals}
@@ -1097,24 +1141,25 @@ export default function App() {
         />
         )}
 
-        <ExportModal
-          isOpen={isExportModalOpen}
-          onClose={() => setIsExportModalOpen(false)}
-          viewportElementId="main-viewport"
-          audioDestinationRef={audioDestinationRef}
-          audioElement={audioElRef?.current}
-          audioSourceUrl={lastAudioFileRef.current}
-          duration={duration}
-          currentTime={currentTime}
-          isPlaying={isPlaying}
-          onStopPlayback={stopEngine}
-          onSeek={seekTo}
-          onRenderFrame={handleRenderFrame}
-          onRenderEnd={handleRenderEnd}
-          sensitivity={sensitivity}
-        />
+        </div>
+      )}
 
-      </div>
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        viewportElementId="main-viewport"
+        audioDestinationRef={audioDestinationRef}
+        audioElement={audioElRef?.current}
+        audioSourceUrl={lastAudioFileRef.current}
+        duration={duration}
+        currentTime={currentTime}
+        isPlaying={isPlaying}
+        onStopPlayback={stopEngine}
+        onSeek={seekTo}
+        onRenderFrame={handleRenderFrame}
+        onRenderEnd={handleRenderEnd}
+        sensitivity={sensitivity}
+      />
     </AppProvider>
   );
 }

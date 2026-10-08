@@ -5,14 +5,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { InterzoneBackground } from './InterzoneBackground.jsx';
 import { isElectronEnvironment } from '../utils/exportPipeline';
-import { DESKTOP_EXE_DOWNLOAD_URL } from '../constants/urls';
+import { DESKTOP_EXE_DOWNLOAD_URL, BUY_ME_A_COFFEE_URL } from '../constants/urls';
 
 const TIMELINE_MIN_H = 100;
 const TIMELINE_MAX_H = 600;
 const TIMELINE_DEFAULT_H = 240;
 const TIMELINE_COLLAPSED_H = 30;
 
-export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none', onToggleCinema = null, cinemaMode = false }) {
+export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none', onToggleCinema = null, cinemaMode = false, onExitToMarquee = null }) {
   const [timelineHeight, setTimelineHeight] = useState(TIMELINE_DEFAULT_H);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -239,6 +239,87 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
         </a>
       )}
 
+      {/* ── UPPER-RIGHT STARFIELD: BUY ME A COFFEE LINK ── */}
+      {!cinemaMode && (
+        <a
+          href={BUY_ME_A_COFFEE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Support the creator on Buy Me a Coffee (☕ magicstatic)"
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 14,
+            zIndex: 35,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            transition: 'transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.08)';
+            e.currentTarget.style.filter = 'drop-shadow(0 0 12px rgba(255, 215, 0, 0.95))';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1.0)';
+            e.currentTarget.style.filter = 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.45))';
+          }}
+        >
+          {/* Circular Badge matching the Méliès Moon aesthetic */}
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#0c0c0e',
+              boxShadow: '0 0 12px rgba(255, 215, 0, 0.5), inset 0 0 8px rgba(0,0,0,0.85)',
+              border: '1px solid rgba(255, 215, 0, 0.5)',
+            }}
+          >
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFDD00"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ filter: 'drop-shadow(0 0 4px rgba(255,221,0,0.7))' }}
+            >
+              <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+              <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+              <line x1="6" y1="2" x2="6" y2="4" />
+              <line x1="10" y1="2" x2="10" y2="4" />
+              <line x1="14" y1="2" x2="14" y2="4" />
+            </svg>
+          </div>
+
+          {/* Small label underneath */}
+          <span
+            style={{
+              marginTop: 4,
+              fontFamily: "'Syncopate', var(--font-mono, monospace)",
+              fontSize: 7.5,
+              fontWeight: 800,
+              letterSpacing: '0.8px',
+              textTransform: 'uppercase',
+              color: '#FFDD00',
+              textShadow: '0 0 8px rgba(255, 221, 0, 0.85), 0 1px 3px #000',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            BUY ME A COFFEE
+          </span>
+        </a>
+      )}
+
       {/* ── INTERZONE DRIVE-IN BANNER ── */}
       {!cinemaMode && (
         <div style={{
@@ -317,6 +398,43 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
               transform: 'scaleX(-1)',
             }}
           />
+
+          {/* Return to Roadside Attractions Marquee */}
+          {onExitToMarquee && (
+            <button
+              onClick={onExitToMarquee}
+              title="Step into the 1930s Interzone Sideshow & Freaks Tent (Audio Arc, Wunderbar, Strangelet Lab)"
+              style={{
+                marginLeft: 4,
+                padding: '6px 11px',
+                borderRadius: 4,
+                border: '1px solid rgba(255, 107, 0, 0.6)',
+                backgroundColor: 'rgba(255, 107, 0, 0.15)',
+                color: 'var(--accent-orange, #ff6b00)',
+                fontSize: 9,
+                fontWeight: 700,
+                fontFamily: "'Syncopate', sans-serif",
+                letterSpacing: 1,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 0 10px rgba(255, 107, 0, 0.25)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--accent-orange, #ff6b00)';
+                e.currentTarget.style.color = '#000';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 107, 0, 0.15)';
+                e.currentTarget.style.color = 'var(--accent-orange, #ff6b00)';
+              }}
+            >
+              🎪 1930s SIDESHOW
+            </button>
+          )}
         </div>
       )}
 

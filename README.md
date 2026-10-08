@@ -3,6 +3,7 @@
 An audio-reactive kinetic montage engine, multi-track visual sequencer, and vintage cinema synthesizer for live VJing, music video creation, and procedural film-chopping — in your browser or as a standalone desktop app.
 
 [![Live Demo](https://img.shields.io/badge/LIVE-interzone--drive--in.vercel.app-FF6B00.svg)](https://interzone-drive-in.vercel.app/)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-magicstatic-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/magicstatic/)
 [![Built with React](https://img.shields.io/badge/React-18.2-blue.svg)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Bundler-Vite_5-646CFF.svg)](https://vitejs.dev/)
 [![Electron](https://img.shields.io/badge/Desktop-Electron-47848F.svg)](https://www.electronjs.org/)
@@ -17,7 +18,23 @@ You can let the **Auto DJ** randomly shift styles, eras, and effects in the flow
 
 ---
 
+## 🎪 The Interzone Traveling Sideshow & Creative Constellation
+
+The **Interzone Drive-In** also features a 1930s Tod Browning-inspired carnival sideshow tent (accessible via `/#carnival` or the in-app `🎪 1930s SIDESHOW` banner button), serving as a gateway to our constellation of creative tools:
+
+| Attraction | Sideshow Banner | Description | Link |
+|------------|-----------------|-------------|------|
+| 📽️ **Strangelet Kineto-Cut** | Banner 01 (Flagship) | Audio-reactive kinetic video sequencer & montage synthesizer with DaVinci/Premiere EDL export | [Live Web App](https://interzone-drive-in.vercel.app/) |
+| 🎬 **Audio Arc** | Banner 02 | Visual storyboarding & dynamic screenplay engine designed specifically for music videos and short films | [audioarc.vercel.app](https://audioarc.vercel.app/) |
+| 🎪 **Wunderbar!** | Banner 03 | Creative sandbox, procedural screenplay generator & music video concept dice-roller on Perchance | [perchance.org/the-wunderbar](https://perchance.org/the-wunderbar) |
+| 🎬 **Strangelet Cine-Sampler** | Banner 04 | 110-shot cinematography library, Akai MPC-style video sampler & linear arrangement timeline | [perchance.org/strangelet-cine-sampler](https://perchance.org/strangelet-cine-sampler) |
+| 🧪 **The Strangelet Lab** | Bunker 05 | High-energy sound design, sub-atomic quark synthesis & modular DAW laboratory | In Sideshow Lot |
+| 🔞 **The Midnight Peep Cabinet** | Tent 06 | Vintage 8mm coin-op mutoscope displaying bizarre desert phantasmagoria & hypnotic celluloid loops | In Sideshow Lot |
+
+---
+
 ## ✨ Features
+
 
 ### 🔊 Audio Engine & Spectral Reactivity
 - **Meyda spectral analysis** — real-time RMS, spectral centroid, energy bands, and transient spike detection
@@ -246,6 +263,14 @@ Also works with Netlify (drag `dist/` to [Netlify Drop](https://app.netlify.com/
 | Archive Export | [JSZip](https://stuk.github.io/jszip/) |
 | Icons | [Lucide React](https://lucide.dev/) |
 | CSS | [Tailwind CSS](https://tailwindcss.com/) + CSS custom properties |
+
+---
+
+## ☕ Support the Project
+
+If you find Strangelet Kineto-Cut helpful for your music videos, visual sets, or creative workflows, you can support development here:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-magicstatic-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/magicstatic/)
 
 ---
 

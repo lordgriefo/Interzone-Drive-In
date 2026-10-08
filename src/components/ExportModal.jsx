@@ -9,7 +9,7 @@ import { isElectronEnvironment, startWebExport, runDeterministicOfflineExport, i
 import { decodeAudioSource } from '../utils/offlineAudioAnalyzer';
 import { QUALITY_PRESETS } from '../hooks/useVideoRecorder';
 import { createProceduralAudioTrack } from '../constants/initialMedia';
-import { DESKTOP_EXE_DOWNLOAD_URL } from '../constants/urls';
+import { DESKTOP_EXE_DOWNLOAD_URL, BUY_ME_A_COFFEE_URL } from '../constants/urls';
 
 export function ExportModal({
   isOpen = false,
@@ -862,6 +862,38 @@ export function ExportModal({
               )}
             </div>
           )}
+        </div>
+
+        {/* Support / Buy Me a Coffee Footer */}
+        <div style={{
+          padding: '10px 24px',
+          borderTop: '1px solid #1f1f2e',
+          backgroundColor: 'rgba(0, 0, 0, 0.35)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: 11,
+        }}>
+          <span style={{ color: '#71717a' }}>Enjoying Strangelet Kineto-Cut?</span>
+          <a
+            href={BUY_ME_A_COFFEE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              color: '#FFDD00',
+              textDecoration: 'none',
+              fontWeight: 700,
+              letterSpacing: 0.5,
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+          >
+            ☕ Buy Me a Coffee
+          </a>
         </div>
       </div>
     </div>
