@@ -16,6 +16,21 @@ export function isElectronEnvironment() {
 }
 
 /**
+ * Checks whether the application is running in a Tauri v2 desktop environment.
+ */
+export function isTauriEnvironment() {
+  if (typeof window === 'undefined') return false;
+  return Boolean(window.__TAURI_INTERNALS__ || window.__TAURI__);
+}
+
+/**
+ * Checks whether the application is running in any native desktop shell (Tauri or Electron).
+ */
+export function isDesktopEnvironment() {
+  return isElectronEnvironment() || isTauriEnvironment();
+}
+
+/**
  * Probes available container MIME types for Web MediaRecorder.
  * Returns the best available type for the requested format,
  * falling back to WebM if the format isn't supported.
@@ -299,7 +314,69 @@ export async function startWebExport({
 }
 
 /**
- * Mode B: Desktop / Electron Mode - Deterministic offline frame-by-frame rendering.
+ * Unified Desktop Bridge: provides the exact same IPC interface
+ * whether running inside Tauri v2 (Rust backend) or Electron (Node.js backend).
+ */
+export async function getDesktopAPI() {
+  if (typeof window === 'undefined') return null;
+
+  // 1. Electron bridge
+  if (window.electronAPI) {
+    return window.electronAPI;
+  }
+
+  // 2. Tauri v2 bridge
+  if (window.__TAURI_INTERNALS__ || window.__TAURI__) {
+    let invoke = window.__TAURI_INTERNALS__?.invoke;
+    if (!invoke) {
+      try {
+        const core = await import('@tauri-apps/api/core');
+        invoke = core.invoke;
+      } catch (_) {}
+    }
+
+    if (invoke) {
+      return {
+        isTauri: true,
+        getStatus: () => invoke('export_status'),
+        initExport: (options = {}) =>
+          invoke('export_init', {
+            options: {
+              fps: options.fps || 60,
+              format: options.format || 'mp4',
+              audio_data: options.audioData ? Array.from(new Uint8Array(options.audioData)) : null,
+              default_file_name: options.defaultFileName || null,
+              width: options.width || 1920,
+              height: options.height || 1080,
+            },
+          }),
+        sendFrame: (buffer, frameIndex) => {
+          const u8 = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+          return invoke('export_write_frame', {
+            buffer: Array.from(u8),
+            frameIndex: frameIndex || 0,
+          });
+        },
+        captureViewportFrame: (rect) =>
+          invoke('export_capture_viewport', {
+            rect: {
+              x: Math.round(rect.x || 0),
+              y: Math.round(rect.y || 0),
+              width: Math.round(rect.width || 1920),
+              height: Math.round(rect.height || 1080),
+            },
+          }),
+        finishExport: () => invoke('export_finish'),
+        cancelExport: () => invoke('export_cancel'),
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Mode B: Zero-Jank Desktop Offline Render (Tauri v2 / Electron + Native FFmpeg).
  * Locks rendering to Δt = 1/60s, stepping Tone.js and Meyda offline.
  */
 export async function runDeterministicOfflineExport({
@@ -309,6 +386,8 @@ export async function runDeterministicOfflineExport({
   fps = 60,
   format = 'mp4',
   sensitivity = 1.0,
+  width = 1920,
+  height = 1080,
   renderFrameSnapshot, // async (timestamp, signals, frameIndex) => ArrayBuffer or Uint8Array (PNG)
   onProgress = () => {},
   onComplete = () => {},
@@ -316,8 +395,9 @@ export async function runDeterministicOfflineExport({
   abortController = null,
   shouldStop = () => false,
 }) {
-  if (!isElectronEnvironment()) {
-    const err = new Error('Deterministic offline render requires the Electron desktop environment.');
+  const desktopAPI = await getDesktopAPI();
+  if (!desktopAPI) {
+    const err = new Error('Deterministic offline render requires a desktop shell (Tauri v2 or Electron).');
     onError(err);
     throw err;
   }
@@ -339,16 +419,16 @@ export async function runDeterministicOfflineExport({
     const isWebM = format.toLowerCase() === 'webm';
     const ext = isWebM ? 'webm' : 'mp4';
 
-    // 1. Initialize session in Electron main process
-    const session = await window.electronAPI.initExport({
+    // 1. Initialize session in Desktop process (Tauri Rust / Electron Node)
+    const session = await desktopAPI.initExport({
       fps,
       totalFrames,
       format,
       audioData,
       audioSourceUrl,
-      width: 1920,
-      height: 1080,
-      defaultFileName: `interzone-hd-${Date.now()}.${ext}`,
+      width,
+      height,
+      defaultFileName: `strangelet-kinetocut-${Date.now()}.${ext}`,
     });
 
     if (session?.canceled) {
@@ -360,7 +440,7 @@ export async function runDeterministicOfflineExport({
     // 2. Deterministic step loop
     for (let k = 0; k < totalFrames; k++) {
       if (abortController?.signal?.aborted) {
-        await window.electronAPI.cancelExport();
+        await desktopAPI.cancelExport();
         return { canceled: true };
       }
 
@@ -382,10 +462,10 @@ export async function runDeterministicOfflineExport({
         throw new Error(`Failed to capture frame ${k}`);
       }
 
-      // Stream PNG buffer to Electron main process -> FFmpeg stdin
+      // Stream frame buffer to Desktop process -> FFmpeg stdin
       // (Skipped if renderFrameSnapshot already piped the frame via captureViewportFrame)
       if (frameBuffer && frameBuffer !== true) {
-        await window.electronAPI.sendFrame(frameBuffer, k);
+        await desktopAPI.sendFrame(frameBuffer, k);
       }
 
       onProgress({
@@ -402,13 +482,14 @@ export async function runDeterministicOfflineExport({
     }
 
     // 3. Finalize FFmpeg encoding & muxing
-    const result = await window.electronAPI.finishExport();
+    const result = await desktopAPI.finishExport();
     onComplete(result);
     return result;
   } catch (err) {
     console.error('[exportPipeline] Offline render error:', err);
     try {
-      await window.electronAPI.cancelExport();
+      const api = await getDesktopAPI();
+      if (api?.cancelExport) await api.cancelExport();
     } catch (_) {}
     onError(err);
     throw err;

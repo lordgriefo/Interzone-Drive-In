@@ -16,7 +16,10 @@
     "build:electron": "vite build && electron electron/main.cjs --prod",
     "package:exe": "vite build && electron-builder --win",
     "package:portable": "vite build && electron-builder --win portable",
-    "package:zip": "vite build && electron-builder --win zip"
+    "package:zip": "vite build && electron-builder --win zip",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "clsx": "^2.1.0",
@@ -32,6 +35,8 @@
     "tone": "^15.1.22"
   },
   "devDependencies": {
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/cli": "^2.2.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",

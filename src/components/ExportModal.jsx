@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Film, Zap, Download, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { isElectronEnvironment, startWebExport, runDeterministicOfflineExport, isMp4RecordingSupported } from '../utils/exportPipeline';
+import { isElectronEnvironment, isTauriEnvironment, isDesktopEnvironment, getDesktopAPI, startWebExport, runDeterministicOfflineExport, isMp4RecordingSupported } from '../utils/exportPipeline';
 import { decodeAudioSource } from '../utils/offlineAudioAnalyzer';
 import { QUALITY_PRESETS } from '../hooks/useVideoRecorder';
 import { createProceduralAudioTrack } from '../constants/initialMedia';
@@ -28,7 +28,9 @@ export function ExportModal({
   sensitivity = 1.0,
 }) {
   const isElectron = isElectronEnvironment();
-  const [activeTab, setActiveTab] = useState(isElectron ? 'electron' : 'web');
+  const isTauri = isTauriEnvironment();
+  const isDesktop = isDesktopEnvironment();
+  const [activeTab, setActiveTab] = useState(isDesktop ? 'electron' : 'web');
 
   // Web mode state
   const [isWebRecording, setIsWebRecording] = useState(false);
@@ -37,7 +39,7 @@ export function ExportModal({
   const [recordViewportOnly, setRecordViewportOnly] = useState(true);
   const webExportControllerRef = useRef(null);
 
-  // Electron mode state
+  // Desktop export state (Tauri / Electron)
   const [isRendering, setIsRendering] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [electronFormat, setElectronFormat] = useState('mp4'); // 'mp4' | 'webm'
@@ -50,10 +52,16 @@ export function ExportModal({
   const stopRequestedRef = useRef(false);
 
   useEffect(() => {
-    if (isElectron && window.electronAPI?.getStatus) {
-      window.electronAPI.getStatus().then(setFfmpegStatus).catch(() => {});
+    let mounted = true;
+    if (isDesktop && isOpen) {
+      getDesktopAPI().then((api) => {
+        if (api?.getStatus && mounted) {
+          api.getStatus().then(setFfmpegStatus).catch(() => {});
+        }
+      });
     }
-  }, [isElectron, isOpen]);
+    return () => { mounted = false; };
+  }, [isDesktop, isOpen]);
 
   useEffect(() => {
     if (!isOpen && isWebRecording && webExportControllerRef.current) {
@@ -103,9 +111,9 @@ export function ExportModal({
     }
   };
 
-  // ── Mode B: Deterministic Electron Render Handlers ──
+  // ── Mode B: Deterministic Desktop Render Handlers (Tauri v2 / Electron) ──
   const handleStartElectronRender = async () => {
-    if (!isElectron) return;
+    if (!isDesktop) return;
 
     setIsRendering(true);
     setIsStopping(false);
@@ -147,12 +155,13 @@ export function ExportModal({
           onSeek(timestamp);
         }
 
-        // 2. Wait 2 ticks to guarantee React commits and Chromium paints the frame buffer
+        // 2. Wait 2 ticks to guarantee React commits and DOM paints the frame buffer
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-        // 3. Capture exact viewport rect via native Chromium buffer
-        if (window.electronAPI?.captureViewportFrame) {
-          await window.electronAPI.captureViewportFrame(rect);
+        // 3. Capture exact viewport rect via native desktop hardware buffer
+        const desktopAPI = await getDesktopAPI();
+        if (desktopAPI?.captureViewportFrame) {
+          await desktopAPI.captureViewportFrame(rect);
           return true;
         }
 
@@ -167,6 +176,8 @@ export function ExportModal({
         format: electronFormat,
         sensitivity,
         renderFrameSnapshot,
+        width: rect.width,
+        height: rect.height,
         shouldStop: () => stopRequestedRef.current,
         onProgress: (p) => setRenderProgress(p),
         onComplete: (res) => {
@@ -208,8 +219,9 @@ export function ExportModal({
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    if (window.electronAPI?.cancelExport) {
-      await window.electronAPI.cancelExport();
+    const desktopAPI = await getDesktopAPI();
+    if (desktopAPI?.cancelExport) {
+      await desktopAPI.cancelExport();
     }
     setIsRendering(false);
     setIsStopping(false);
@@ -432,12 +444,12 @@ export function ExportModal({
                 padding: '2px 8px',
                 borderRadius: 4,
                 fontWeight: 700,
-                backgroundColor: isElectron ? 'rgba(16,185,129,0.2)' : 'rgba(0,229,255,0.15)',
-                color: isElectron ? '#10b981' : 'var(--accent-cyan, #00e5ff)',
-                border: isElectron ? '1px solid #10b981' : '1px solid var(--accent-cyan, #00e5ff)',
+                backgroundColor: isDesktop ? 'rgba(16,185,129,0.2)' : 'rgba(0,229,255,0.15)',
+                color: isDesktop ? '#10b981' : 'var(--accent-cyan, #00e5ff)',
+                border: isDesktop ? '1px solid #10b981' : '1px solid var(--accent-cyan, #00e5ff)',
               }}
             >
-              {isElectron ? '⚡ DESKTOP / ELECTRON' : '🌐 BROWSER WEB MODE'}
+              {isTauri ? '⚡ DESKTOP / TAURI v2' : isElectron ? '⚡ DESKTOP / ELECTRON' : '🌐 BROWSER WEB MODE'}
             </span>
           </div>
 
@@ -504,7 +516,7 @@ export function ExportModal({
             }}
           >
             <Zap size={14} />
-            MODE B: HD ELECTRON RENDER
+            MODE B: ZERO-JANK HD DESKTOP RENDER
           </button>
         </div>
 
@@ -623,13 +635,13 @@ export function ExportModal({
               )}
             </div>
           ) : (
-            /* ── MODE B: ELECTRON DETERMINISTIC RENDER ── */
+            /* ── MODE B: ZERO-JANK HD DESKTOP RENDER (TAURI / ELECTRON + FFMPEG) ── */
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ fontSize: 11, color: '#a1a1aa', lineHeight: 1.5 }}>
-                Decoupled offline rendering pipeline with fixed <code style={{ color: '#c084fc' }}>Δt = 1/60s (16.666 ms)</code> step. Advances Tone.js timeline and Meyda spectral state deterministically, streaming lossless PNG frames to a native FFmpeg process.
+                Decoupled offline rendering pipeline with fixed <code style={{ color: '#c084fc' }}>Δt = 1/60s (16.666 ms)</code> step. Advances Tone.js timeline and Meyda spectral state deterministically, streaming lossless frames to a native FFmpeg process for studio-grade MP4 / WebM video.
               </div>
 
-              {!isElectron ? (
+              {!isDesktop ? (
                 <div
                   style={{
                     padding: 16,
@@ -645,9 +657,9 @@ export function ExportModal({
                 >
                   <AlertCircle size={20} color="#eab308" style={{ flexShrink: 0, marginTop: 2 }} />
                   <div>
-                    <div style={{ fontWeight: 700, marginBottom: 4 }}>Electron Desktop Environment Required</div>
+                    <div style={{ fontWeight: 700, marginBottom: 4 }}>Desktop Environment Required (Tauri v2 / FFmpeg)</div>
                     <div>
-                      Mode B requires direct access to system processes to spawn local FFmpeg and pipe raw frame buffers. In your browser tab, please use <strong>Mode A (Quick Web Export)</strong> which records directly using high-bitrate MediaRecorder.
+                      Mode B requires direct access to system processes to spawn native FFmpeg and encode pristine, jitter-free video. In your browser tab, please use <strong>Mode A (Quick Web Export)</strong> which records directly using high-bitrate MediaRecorder, or launch the desktop app below:
                     </div>
                     <div style={{ marginTop: 10 }}>
                       <a
@@ -668,7 +680,7 @@ export function ExportModal({
                           boxShadow: '0 0 10px rgba(168,85,247,0.4)',
                         }}
                       >
-                        ⬇ DOWNLOAD STRANGELET KINETO-CUT DESKTOP (.EXE)
+                        ⬇ DOWNLOAD STRANGELET KINETICUT DESKTOP (.EXE)
                       </a>
                     </div>
                   </div>
@@ -698,7 +710,7 @@ export function ExportModal({
                         {ffmpegStatus?.available !== false ? 'Native FFmpeg Ready' : 'FFmpeg Not Found'}
                       </span>
                       <span style={{ color: '#888', fontSize: 9 }}>
-                        {ffmpegStatus?.isBundled ? '(Bundled Native Binary)' : ffmpegStatus?.path ? `(${ffmpegStatus.path})` : ''}
+                        {ffmpegStatus?.engine === 'tauri_native_rust' ? '(Tauri v2 Native Rust)' : ffmpegStatus?.isBundled ? '(Bundled Native Binary)' : ffmpegStatus?.path ? `(${ffmpegStatus.path})` : ''}
                       </span>
                     </div>
                     <span style={{ color: '#c084fc', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
@@ -824,6 +836,7 @@ export function ExportModal({
                   ) : (
                     <button
                       onClick={handleStartElectronRender}
+                      disabled={ffmpegStatus?.available === false}
                       style={{
                         padding: '12px',
                         borderRadius: 6,
@@ -831,9 +844,9 @@ export function ExportModal({
                         fontSize: 12,
                         letterSpacing: 0.5,
                         border: 'none',
-                        cursor: 'pointer',
-                        backgroundColor: '#a855f7',
-                        color: '#fff',
+                        cursor: ffmpegStatus?.available === false ? 'not-allowed' : 'pointer',
+                        backgroundColor: ffmpegStatus?.available === false ? '#3f3f46' : '#a855f7',
+                        color: ffmpegStatus?.available === false ? '#71717a' : '#fff',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -841,7 +854,9 @@ export function ExportModal({
                       }}
                     >
                       <Zap size={16} />
-                      START ZERO-JANK HD {electronFormat.toUpperCase()} RENDER
+                      {ffmpegStatus?.available === false
+                        ? 'FFMPEG NOT FOUND'
+                        : `START ZERO-JANK HD ${electronFormat.toUpperCase()} RENDER`}
                     </button>
                   )}
 

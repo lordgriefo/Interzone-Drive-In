@@ -98,6 +98,25 @@ function mediaScannerPlugin() {
     } catch (err) {
       console.warn('[mediaScannerPlugin] Could not write discoveredAssets.json:', err.message);
     }
+
+    // Ensure ffmpeg.exe is copied into src-tauri and resources so Tauri finds it instantly
+    const ffmpegSrc = path.resolve(root, 'node_modules/ffmpeg-static/ffmpeg.exe');
+    if (fs.existsSync(ffmpegSrc)) {
+      const tauriDirs = [
+        path.resolve(root, 'src-tauri'),
+        path.resolve(root, 'src-tauri/resources'),
+      ];
+      for (const d of tauriDirs) {
+        try {
+          if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+          const target = path.join(d, 'ffmpeg.exe');
+          if (!fs.existsSync(target) || fs.statSync(target).size !== fs.statSync(ffmpegSrc).size) {
+            fs.copyFileSync(ffmpegSrc, target);
+            console.log(`[mediaScannerPlugin] Synced ffmpeg.exe to ${target}`);
+          }
+        } catch (_) {}
+      }
+    }
   };
 
   // Run scan immediately when config loads

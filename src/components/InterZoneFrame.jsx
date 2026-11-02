@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { InterzoneBackground } from './InterzoneBackground.jsx';
-import { isElectronEnvironment } from '../utils/exportPipeline';
+import { isDesktopEnvironment } from '../utils/exportPipeline';
 import { DESKTOP_EXE_DOWNLOAD_URL, BUY_ME_A_COFFEE_URL } from '../constants/urls';
 
 const TIMELINE_MIN_H = 100;
@@ -162,7 +162,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
       )}
 
       {/* ── UPPER-LEFT STARFIELD: MÉLIÈS MOON DESKTOP APP LINK ── */}
-      {!cinemaMode && !isElectronEnvironment() && (
+      {!cinemaMode && !isDesktopEnvironment() && (
         <a
           href={DESKTOP_EXE_DOWNLOAD_URL}
           target="_blank"
@@ -295,10 +295,9 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
               color: 'var(--accent-blue)',
               textShadow: '0 0 10px var(--accent-blue-glow)',
               marginTop: 4,
-              textTransform: 'uppercase',
               fontWeight: 700,
             }}>
-              STRANGELET · KINETICUT
+              THE STRANGELET · KenetiCut
             </div>
           </div>
 

@@ -38,3 +38,7 @@ dist-electron/
 *.AppImage
 *.blockmap
 
+
+# Tauri build artifacts
+src-tauri/target/
+src-tauri/gen/

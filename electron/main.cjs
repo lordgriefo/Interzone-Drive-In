@@ -40,6 +40,9 @@ function cleanupTempAudio() {
 }
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 
 function createWindow() {
   const iconPath = path.join(__dirname, '../build/icon.ico');
@@ -58,6 +61,7 @@ function createWindow() {
       nodeIntegration: false,
       webSecurity: false, // Allows fetch() on local media files and audio/video blobs
       allowRunningInsecureContent: true,
+      backgroundThrottling: false, // Prevents timer jitter and playback catch-up bursts
     },
   });
 

@@ -51,8 +51,19 @@ function TimelineClipMedia({ url, name, clip, localTime, isPlaying, isVideo, isO
       if (!v.paused) v.pause();
       if (circularDiff() > 0.01) v.currentTime = target;
     } else {
-      // Forward playback: let the browser play, but correct drift
-      if (circularDiff() > 0.3 && !v.seeking) v.currentTime = target;
+      // Forward playback: smooth drift compensation to eliminate jarring seeks & catch-up speedups
+      const diff = v.currentTime - target;
+      const absDiff = circularDiff();
+      if (absDiff > 1.2 && !v.seeking) {
+        // Large seek jump (timeline scrub or loop boundary)
+        v.currentTime = target;
+        v.playbackRate = 1.0;
+      } else if (absDiff > 0.08) {
+        // Minor clock drift: gently micro-adjust playback rate (±4%) rather than dropping frames or seeking
+        v.playbackRate = diff < 0 ? 1.04 : 0.96;
+      } else {
+        if (v.playbackRate !== 1.0) v.playbackRate = 1.0;
+      }
       if (v.paused) v.play().catch(() => {});
     }
   }, [isVideo, metaReady, localTime, isPlaying, isOfflineRendering, clip.reversed, clip.inPoint, clip.duration]);
