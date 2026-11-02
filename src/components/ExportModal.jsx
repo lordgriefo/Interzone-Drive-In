@@ -680,7 +680,7 @@ export function ExportModal({
                           boxShadow: '0 0 10px rgba(168,85,247,0.4)',
                         }}
                       >
-                        ⬇ DOWNLOAD STRANGELET KINETICUT DESKTOP (.EXE)
+                        ⬇ DOWNLOAD STRANGELET KENETICUT DESKTOP (.EXE)
                       </a>
                     </div>
                   </div>

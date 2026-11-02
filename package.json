@@ -50,8 +50,8 @@
   },
   "build": {
     "appId": "com.strangelet.kinetocut",
-    "productName": "Strangelet Kineto-Cut",
-    "executableName": "Strangelet-Kineto-Cut",
+    "productName": "Strangelet KenetiCut",
+    "executableName": "Strangelet-KenetiCut",
     "copyright": "Copyright © 2026 Interzone Drive-In",
     "directories": {
       "output": "release"
@@ -83,8 +83,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Strangelet Kineto-Cut",
-      "uninstallDisplayName": "Strangelet Kineto-Cut",
+      "shortcutName": "Strangelet KenetiCut",
+      "uninstallDisplayName": "Strangelet KenetiCut",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "guid": "d38402c8-89c2-4682-a728-kinetocut2026"

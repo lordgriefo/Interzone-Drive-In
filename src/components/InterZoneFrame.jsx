@@ -711,7 +711,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
             href={BUY_ME_A_COFFEE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            title="Support Strangelet Kineto-Cut on Buy Me a Coffee"
+            title="Support Strangelet KenetiCut on Buy Me a Coffee"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
