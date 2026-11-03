@@ -89,25 +89,36 @@ export function ExportModal({
       return;
     }
 
-    const controller = await startWebExport({
-      viewportElement: viewportEl,
-      audioDestinationRef,
-      exportQuality: webQuality,
-      exportFormat: webFormat,
-      recordViewportOnly,
-      onStop: () => {
-        setIsWebRecording(false);
-        webExportControllerRef.current = null;
-      },
-      onError: (err) => {
-        alert('Web export failed: ' + err.message);
-        setIsWebRecording(false);
-      },
-    });
+    // Collapse modal to corner floating HUD immediately before media dialog opens,
+    // so the modal dialog never obstructs the viewport in the recorded video.
+    setIsWebRecording(true);
 
-    if (controller) {
-      webExportControllerRef.current = controller;
-      setIsWebRecording(true);
+    try {
+      const controller = await startWebExport({
+        viewportElement: viewportEl,
+        audioDestinationRef,
+        exportQuality: webQuality,
+        exportFormat: webFormat,
+        recordViewportOnly,
+        onStop: () => {
+          setIsWebRecording(false);
+          webExportControllerRef.current = null;
+        },
+        onError: (err) => {
+          setIsWebRecording(false);
+          webExportControllerRef.current = null;
+          alert('Web export failed: ' + err.message);
+        },
+      });
+
+      if (controller) {
+        webExportControllerRef.current = controller;
+      } else {
+        setIsWebRecording(false);
+      }
+    } catch (err) {
+      setIsWebRecording(false);
+      alert('Web export error: ' + (err?.message || err));
     }
   };
 

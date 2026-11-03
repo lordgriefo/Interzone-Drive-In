@@ -137,105 +137,131 @@ export async function startWebExport({
   let recordStream = videoStream;
   let stopCropper = null;
 
-  // ── Real-Time Viewport Canvas Cropper ──
-  // Extract strictly the #main-viewport bounding rectangle into a dedicated 16:9 canvas stream.
+  // ── High-Precision Viewport Cropper (Native CropTarget + Robust Fallback) ──
+  // Extract strictly the #main-viewport bounding rectangle into a dedicated 16:9 stream.
   if (recordViewportOnly && viewportElement) {
-    try {
-      const hiddenVideo = document.createElement('video');
-      hiddenVideo.srcObject = videoStream;
-      hiddenVideo.muted = true;
-      hiddenVideo.playsInline = true;
-      hiddenVideo.style.position = 'fixed';
-      hiddenVideo.style.top = '0';
-      hiddenVideo.style.left = '0';
-      hiddenVideo.style.width = '1px';
-      hiddenVideo.style.height = '1px';
-      hiddenVideo.style.opacity = '0.01';
-      hiddenVideo.style.pointerEvents = 'none';
-      hiddenVideo.style.zIndex = '-9999';
-      document.body.appendChild(hiddenVideo);
+    let nativeCropped = false;
+    const [rawTrack] = videoStream.getVideoTracks();
 
-      await hiddenVideo.play().catch(() => {});
+    // 1. Try modern Chromium W3C Region Capture API (CropTarget)
+    if (window.CropTarget && typeof CropTarget.fromElement === 'function' && rawTrack && typeof rawTrack.cropTo === 'function') {
+      try {
+        const cropTarget = await CropTarget.fromElement(viewportElement);
+        await rawTrack.cropTo(cropTarget);
+        nativeCropped = true;
+        console.info('[exportPipeline] Native CropTarget applied directly to #main-viewport!');
+      } catch (cropTargetErr) {
+        console.warn('[exportPipeline] Native CropTarget failed or not allowed on this surface, using precision canvas cropper:', cropTargetErr);
+      }
+    }
 
-      const cropCanvas = document.createElement('canvas');
-      cropCanvas.width = preset.width || 1920;
-      cropCanvas.height = preset.height || 1080;
-      const cropCtx = cropCanvas.getContext('2d', { alpha: false });
+    // 2. Fallback: Precision Real-Time Canvas Cropper
+    if (!nativeCropped) {
+      try {
+        const hiddenVideo = document.createElement('video');
+        hiddenVideo.srcObject = videoStream;
+        hiddenVideo.muted = true;
+        hiddenVideo.playsInline = true;
+        hiddenVideo.style.position = 'fixed';
+        hiddenVideo.style.top = '0';
+        hiddenVideo.style.left = '0';
+        hiddenVideo.style.width = '1px';
+        hiddenVideo.style.height = '1px';
+        hiddenVideo.style.opacity = '0.01';
+        hiddenVideo.style.pointerEvents = 'none';
+        hiddenVideo.style.zIndex = '-9999';
+        document.body.appendChild(hiddenVideo);
 
-      let isCropping = true;
-      let cropRaf = null;
+        await hiddenVideo.play().catch(() => {});
 
-      const cropLoop = () => {
-        if (!isCropping) return;
-        if (hiddenVideo.readyState >= 2 && hiddenVideo.videoWidth > 0) {
-          const rect = viewportElement.getBoundingClientRect();
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width = preset.width || 1920;
+        cropCanvas.height = preset.height || 1080;
+        const cropCtx = cropCanvas.getContext('2d', { alpha: false });
 
-          // Detect whether user shared a Tab vs Window/Screen:
-          // A Tab capture's aspect ratio matches window.innerWidth / window.innerHeight.
-          // A Window capture includes the browser title bar, tab strip, and URL address bar at the top.
-          const streamRatio = hiddenVideo.videoWidth / hiddenVideo.videoHeight;
-          const contentRatio = window.innerWidth / window.innerHeight;
-          const isTabCapture = Math.abs(streamRatio - contentRatio) < 0.04;
+        let isCropping = true;
+        let cropRaf = null;
 
-          let chromeTop = 0;
-          let chromeLeft = 0;
-          let baseW = window.innerWidth;
-          let baseH = window.innerHeight;
+        const cropLoop = () => {
+          if (!isCropping) return;
+          if (hiddenVideo.readyState >= 2 && hiddenVideo.videoWidth > 0) {
+            const rect = viewportElement.getBoundingClientRect();
+            const track = videoStream.getVideoTracks()[0];
+            const settings = track?.getSettings ? track.getSettings() : {};
+            const surface = settings.displaySurface; // 'browser' | 'window' | 'monitor'
 
-          if (!isTabCapture) {
-            // Window capture: web content starts below the browser's tabs + URL address bar
-            const totalChromeH = Math.max(0, window.outerHeight - window.innerHeight);
-            chromeTop = Math.max(0, totalChromeH - 8);
-            chromeLeft = Math.max(0, (window.outerWidth - window.innerWidth) / 2);
-            baseW = window.outerWidth;
-            baseH = window.outerHeight;
+            // Tab vs Window/Monitor detection:
+            // - surface === 'browser' is a tab.
+            // - document.fullscreenElement means zero window chrome.
+            // - or video aspect ratio matches client window aspect ratio.
+            const dpr = window.devicePixelRatio || 1;
+            const tabRatio = window.innerWidth / window.innerHeight;
+            const videoRatio = hiddenVideo.videoWidth / hiddenVideo.videoHeight;
+            const isTab = surface === 'browser' ||
+                          !!document.fullscreenElement ||
+                          Math.abs(videoRatio - tabRatio) < 0.05 ||
+                          Math.abs(hiddenVideo.videoWidth - Math.round(window.innerWidth * dpr)) < 8;
+
+            let sx = 0;
+            let sy = 0;
+            let sw = hiddenVideo.videoWidth;
+            let sh = hiddenVideo.videoHeight;
+
+            if (isTab) {
+              // Pure web viewport capture (Current Tab):
+              // Top-left of the stream is (0,0) of window.innerWidth x window.innerHeight.
+              const scaleX = hiddenVideo.videoWidth / window.innerWidth;
+              const scaleY = hiddenVideo.videoHeight / window.innerHeight;
+
+              sx = Math.max(0, Math.round(rect.left * scaleX));
+              sy = Math.max(0, Math.round(rect.top * scaleY));
+              sw = Math.min(hiddenVideo.videoWidth - sx, Math.round(rect.width * scaleX));
+              sh = Math.min(hiddenVideo.videoHeight - sy, Math.round(rect.height * scaleY));
+            } else {
+              // Window / Screen capture:
+              // Account for OS window border and browser top chrome (title bar, tabs, URL bar).
+              const chromeTop = Math.max(0, window.outerHeight - window.innerHeight);
+              const chromeLeft = Math.max(0, (window.outerWidth - window.innerWidth) / 2);
+              const scaleX = hiddenVideo.videoWidth / window.outerWidth;
+              const scaleY = hiddenVideo.videoHeight / window.outerHeight;
+
+              sx = Math.max(0, Math.round((rect.left + chromeLeft) * scaleX));
+              sy = Math.max(0, Math.round((rect.top + chromeTop) * scaleY));
+              sw = Math.min(hiddenVideo.videoWidth - sx, Math.round(rect.width * scaleX));
+              sh = Math.min(hiddenVideo.videoHeight - sy, Math.round(rect.height * scaleY));
+            }
+
+            if (sw > 20 && sh > 20) {
+              cropCtx.drawImage(
+                hiddenVideo,
+                sx,
+                sy,
+                sw,
+                sh,
+                0,
+                0,
+                cropCanvas.width,
+                cropCanvas.height
+              );
+            }
           }
+          cropRaf = requestAnimationFrame(cropLoop);
+        };
+        cropLoop();
 
-          const sX = hiddenVideo.videoWidth / baseW;
-          const sY = hiddenVideo.videoHeight / baseH;
+        recordStream = cropCanvas.captureStream(preset.fps || 60);
 
-          // Trim 5px inside the viewport border to ensure zero bezel/border bleed
-          const inset = 5;
-          const targetX = rect.left + chromeLeft + inset;
-          const targetY = rect.top + chromeTop + inset;
-          const targetW = Math.max(10, rect.width - inset * 2);
-          const targetH = Math.max(10, rect.height - inset * 2);
-
-          const sx = Math.max(0, targetX * sX);
-          const sy = Math.max(0, targetY * sY);
-          const sw = Math.min(hiddenVideo.videoWidth - sx, targetW * sX);
-          const sh = Math.min(hiddenVideo.videoHeight - sy, targetH * sY);
-
-          if (sw > 10 && sh > 10) {
-            cropCtx.drawImage(
-              hiddenVideo,
-              sx,
-              sy,
-              sw,
-              sh,
-              0,
-              0,
-              cropCanvas.width,
-              cropCanvas.height
-            );
-          }
-        }
-        cropRaf = requestAnimationFrame(cropLoop);
-      };
-      cropLoop();
-
-      recordStream = cropCanvas.captureStream(preset.fps || 60);
-
-      stopCropper = () => {
-        isCropping = false;
-        if (cropRaf) cancelAnimationFrame(cropRaf);
-        hiddenVideo.pause();
-        hiddenVideo.srcObject = null;
-        hiddenVideo.remove();
-      };
-      console.info('[exportPipeline] Live canvas cropper active for #main-viewport');
-    } catch (cropErr) {
-      console.warn('[exportPipeline] Canvas cropper init failed, recording full tab:', cropErr);
+        stopCropper = () => {
+          isCropping = false;
+          if (cropRaf) cancelAnimationFrame(cropRaf);
+          hiddenVideo.pause();
+          hiddenVideo.srcObject = null;
+          hiddenVideo.remove();
+        };
+        console.info('[exportPipeline] Precision canvas cropper active for #main-viewport');
+      } catch (cropErr) {
+        console.warn('[exportPipeline] Canvas cropper init failed, recording full stream:', cropErr);
+      }
     }
   }
 
