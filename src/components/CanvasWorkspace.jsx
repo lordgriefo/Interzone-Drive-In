@@ -293,6 +293,13 @@ export function CanvasWorkspace({
   const beatFlashRafRef = useRef(null);
   // Per-style minimum hold time between slide advances (ms). Chill styles use a long hold.
   const lastSlideAdvanceRef = useRef(0);
+  const lastTransientCountRef = useRef(-1);
+  const currentTimeRef = useRef(currentTime);
+  useEffect(() => { currentTimeRef.current = currentTime; }, [currentTime]);
+  const selectedStyleRef = useRef(selectedStyle);
+  useEffect(() => { selectedStyleRef.current = selectedStyle; }, [selectedStyle]);
+  const bpmRef = useRef(bpm);
+  useEffect(() => { bpmRef.current = bpm; }, [bpm]);
 
   const contextState = useAppState() || {};
 
@@ -1091,8 +1098,16 @@ export function CanvasWorkspace({
       return;
     }
 
+    const currentCount = audioSignals?.transientCount;
+    const isNewTransient = currentCount !== undefined && currentCount !== lastTransientCountRef.current;
+    if (isNewTransient) {
+      lastTransientCountRef.current = currentCount;
+    }
+
     const isTransient = Boolean(audioSignals?.isTransient);
-    if (isTransient && !previousTransientRef.current) {
+    const beatTriggered = isNewTransient || (isTransient && !previousTransientRef.current);
+
+    if (beatTriggered) {
       // ── Per-style minimum hold between slide advances ──
       // High-energy styles chop fast on beat transients.
       // Chill and long-cut styles linger to let clips breathe.
@@ -1153,7 +1168,7 @@ export function CanvasWorkspace({
       // Default fallback hold: snappy ~375ms for kinetic editing
       const minHold = CHILL_MIN_HOLD_MS[currentStyle] ?? Math.max(320, Math.round(beatMs * 0.75));
       // In offline render mode, use song timeline milliseconds so cuts don't speed up with render loop
-      const now = isOfflineRendering ? (currentTime * 1000) : performance.now();
+      const now = isOfflineRendering ? (currentTimeRef.current * 1000) : performance.now();
       const sinceLastAdvance = now - lastSlideAdvanceRef.current;
 
       // ── 1. Advance slide if minHold satisfied ──
@@ -1162,16 +1177,17 @@ export function CanvasWorkspace({
         lastSlideAdvanceRef.current = now;
       }
 
-      // ── 2. Beat flash: strobe punch on EVERY transient kick ──
+      // ── 2. Beat flash: punchy strobe on EVERY transient kick ──
       if (!isOfflineRendering && !CHILL_STYLES.has(currentStyle) && beatFlashRef.current) {
         if (beatFlashRafRef.current) cancelAnimationFrame(beatFlashRafRef.current);
-        beatFlashRef.current.style.opacity = '0.42';
+        const peakOpacity = (currentStyle === 'strobe' || currentStyle === 'mv_flash_cut') ? 0.88 : 0.75;
+        beatFlashRef.current.style.opacity = String(peakOpacity);
         const flashStart = performance.now();
         const decayFlash = () => {
           const age = performance.now() - flashStart;
-          const opacity = Math.max(0, 0.42 * (1 - age / 150));
+          const opacity = Math.max(0, peakOpacity * Math.pow(Math.max(0, 1 - age / 180), 1.4));
           if (beatFlashRef.current) beatFlashRef.current.style.opacity = String(opacity.toFixed(3));
-          if (age < 150) beatFlashRafRef.current = requestAnimationFrame(decayFlash);
+          if (age < 180) beatFlashRafRef.current = requestAnimationFrame(decayFlash);
         };
         beatFlashRafRef.current = requestAnimationFrame(decayFlash);
       }
@@ -1265,7 +1281,7 @@ export function CanvasWorkspace({
         }
       }
       previousTransientRef.current = isTransient;
-    }, [audioSignals?.isTransient, assets, selectedStyle, selectedEra, isPlaying, bpm, advanceSlide, currentTime, isOfflineRendering]);
+    }, [audioSignals?.transientCount, audioSignals?.isTransient, assets, selectedStyle, selectedEra, isPlaying, bpm, advanceSlide, isOfflineRendering]);
 
   // Halt animation + reset when paused/stopped
   useEffect(() => {
@@ -1305,6 +1321,26 @@ export function CanvasWorkspace({
 
     const loop = () => {
       setAnimTick((t) => t + 1);
+      // Kinetic Auto-Advance Fallback:
+      // Guarantees rapid cutting rhythm even during heavy recording load or quiet audio breakdowns
+      const currentStyle = (selectedStyleRef.current || '').toLowerCase();
+      const CHILL_STYLES = new Set([
+        'ambient_drift', 'lo_fi_flicker', 'slow_dissolve', 'dreamscape',
+        'deren_meshes', 'marker_jetee', 'warhol_screen', 'debord_detourne',
+        'lynch_redroom', 'lynch_eraserhead', 'mv_long_cut', 'mv_slow_burn',
+        'mv_cinematic_glide', 'mv_hypnotic_drift'
+      ]);
+      if (!CHILL_STYLES.has(currentStyle)) {
+        const now = isOfflineRendering ? (currentTimeRef.current * 1000) : performance.now();
+        const sinceLastAdvance = now - lastSlideAdvanceRef.current;
+        const currentBpm = bpmRef.current || 120;
+        const beatMs = Math.round(60000 / currentBpm);
+        const maxKineticHold = Math.max(650, beatMs * 2);
+        if (sinceLastAdvance >= maxKineticHold) {
+          advanceSlide();
+          lastSlideAdvanceRef.current = now;
+        }
+      }
       animFrameRef.current = requestAnimationFrame(loop);
     };
     animFrameRef.current = requestAnimationFrame(loop);

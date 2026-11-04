@@ -181,11 +181,21 @@ export async function startWebExport({
 
         let isCropping = true;
         let cropRaf = null;
+        let cachedRect = viewportElement.getBoundingClientRect();
+        let frameCount = 0;
+        const onResize = () => {
+          if (viewportElement) cachedRect = viewportElement.getBoundingClientRect();
+        };
+        window.addEventListener('resize', onResize);
 
         const cropLoop = () => {
           if (!isCropping) return;
+          frameCount++;
+          if (frameCount % 30 === 0 && viewportElement) {
+            cachedRect = viewportElement.getBoundingClientRect();
+          }
           if (hiddenVideo.readyState >= 2 && hiddenVideo.videoWidth > 0) {
-            const rect = viewportElement.getBoundingClientRect();
+            const rect = cachedRect;
             const track = videoStream.getVideoTracks()[0];
             const settings = track?.getSettings ? track.getSettings() : {};
             const surface = settings.displaySurface; // 'browser' | 'window' | 'monitor'
@@ -253,6 +263,7 @@ export async function startWebExport({
 
         stopCropper = () => {
           isCropping = false;
+          window.removeEventListener('resize', onResize);
           if (cropRaf) cancelAnimationFrame(cropRaf);
           hiddenVideo.pause();
           hiddenVideo.srcObject = null;

@@ -7,12 +7,12 @@ import { useState, useRef } from 'react';
 
 // Quality presets — high-bitrate profiles preserving grain, glitch, and depth shaders
 export const QUALITY_PRESETS = {
-  '1080p-master': { label: '1080p · Master (24M 60fps)', fps: 60, bitrate: 24_000_000, width: 1920, height: 1080 },
-  '1080p-high':   { label: '1080p · High (16M 60fps)',   fps: 60, bitrate: 16_000_000, width: 1920, height: 1080 },
-  '1080p-cinema': { label: '1080p · Cinema (12M 24fps)', fps: 24, bitrate: 12_000_000, width: 1920, height: 1080 },
-  '720p-high':    { label: '720p · High (8M 60fps)',     fps: 60, bitrate: 8_000_000,  width: 1280, height: 720  },
+  '1080p-master': { label: '1080p · Master (16M 60fps)', fps: 60, bitrate: 16_000_000, width: 1920, height: 1080 },
+  '1080p-high':   { label: '1080p · High (12M 60fps)',   fps: 60, bitrate: 12_000_000, width: 1920, height: 1080 },
+  '1080p-cinema': { label: '1080p · Cinema (10M 24fps)', fps: 24, bitrate: 10_000_000, width: 1920, height: 1080 },
+  '720p-high':    { label: '720p · High (7M 60fps)',     fps: 60, bitrate: 7_000_000,  width: 1280, height: 720  },
   '720p-medium':  { label: '720p · Standard (5M 30fps)', fps: 30, bitrate: 5_000_000,  width: 1280, height: 720  },
-  '4k-ultra':     { label: '4K · Ultra (40M 60fps)',     fps: 60, bitrate: 40_000_000, width: 3840, height: 2160 },
+  '4k-ultra':     { label: '4K · Ultra (32M 60fps)',     fps: 60, bitrate: 32_000_000, width: 3840, height: 2160 },
 };
 
 export const DEFAULT_QUALITY = '1080p-master';
@@ -132,11 +132,21 @@ export function useVideoRecorder() {
 
           let isCropping = true;
           let cropRaf = null;
+          let cachedRect = viewportElement.getBoundingClientRect();
+          let frameCount = 0;
+          const onResize = () => {
+            if (viewportElement) cachedRect = viewportElement.getBoundingClientRect();
+          };
+          window.addEventListener('resize', onResize);
 
           const cropLoop = () => {
             if (!isCropping) return;
+            frameCount++;
+            if (frameCount % 30 === 0 && viewportElement) {
+              cachedRect = viewportElement.getBoundingClientRect();
+            }
             if (hiddenVideo.readyState >= 2 && hiddenVideo.videoWidth > 0) {
-              const rect = viewportElement.getBoundingClientRect();
+              const rect = cachedRect;
               const track = displayStream.getVideoTracks()[0];
               const settings = track?.getSettings ? track.getSettings() : {};
               const surface = settings.displaySurface; // 'browser' | 'window' | 'monitor'
@@ -198,6 +208,7 @@ export function useVideoRecorder() {
 
           stopCropper = () => {
             isCropping = false;
+            window.removeEventListener('resize', onResize);
             if (cropRaf) cancelAnimationFrame(cropRaf);
             hiddenVideo.pause();
             hiddenVideo.srcObject = null;

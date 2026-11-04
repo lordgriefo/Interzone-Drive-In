@@ -82,13 +82,13 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     bass: 0, mid: 0, treble: 0, rawVolume: 0,
     spectralFlux: 0, spectralCentroid: 0,
     rms: 0, energy: 0, vocalEnergy: 0,
-    isTransient: false, isPlaying: false,
+    isTransient: false, isPlaying: false, transientCount: 0,
   });
   const zeroSignals = () => ({
     bass: 0, mid: 0, treble: 0, rawVolume: 0,
     spectralFlux: 0, spectralCentroid: 0,
     rms: 0, energy: 0, vocalEnergy: 0,
-    isTransient: false, isPlaying: false,
+    isTransient: false, isPlaying: false, transientCount: 0,
   });
 
   // ── Reverb state ───────────────────────────────────────────────────────
@@ -126,6 +126,7 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
   useEffect(() => { sensitivityRef.current = sensitivity; }, [sensitivity]);
 
   const lastTransientTime = useRef(0);
+  const transientCountRef = useRef(0);
   const fluxHistoryRef    = useRef([]);
   const latestMeyda       = useRef({
     spectralFlux: 0, spectralCentroid: 0, rms: 0, energy: 0, vocalEnergy: 0, rawFlux: 0,
@@ -296,18 +297,25 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
           if (!prevFrame || prevFrame.length !== len) prevFrame = new Uint8Array(len);
           prevFrame.set(data);
 
-          // ── Transient detection from flux history ──
+          // ── Transient detection with time-bounded flux history (~700ms) ──
           const now = performance.now() / 1000;
-          fluxHistoryRef.current.push(flux);
-          if (fluxHistoryRef.current.length > 43) fluxHistoryRef.current.shift(); // ~700ms at 60fps
-          const avgFlux = fluxHistoryRef.current.reduce((a, b) => a + b, 0) / fluxHistoryRef.current.length;
+          fluxHistoryRef.current.push({ time: now, flux });
+          while (fluxHistoryRef.current.length > 0 && (now - fluxHistoryRef.current[0].time) > 0.70) {
+            fluxHistoryRef.current.shift();
+          }
+          const avgFlux = fluxHistoryRef.current.reduce((a, b) => a + b.flux, 0) / Math.max(1, fluxHistoryRef.current.length);
 
           // Transient fires when flux spikes above average or on heavy bass kicks, scaled by sensitivity
-          const threshMultiplier = Math.max(1.15, 2.0 - (s - 1.0) * 0.45);
-          const minFluxThresh = 0.0016 / Math.max(0.4, s);
+          const threshMultiplier = Math.max(1.15, 1.95 - (s - 1.0) * 0.45);
+          const minFluxThresh = 0.0014 / Math.max(0.4, s);
           const timeSinceLast = now - lastTransientTime.current;
-          const isTransient = ((flux > avgFlux * threshMultiplier && flux > minFluxThresh) || (bass > 0.75 && flux > avgFlux * 1.1) || (flux > 0.035)) && timeSinceLast > 0.11;
-          if (isTransient) lastTransientTime.current = now;
+          const isNewTransient = ((flux > avgFlux * threshMultiplier && flux > minFluxThresh) || (bass > 0.72 && flux > avgFlux * 1.05) || (flux > 0.032)) && timeSinceLast > 0.11;
+          if (isNewTransient) {
+            lastTransientTime.current = now;
+            transientCountRef.current = (transientCountRef.current + 1) | 0;
+          }
+          // Hold isTransient for 80ms (~5 frames at 60fps) so CSS filters and video recorders capture it cleanly
+          const isTransient = (now - lastTransientTime.current) < 0.080;
 
           // Also grab any Meyda data if it happened to fire (optional enhancement)
           const m = latestMeyda.current;
@@ -319,7 +327,9 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
             spectralFlux:    flux,
             spectralCentroid: m.spectralCentroid || 0,
             vocalEnergy:     m.vocalEnergy || 0,
-            isTransient, isPlaying: true,
+            isTransient,
+            transientCount:  transientCountRef.current,
+            isPlaying: true,
           });
         }
 
