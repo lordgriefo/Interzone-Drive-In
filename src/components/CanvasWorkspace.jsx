@@ -257,8 +257,16 @@ export function CanvasWorkspace({
   lyricAnim = 'pulse_slam',
   fxEnvelopeDepth = 1.0,
 }) {
+  const contextState = useAppState() || {};
 
+  const audioSignals = propsAudioSignals !== undefined ? propsAudioSignals : contextState.audioSignals;
+  const selectedEra = propsSelectedEra !== undefined ? propsSelectedEra : contextState.selectedEra;
+  const selectedStyle = propsSelectedStyle !== undefined ? propsSelectedStyle : contextState.selectedStyle;
+  const selectedRube = propsSelectedRube !== undefined ? propsSelectedRube : contextState.selectedRube;
+  const assets = propsAssets !== undefined ? propsAssets : contextState.assets;
 
+  const assetsRef = useRef(assets);
+  useEffect(() => { assetsRef.current = assets; }, [assets]);
 
   const [slideIndex, setSlideIndex] = useState(0);
   const [, setAnimTick] = useState(0);
@@ -301,13 +309,6 @@ export function CanvasWorkspace({
   const bpmRef = useRef(bpm);
   useEffect(() => { bpmRef.current = bpm; }, [bpm]);
 
-  const contextState = useAppState() || {};
-
-  const audioSignals = propsAudioSignals !== undefined ? propsAudioSignals : contextState.audioSignals;
-  const selectedEra = propsSelectedEra !== undefined ? propsSelectedEra : contextState.selectedEra;
-  const selectedStyle = propsSelectedStyle !== undefined ? propsSelectedStyle : contextState.selectedStyle;
-  const selectedRube = propsSelectedRube !== undefined ? propsSelectedRube : contextState.selectedRube;
-  const assets = propsAssets !== undefined ? propsAssets : contextState.assets;
 
   const { stage: rubeStage, visuals: rubeVisuals } = useRubeGoldbergEngine({
     selectedRube,
