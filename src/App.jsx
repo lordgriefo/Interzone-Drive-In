@@ -46,7 +46,7 @@ export const DEFAULT_PLAYLIST = [
   },
   {
     id: 'pl_the_breach',
-    title: "The Breach (Chasing Shadows) — 'O' Shibboleth",
+    title: "The Breach (Chasing Shadows) — The Magic Static Society",
     url: './assets-bg/the-breach.mp3',
     lrcUrl: './assets-bg/the-breach.lrc',
     duration: 338,
