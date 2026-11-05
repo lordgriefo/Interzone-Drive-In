@@ -65,6 +65,82 @@ export default function App() {
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
+  // ── Perchance Iframe postMessage Bridge ──
+  useEffect(() => {
+    const onMessage = (event) => {
+      const data = event.data;
+      if (!data || typeof data !== 'object') return;
+
+      switch (data.type) {
+        case 'ADD_ASSET': {
+          if (data.url) {
+            const newItem = {
+              id: 'perchance-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+              name: data.name || 'Perchance AI Frame',
+              url: data.url,
+              mediaType: data.mediaType || (data.url.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
+            };
+            setAssets((prev) => [newItem, ...prev]);
+          }
+          break;
+        }
+        case 'SET_STYLE': {
+          if (data.style) setSelectedStyle(String(data.style).toLowerCase());
+          break;
+        }
+        case 'SET_ERA': {
+          if (data.era) setSelectedEra(String(data.era).toLowerCase());
+          break;
+        }
+        case 'SET_BPM': {
+          if (data.bpm && Number(data.bpm) > 0) setBpm(Number(data.bpm));
+          break;
+        }
+        case 'TOGGLE_PLAY': {
+          togglePlay();
+          break;
+        }
+        case 'PLAY': {
+          if (!isPlaying) togglePlay();
+          break;
+        }
+        case 'PAUSE': {
+          if (isPlaying) togglePlay();
+          break;
+        }
+        case 'TRIGGER_CHOP': {
+          window.dispatchEvent(new CustomEvent('keneticut:manual-chop'));
+          break;
+        }
+        case 'SET_SUBLIMINAL': {
+          if (data.text) {
+            window.dispatchEvent(new CustomEvent('keneticut:subliminal', {
+              detail: { text: data.text, duration: data.duration }
+            }));
+          }
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [isPlaying, togglePlay]);
+
+  // Broadcast beat pulses back to Perchance parent window
+  useEffect(() => {
+    if (window.parent && window.parent !== window && isPlaying && audioSignals?.isTransient) {
+      window.parent.postMessage({
+        type: 'KENETICUT_BEAT',
+        transientCount: audioSignals.transientCount,
+        bpm,
+        currentTime,
+        era: selectedEra,
+        style: selectedStyle,
+      }, '*');
+    }
+  }, [audioSignals?.transientCount, isPlaying, bpm, currentTime, selectedEra, selectedStyle]);
+
   // ── Cinema Mode: hides panels + goes fullscreen for clean viewport recording ──
   const [cinemaMode, setCinemaMode] = useState(false);
 
