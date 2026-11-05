@@ -27,6 +27,101 @@ import { parseLrcString } from './utils/lrcParser';
 
 
 
+
+export const DEFAULT_PLAYLIST = [
+  {
+    id: 'pl_babalon_jato',
+    title: "Babalon [JATO] — 'O' Shibboleth",
+    url: './assets-bg/babalon-jato.mp3',
+    duration: 214,
+    preset: {
+      selectedStyle: 'montage',
+      selectedEra: '1970_grindhouse',
+      bpm: 132,
+      chaosLevel: 0.35,
+      chaosEnabled: true,
+      sensitivity: 1.2,
+      reverbWet: 0.25,
+    },
+  },
+  {
+    id: 'pl_the_breach',
+    title: "The Breach — 'O' Shibboleth",
+    url: './assets-bg/the-breach.mp3',
+    duration: 336,
+    preset: {
+      selectedStyle: 'third_mind',
+      selectedEra: 'lynchian_interzone',
+      bpm: 105,
+      chaosLevel: 0.5,
+      chaosEnabled: true,
+      sensitivity: 1.1,
+      reverbWet: 0.4,
+    },
+  },
+  {
+    id: 'pl_excavating_neverland',
+    title: 'Excavating Neverland — The Magic Static Society',
+    url: './assets-bg/excavating-neverland.mp3',
+    lrcUrl: './assets-bg/excavating-neverland.lrc',
+    duration: 310,
+    preset: {
+      selectedStyle: 'montage',
+      selectedEra: '1902_melies',
+      bpm: 120,
+      chaosLevel: 0.15,
+      chaosEnabled: true,
+      sensitivity: 1.0,
+      reverbWet: 0.2,
+    },
+  },
+  {
+    id: 'pl_archon',
+    title: 'Archon — Strangelet',
+    url: './assets-bg/archon.mp3',
+    duration: 334,
+    preset: {
+      selectedStyle: 'dmt_breakthrough',
+      selectedEra: '1927_metropolis',
+      bpm: 128,
+      chaosLevel: 0.45,
+      chaosEnabled: true,
+      sensitivity: 1.2,
+      reverbWet: 0.35,
+    },
+  },
+  {
+    id: 'pl_plush',
+    title: 'Plush — The Magic Static Society',
+    url: './assets-bg/plush.mp3',
+    duration: 385,
+    preset: {
+      selectedStyle: 'venetian',
+      selectedEra: '1927_metropolis',
+      bpm: 95,
+      chaosLevel: 0.25,
+      chaosEnabled: false,
+      sensitivity: 1.0,
+      reverbWet: 0.3,
+    },
+  },
+  {
+    id: 'pl_radiator',
+    title: 'Radiator — The Magic Static Society',
+    url: './assets-bg/radiator.mp3',
+    duration: 249,
+    preset: {
+      selectedStyle: 'brakhage_emulsion',
+      selectedEra: '1970_grindhouse',
+      bpm: 110,
+      chaosLevel: 0.6,
+      chaosEnabled: true,
+      sensitivity: 1.1,
+      reverbWet: 0.35,
+    },
+  },
+];
+
 export default function App() {
   const [sensitivity, setSensitivity] = useState(1.0);
 
@@ -243,8 +338,8 @@ export default function App() {
   const [adaptiveTheme, setAdaptiveTheme] = useState(false);
 
   // ── Playlist ──────────────────────────────────────────────────────────────
-  const [playlist,       setPlaylist]      = useState([]);
-  const [playlistIndex,  setPlaylistIndex] = useState(-1);
+  const [playlist,       setPlaylist]      = useState(DEFAULT_PLAYLIST);
+  const [playlistIndex,  setPlaylistIndex] = useState(0);
   const [autoAdvance,    setAutoAdvance]   = useState(true);
   const [saveImages,     setSaveImages]    = useState(false);
   const [playlistOpen,   setPlaylistOpen]  = useState(false);
@@ -373,6 +468,18 @@ export default function App() {
       if (entry.preset.reverbWet     !== undefined) setReverbWet(entry.preset.reverbWet);
     }
     setLyricSegments([]);
+    if (entry.lrcUrl) {
+      fetch(entry.lrcUrl)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.text();
+        })
+        .then((raw) => {
+          const segs = parseLrcString(raw);
+          if (segs.length > 0) setLyricSegments(segs);
+        })
+        .catch(() => {});
+    }
   }, [loadAudioTrack, setReverbWet]);
 
   // Advance to the next track in the playlist
@@ -442,8 +549,8 @@ export default function App() {
   const handleRubeStageChange = useCallback((s) => setRubeStage(s), []);
 
 
-  const DEFAULT_TRACK_URL = './assets-bg/excavating-neverland.mp3';
-  const DEFAULT_TRACK_TITLE = 'Excavating Neverland by The Magic Static Society';
+  const DEFAULT_TRACK_URL = DEFAULT_PLAYLIST[0].url;
+  const DEFAULT_TRACK_TITLE = DEFAULT_PLAYLIST[0].title;
 
   const lastAudioFileRef = useRef(DEFAULT_TRACK_URL);
   const hasAudioLoaded   = Boolean(lastAudioFileRef.current);
