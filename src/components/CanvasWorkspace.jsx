@@ -519,25 +519,44 @@ export function CanvasWorkspace({
   }, [advanceSlide, bpm]);
 
   const advanceSlide = useCallback(() => {
-    const len = assetsLengthRef.current;
+    const allAssets = assetsRef.current || [];
+    const len = allAssets.length;
     if (len === 0) return;
 
-    if (chopOrderRef.current.length !== len) {
-      chopOrderRef.current = Array.from({ length: len }, (_, i) => i);
-      chopPointerRef.current = 0;
+    const nowTime = currentTimeRef.current || 0;
+
+    // ── Choreographed Cue Matching ──
+    // If the song is currently inside a cued section, prioritize that reel
+    const activeCuedIndices = [];
+    for (let i = 0; i < len; i++) {
+      const a = allAssets[i];
+      if (a && a.cueStart != null && a.cueEnd != null) {
+        if (nowTime >= a.cueStart && nowTime <= a.cueEnd) {
+          activeCuedIndices.push(i);
+        }
+      }
     }
 
-    const nextPointer = (chopPointerRef.current + 1) % len;
-    if (nextPointer === 0) {
-      const indices = [...chopOrderRef.current];
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
-      }
-      chopOrderRef.current = indices;
+    if (activeCuedIndices.length > 0) {
+      const cuedPointer = (chopPointerRef.current + 1) % activeCuedIndices.length;
+      chopPointerRef.current = cuedPointer;
+      setSlideIndex(activeCuedIndices[cuedPointer]);
+      return;
     }
+
+    // Default: cycle through general assets (excluding assets cued strictly for other times)
+    const availableIndices = [];
+    for (let i = 0; i < len; i++) {
+      const a = allAssets[i];
+      if (!a || a.cueStart == null || a.cueEnd == null) {
+        availableIndices.push(i);
+      }
+    }
+
+    const pool = availableIndices.length > 0 ? availableIndices : Array.from({ length: len }, (_, i) => i);
+    const nextPointer = (chopPointerRef.current + 1) % pool.length;
     chopPointerRef.current = nextPointer;
-    setSlideIndex(chopOrderRef.current[chopPointerRef.current]);
+    setSlideIndex(pool[nextPointer]);
   }, []);
 
   // Era filter — applied at container level so it blankets ALL content in the viewport

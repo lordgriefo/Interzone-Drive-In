@@ -79,8 +79,17 @@ export default function App() {
               name: data.name || 'Perchance AI Frame',
               url: data.url,
               mediaType: data.mediaType || (data.url.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
+              cueStart: (data.cueStart !== undefined && data.cueStart !== null) ? Number(data.cueStart) : null,
+              cueEnd:   (data.cueEnd !== undefined && data.cueEnd !== null) ? Number(data.cueEnd) : null,
+              reelName: data.reelName || null,
             };
             setAssets((prev) => [newItem, ...prev]);
+          }
+          break;
+        }
+        case 'SEEK_TO': {
+          if (data.time !== undefined && typeof seekTo === 'function') {
+            seekTo(Number(data.time));
           }
           break;
         }
@@ -127,19 +136,28 @@ export default function App() {
     return () => window.removeEventListener('message', onMessage);
   }, [isPlaying, togglePlay]);
 
-  // Broadcast beat pulses back to Perchance parent window
+  // Broadcast beat pulses and real-time timecode back to Perchance parent window
   useEffect(() => {
-    if (window.parent && window.parent !== window && isPlaying && audioSignals?.isTransient) {
+    if (window.parent && window.parent !== window) {
       window.parent.postMessage({
-        type: 'KENETICUT_BEAT',
-        transientCount: audioSignals.transientCount,
-        bpm,
+        type: 'KENETICUT_STATE',
         currentTime,
+        duration,
+        isPlaying,
+        bpm,
         era: selectedEra,
         style: selectedStyle,
       }, '*');
+      if (isPlaying && audioSignals?.isTransient) {
+        window.parent.postMessage({
+          type: 'KENETICUT_BEAT',
+          transientCount: audioSignals.transientCount,
+          bpm,
+          currentTime,
+        }, '*');
+      }
     }
-  }, [audioSignals?.transientCount, isPlaying, bpm, currentTime, selectedEra, selectedStyle]);
+  }, [audioSignals?.transientCount, isPlaying, bpm, currentTime, duration, selectedEra, selectedStyle]);
 
   // ── Cinema Mode: hides panels + goes fullscreen for clean viewport recording ──
   const [cinemaMode, setCinemaMode] = useState(false);
