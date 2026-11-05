@@ -493,31 +493,6 @@ export function CanvasWorkspace({
     }
   }, [adaptiveTheme]);
 
-  // ── Perchance / External Bridge Listeners ──
-  useEffect(() => {
-    const onManualChop = () => advanceSlide();
-    const onSubliminal = (e) => {
-      if (e.detail?.text) {
-        setSubliminal({
-          text: e.detail.text,
-          top: `${30 + Math.random() * 40}%`,
-          left: `${15 + Math.random() * 70}%`,
-          visible: true,
-          scale: 0.85 + Math.random() * 0.4,
-          rotation: (Math.random() - 0.5) * 16,
-        });
-        const duration = e.detail.duration || Math.min(800, Math.max(200, Math.round(60000 / (bpm || 120))));
-        setTimeout(() => setSubliminal((prev) => ({ ...prev, visible: false })), duration);
-      }
-    };
-    window.addEventListener('keneticut:manual-chop', onManualChop);
-    window.addEventListener('keneticut:subliminal', onSubliminal);
-    return () => {
-      window.removeEventListener('keneticut:manual-chop', onManualChop);
-      window.removeEventListener('keneticut:subliminal', onSubliminal);
-    };
-  }, [advanceSlide, bpm]);
-
   const advanceSlide = useCallback(() => {
     const allAssets = assetsRef.current || [];
     const len = allAssets.length;
@@ -559,7 +534,32 @@ export function CanvasWorkspace({
     setSlideIndex(pool[nextPointer]);
   }, []);
 
-  // Era filter — applied at container level so it blankets ALL content in the viewport
+  // ── Perchance / External Bridge Listeners ──
+  useEffect(() => {
+    const onManualChop = () => advanceSlide();
+    const onSubliminal = (e) => {
+      if (e.detail?.text) {
+        setSubliminal({
+          text: e.detail.text,
+          top: `${30 + Math.random() * 40}%`,
+          left: `${15 + Math.random() * 70}%`,
+          visible: true,
+          scale: 0.85 + Math.random() * 0.4,
+          rotation: (Math.random() - 0.5) * 16,
+        });
+        const duration = e.detail.duration || Math.min(800, Math.max(200, Math.round(60000 / (bpm || 120))));
+        setTimeout(() => setSubliminal((prev) => ({ ...prev, visible: false })), duration);
+      }
+    };
+    window.addEventListener('keneticut:manual-chop', onManualChop);
+    window.addEventListener('keneticut:subliminal', onSubliminal);
+    return () => {
+      window.removeEventListener('keneticut:manual-chop', onManualChop);
+      window.removeEventListener('keneticut:subliminal', onSubliminal);
+    };
+  }, [advanceSlide, bpm]);
+
+    // Era filter — applied at container level so it blankets ALL content in the viewport
   const getEraFilter = () => ERA_FILTER_MAP[activeEra] || ERA_FILTER_MAP.default;
 
   // Image-level filter — envelope (beat-reactive contrast/brightness) + rube visual overrides

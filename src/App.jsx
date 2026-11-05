@@ -65,100 +65,6 @@ export default function App() {
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // ── Perchance Iframe postMessage Bridge ──
-  useEffect(() => {
-    const onMessage = (event) => {
-      const data = event.data;
-      if (!data || typeof data !== 'object') return;
-
-      switch (data.type) {
-        case 'ADD_ASSET': {
-          if (data.url) {
-            const newItem = {
-              id: 'perchance-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-              name: data.name || 'Perchance AI Frame',
-              url: data.url,
-              mediaType: data.mediaType || (data.url.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
-              cueStart: (data.cueStart !== undefined && data.cueStart !== null) ? Number(data.cueStart) : null,
-              cueEnd:   (data.cueEnd !== undefined && data.cueEnd !== null) ? Number(data.cueEnd) : null,
-              reelName: data.reelName || null,
-            };
-            setAssets((prev) => [newItem, ...prev]);
-          }
-          break;
-        }
-        case 'SEEK_TO': {
-          if (data.time !== undefined && typeof seekTo === 'function') {
-            seekTo(Number(data.time));
-          }
-          break;
-        }
-        case 'SET_STYLE': {
-          if (data.style) setSelectedStyle(String(data.style).toLowerCase());
-          break;
-        }
-        case 'SET_ERA': {
-          if (data.era) setSelectedEra(String(data.era).toLowerCase());
-          break;
-        }
-        case 'SET_BPM': {
-          if (data.bpm && Number(data.bpm) > 0) setBpm(Number(data.bpm));
-          break;
-        }
-        case 'TOGGLE_PLAY': {
-          togglePlay();
-          break;
-        }
-        case 'PLAY': {
-          if (!isPlaying) togglePlay();
-          break;
-        }
-        case 'PAUSE': {
-          if (isPlaying) togglePlay();
-          break;
-        }
-        case 'TRIGGER_CHOP': {
-          window.dispatchEvent(new CustomEvent('keneticut:manual-chop'));
-          break;
-        }
-        case 'SET_SUBLIMINAL': {
-          if (data.text) {
-            window.dispatchEvent(new CustomEvent('keneticut:subliminal', {
-              detail: { text: data.text, duration: data.duration }
-            }));
-          }
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, [isPlaying, togglePlay]);
-
-  // Broadcast beat pulses and real-time timecode back to Perchance parent window
-  useEffect(() => {
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'KENETICUT_STATE',
-        currentTime,
-        duration,
-        isPlaying,
-        bpm,
-        era: selectedEra,
-        style: selectedStyle,
-      }, '*');
-      if (isPlaying && audioSignals?.isTransient) {
-        window.parent.postMessage({
-          type: 'KENETICUT_BEAT',
-          transientCount: audioSignals.transientCount,
-          bpm,
-          currentTime,
-        }, '*');
-      }
-    }
-  }, [audioSignals?.transientCount, isPlaying, bpm, currentTime, duration, selectedEra, selectedStyle]);
-
   // ── Cinema Mode: hides panels + goes fullscreen for clean viewport recording ──
   const [cinemaMode, setCinemaMode] = useState(false);
 
@@ -353,6 +259,102 @@ export default function App() {
     bpm,
     reverbWet,
   }), [selectedStyle, selectedEra, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet]);
+
+  // ── Perchance Iframe postMessage Bridge ──
+  useEffect(() => {
+    const onMessage = (event) => {
+      const data = event.data;
+      if (!data || typeof data !== 'object') return;
+
+      switch (data.type) {
+        case 'ADD_ASSET': {
+          if (data.url) {
+            const newItem = {
+              id: 'perchance-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+              name: data.name || 'Perchance AI Frame',
+              url: data.url,
+              mediaType: data.mediaType || (data.url.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
+              cueStart: (data.cueStart !== undefined && data.cueStart !== null) ? Number(data.cueStart) : null,
+              cueEnd:   (data.cueEnd !== undefined && data.cueEnd !== null) ? Number(data.cueEnd) : null,
+              reelName: data.reelName || null,
+            };
+            setAssets((prev) => [newItem, ...prev]);
+          }
+          break;
+        }
+        case 'SEEK_TO': {
+          if (data.time !== undefined && typeof seekTo === 'function') {
+            seekTo(Number(data.time));
+          }
+          break;
+        }
+        case 'SET_STYLE': {
+          if (data.style) setSelectedStyle(String(data.style).toLowerCase());
+          break;
+        }
+        case 'SET_ERA': {
+          if (data.era) setSelectedEra(String(data.era).toLowerCase());
+          break;
+        }
+        case 'SET_BPM': {
+          if (data.bpm && Number(data.bpm) > 0) setBpm(Number(data.bpm));
+          break;
+        }
+        case 'TOGGLE_PLAY': {
+          togglePlay();
+          break;
+        }
+        case 'PLAY': {
+          if (!isPlaying) togglePlay();
+          break;
+        }
+        case 'PAUSE': {
+          if (isPlaying) togglePlay();
+          break;
+        }
+        case 'TRIGGER_CHOP': {
+          window.dispatchEvent(new CustomEvent('keneticut:manual-chop'));
+          break;
+        }
+        case 'SET_SUBLIMINAL': {
+          if (data.text) {
+            window.dispatchEvent(new CustomEvent('keneticut:subliminal', {
+              detail: { text: data.text, duration: data.duration }
+            }));
+          }
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [isPlaying, togglePlay]);
+
+  // Broadcast beat pulses and real-time timecode back to Perchance parent window
+  useEffect(() => {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'KENETICUT_STATE',
+        currentTime,
+        duration,
+        isPlaying,
+        bpm,
+        era: selectedEra,
+        style: selectedStyle,
+      }, '*');
+      if (isPlaying && audioSignals?.isTransient) {
+        window.parent.postMessage({
+          type: 'KENETICUT_BEAT',
+          transientCount: audioSignals.transientCount,
+          bpm,
+          currentTime,
+        }, '*');
+      }
+    }
+  }, [audioSignals?.transientCount, isPlaying, bpm, currentTime, duration, selectedEra, selectedStyle]);
+
+
 
   // Load a playlist entry: load audio + apply its preset + (optionally) restore asset bin
   const handlePlayTrack = useCallback((entry, idx) => {
