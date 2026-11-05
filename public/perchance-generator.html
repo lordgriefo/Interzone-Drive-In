@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Strangelet KenetiCut — Perchance AI Choreography & Flipbook Studio</title>
+  <style>
+    :root {
+      --bg: #09090c;
+      --panel: #121218;
+      --panel-dark: #0a0a0f;
+      --border: #242432;
+      --accent: #00ffcc;
+      --accent-glow: rgba(0, 255, 204, 0.35);
+      --hot-pink: #ff0077;
+      --amber: #ffaa00;
+      --text: #e2e2ec;
+      --text-muted: #84849a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Top Header & Song Transport ── */
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand h1 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+    .beat-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2a2a36;
+      transition: background 0.05s ease-out;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+    }
+    .beat-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+    .song-counter {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: #000;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .song-counter span.label {
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    /* ── Secondary Control Bar: Prompt & Choreography Timing ── */
+    .choreo-bar {
+      background: #14141d;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    select, input, button {
+      background: #1b1b26;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+    select:focus, input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button:hover {
+      background: #252538;
+      border-color: #3f3f58;
+    }
+    button.btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    button.btn-primary:hover {
+      background: #33ffdd;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+    button.btn-cue {
+      background: #2a1a38;
+      border-color: var(--hot-pink);
+      color: #ff88cc;
+    }
+    button.btn-cue:hover {
+      background: #3d2452;
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    #prompt-input {
+      flex: 1;
+      min-width: 240px;
+    }
+    .timing-input {
+      width: 72px;
+      text-align: center;
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+    /* ── Main Work Area: Cues Sidebar + KenetiCut Viewport ── */
+    #main-content {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+    #cue-sidebar {
+      width: 280px;
+      background: var(--panel-dark);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #cue-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cue-card {
+      background: #14141e;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .cue-card.active-now {
+      border-color: var(--accent);
+      background: #102422;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+    }
+    .cue-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .cue-time {
+      font-family: monospace;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .cue-name {
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 150px;
+    }
+    .cue-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .cue-btn-seek {
+      padding: 3px 7px;
+      font-size: 11px;
+      background: #1f1f2e;
+      border: 1px solid #333;
+    }
+
+    #viewport-container {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+    }
+    iframe#keneticut-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ── Bottom Reel Strip ── */
+    #reel-strip {
+      background: #0d0d14;
+      border-top: 1px solid var(--border);
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      min-height: 54px;
+    }
+    .reel-thumb {
+      width: 68px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid #333;
+      flex-shrink: 0;
+      animation: popIn 0.25s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header>
+    <div class="brand">
+      <div id="beat-dot" class="beat-dot"></div>
+      <h1>KenetiCut · Song Choreography Studio</h1>
+      <span id="bpm-badge" style="font-size: 11px; color: var(--text-muted);">120 BPM</span>
+    </div>
+
+    <!-- Live Running Timecode Counter -->
+    <div class="song-counter">
+      <span class="label">SONG TIME:</span>
+      <span id="timecode-display">00:00.0</span>
+      <span style="color:#555;">/</span>
+      <span id="duration-display" style="color:#888;">00:32.0</span>
+    </div>
+
+    <div style="display:flex; gap:6px; align-items:center;">
+      <button onclick="flashSubliminal()" title="Send beat-synced cut-up phrase">
+        ⚡ Cut-Up
+      </button>
+      <button onclick="triggerChop()" title="Instant manual cut">
+        ✂️ Cut
+      </button>
+      <button onclick="togglePlay()" title="Toggle playback" style="min-width: 44px;">
+        ⏯️ Play
+      </button>
+    </div>
+  </header>
+
+  <!-- Choreography Cue & AI Generation Bar -->
+  <div class="choreo-bar">
+    <!-- Preset Dropdown -->
+    <select id="preset-selector" onchange="onSelectPreset()" style="max-width: 220px;">
+      <option value="" disabled selected>🎬 Select a Preset Theme...</option>
+      <option value="p11">💥 1. Nevada '55: Atomic Rearview Escape</option>
+      <option value="p1">🪧 2. Vegas Corridor '59 (Burma-Shave Highway)</option>
+      <option value="p2">🌌 3. The 8th Sphere: Enochian Horizon</option>
+      <option value="p3">🏍️ 4. Kenneth Anger: Scorpio Rites</option>
+      <option value="p4">📻 5. W-OCCULT AM 660 Broadcast Intrusion</option>
+      <option value="p5">🏭 6. Eraserhead: Industrial Radiator Shimmer</option>
+      <option value="p6">🛋️ 7. The Black Lodge: Chevron Horizon</option>
+      <option value="p7">🛸 8. 1956 Drive-In Atomic Invasion</option>
+      <option value="p8">🗝️ 9. Maya Deren: Meshes of the Afternoon</option>
+      <option value="p9">💊 10. Interzone Burroughs Cut-Up</option>
+      <option value="p10">🧬 11. Sacred Geometry Hyperspace</option>
+      <option value="p12">🪦 12. Neon Boneyard: Mojave Sign Graveyard</option>
+      <option value="p13">🏨 13. The Starlight Motel: Room 13</option>
+      <option value="p14">🕶️ 14. Route 375: Black Sedan Pursuit</option>
+      <option value="p15">⚡ 15. Wardenclyffe Desert: The Tesla Spire</option>
+      <option value="p16">🦋 16. Stan Brakhage: Mothlight Emulsion</option>
+      <option value="p17">⏳ 17. Chris Marker: La Jetée Jetty</option>
+      <option value="p18">🔮 18. The Fox Sisters: 1920s Spirit Cabinet</option>
+      <option value="p19">📂 19. Project Blue Book: Redacted Microfilm</option>
+      <option value="p20">🍄 20. Psilocybin Breath: The Living Tapestry</option>
+    </select>
+
+    <input id="prompt-input" type="text" placeholder="Type prompt or select a preset..." />
+
+    <!-- Choreography Timing Controls -->
+    <div class="input-group">
+      <span>Cue In:</span>
+      <input id="cue-in" class="timing-input" type="text" value="00:00" placeholder="00:00" />
+      <button class="btn-cue" onclick="snapCueToCurrentTime()" title="Snap Cue In to current playing song time">
+        ⏱️ Current
+      </button>
+    </div>
+
+    <div class="input-group">
+      <span>Dur:</span>
+      <input id="cue-dur" class="timing-input" type="text" value="15s" placeholder="15s" />
+    </div>
+
+    <div class="input-group">
+      <select id="frame-count">
+        <option value="6">6 Frames</option>
+        <option value="12" selected>12 Frames</option>
+        <option value="24">24 Frames</option>
+      </select>
+    </div>
+
+    <button id="gen-btn" class="btn-primary" onclick="generateChoreographedReel()">
+      <span>🎬</span> Choreograph Reel
+    </button>
+  </div>
+
+  <!-- Main Split: Cue Board + Viewport -->
+  <div id="main-content">
+    
+    <!-- Choreography Cue Board Sidebar -->
+    <div id="cue-sidebar">
+      <div class="sidebar-header">
+        <span>Choreographed Song Cues</span>
+        <span id="cue-count" style="color:var(--accent);">0</span>
+      </div>
+      <div id="cue-list">
+        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 24px; padding: 0 16px;">
+          Set a "Cue In" timestamp (e.g. 01:14) and generate a reel. KenetiCut will automatically chop that specific reel during that exact window of your song!
+        </div>
+      </div>
+    </div>
+
+    <!-- KenetiCut Viewport -->
+    <div id="viewport-container">
+      <iframe
+        id="keneticut-frame"
+        src="https://lordgriefo.github.io/strangelet-kineticut-perchance/"
+        allow="display-capture; autoplay; cross-origin-isolated"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Bottom Reel Thumbnail Strip -->
+  <div id="reel-strip">
+    <span id="reel-status" style="font-size: 11px; color: var(--text-muted);">
+      Generated frames will appear here and stream directly into the active song cue.
+    </span>
+  </div>
+
+  <script>
+    // ── 20 Presets Dictionary ──
+    const PRESETS = {
+      p11: { name: "Nevada '55 Atomic Rearview", prompt: "Framed tightly inside the vintage chrome rearview mirror of a 1955 car speeding away on dark Nevada desert highway, distant atomic mushroom cloud detonating on horizon, boiling orange fireball and purple radioactive ionization glow, blinding nuclear flash reflecting off windshield and dashboard chrome, 35mm Technicolor cinema frame, motion blur on asphalt", style: "strobe" },
+      p1:  { name: "Vegas Highway '59", prompt: "1950s highway billboards heading into Las Vegas at night, sequential Burma-Shave signs on desert asphalt, glowing neon cactus and arrow motels, taillights of 1957 chrome finned cars, 35mm Kodachrome slide, cinematic depth of field, heat mirage", style: "montage" },
+      p2:  { name: "The 8th Sphere Horizon", prompt: "Giant glowing celestial event horizon over an abandoned desert drive-in theater, rotating Enochian portal ring with golden occult sigils in dark purple sky, eclipse halo, silhouetted lone watcher in trenchcoat, retro Panavision 70mm lens flare", style: "dmt_breakthrough" },
+      p3:  { name: "Scorpio Rites (Anger)", prompt: "Kenneth Anger 1965 Scorpio Rising aesthetic, close-up gleaming chrome motorcycle exhaust pipes, leather jacket studs, flickering ritual candles, Luciferian occult neon blue and crimson red gel lighting, 16mm Technicolor grain, blown highlights", style: "anger_scorpio" },
+      p4:  { name: "W-OCCULT AM 660 Pirate", prompt: "Analog pirate radio tower under stormy clouds at 3 AM, glowing orange vacuum tubes, glowing phosphor oscilloscope screen waveforms, retro TV test pattern emergency broadcast card, magnetic tape distortion, CRT scanlines, 1980s VHS tape pause glitch", style: "magnetic_tape" },
+      p5:  { name: "Eraserhead Factory", prompt: "David Lynch Eraserhead 1977 aesthetic, stark industrial factory interior, steam radiator emitting white mist, heavy mechanical gears and spinning belts, deep pitch black shadows and tungsten blown highlights, gritty 35mm silver gelatin monochrome film", style: "lynch_eraserhead" },
+      p6:  { name: "Black Lodge Red Room", prompt: "Twin Peaks Red Room aesthetic, flowing heavy scarlet velvet curtains, black and white zigzag chevron patterned floor, warm 1940s art-deco floor lamp casting long shadows, dreamlike atmospheric fog, 35mm cinematic film still", style: "lynch_redroom" },
+      p7:  { name: "1956 Saucer Invasion", prompt: "1956 vintage drive-in movie screen showing retro flying saucer invasion, glowing green beam over a 1950s neon diner parking lot, chrome fins of vintage cars, dramatic B-movie lobby card coloring, two-tone Technicolor, retro movie poster grain", style: "montage" },
+      p8:  { name: "Meshes of the Afternoon", prompt: "Maya Deren 1943 Meshes of the Afternoon aesthetic, close-up of a bronze skeleton key lying in desert sand turning into a reflection, figure in black cloak with mirror face reflecting clouds, harsh afternoon sun casting geometric shadows, 16mm Bolex black and white film grain", style: "deren_meshes" },
+      p9:  { name: "Burroughs Interzone", prompt: "William S. Burroughs Naked Lunch Interzone aesthetic, 1953 mechanical typewriter with torn newspaper headline collage, cigarette smoke curling under green banker lamp, classified government teletype tape, murky sepia and amber lighting, grainy 16mm spy camera film", style: "third_mind" },
+      p10: { name: "Sacred Geometry Hyperspace", prompt: "Intricate sacred geometry portal chamber, glowing neon cyan and magenta fractal mandalas, iridescent holographic lattices, hyper-dimensional crystal refraction, volumetric light rays, dark void background, high symmetry, cinematic 8k render", style: "dmt_breakthrough" },
+      p12: { name: "Mojave Neon Boneyard", prompt: "Overgrown Mojave desert neon sign boneyard at twilight, tangled pile of massive rusted 1950s casino marquee letters, broken buzzing neon glass tubes glowing dim turquoise and hot pink in sand, cracked porcelain enamel signs, heat distortion, 35mm film grain, moody atmospheric lighting", style: "apple_kinetic" },
+      p13: { name: "Starlight Motel Room 13", prompt: "1950s isolated desert roadside motel at 3 AM in rain, buzzing neon red NO VACANCY sign reflecting in wet asphalt puddle, peeling turquoise painted door numbered 13 cracked open, silhouette watcher visible through venetian blinds, noir low-angle camera, Kodachrome vintage film still", style: "fiona_voyeur" },
+      p14: { name: "Route 375 Black Sedan", prompt: "Pair of menacing black 1951 government sedans pursuing closely on desert highway at night, twin spotlight beams cutting through dust, chrome bumper grill reflecting red pursuit flashers, long radio whip antennas bending in wind, cinematic 70mm anamorphic lens flare, gritty night grain", style: "montage" },
+      p15: { name: "Tesla Wardenclyffe Spire", prompt: "Massive copper-wound Nikola Tesla electrical spire standing in dried desert salt flat, violent blinding violet electric lightning arcs discharging into dark storm clouds, copper spheres glowing with plasma aura, vintage 1940s scientific expedition equipment, silver-gelatin black and white film with electric blue toning", style: "strobe" },
+      p16: { name: "Mothlight Emulsion", prompt: "Stan Brakhage 1963 Mothlight experimental film aesthetic, translucent moth wings pressed between clear 16mm celluloid frames, microscopic view of amber insect wing scales and dandelion seeds, hand-scratched razor film cuts, chemical emulsion burns, intense organic abstract texture, macro cinema still", style: "brakhage_emulsion" },
+      p17: { name: "La Jetee Jetty", prompt: "Chris Marker 1962 La Jetee aesthetic, dramatic high-contrast black and white photography, viewing jetty of 1960s airport terminal, woman face turning toward camera in wind, harsh grey overcast sky, vintage mechanical chronograph stopwatch in foreground, deep film grain, cinematic timeless memory stillness", style: "marker_jetee" },
+      p18: { name: "1920s Spirit Cabinet", prompt: "1920s spiritualist seance in dark velvet Victorian parlor, glowing white ectoplasm wisp floating from medium hands, tin spirit trumpet levitating above mahogany circular table, startled sitters in antique suits, magnesium powder flashbulb explosion casting harsh shadows, vintage sepia photographic plate", style: "seance_dissolve" },
+      p19: { name: "Project Blue Book Dossier", prompt: "Glowing green CRT screen of vintage 1950s microfilm reader machine, classified military UFO incident report with heavy black marker redactions, stamped in red ink TOP SECRET RESTRICTED, grainy black and white saucer photo inset, scratches and dust on microfilm tape, macro angle", style: "third_mind" },
+      p20: { name: "Psilocybin Living Tapestry", prompt: "Ancient mossy forest floor and giant twisted oak roots breathing with bioluminescent turquoise and amber light, bark texture morphing into subtle intricate Celtic knotwork patterns, floating glowing spores in damp evening air, macro shallow depth of field, mystical psychedelic dreamscape", style: "psilocybin_breath" }
+    };
+
+    const BURROUGHS_LINES = [
+      "THE WORD IS A VIRUS", "REARVIEW MIRROR IGNITION", "PAST PORTAL NINE // IN '59",
+      "RADIO W-OCCULT AM 660", "SILVER GELATIN PROTOCOL", "THE OWLS ARE CALLING",
+      "DO NOT STOP IN RACHEL", "BURMA-SHAVE", "TAPE DECAY 0.088", "THE 8TH SPHERE REALIGNED"
+    ];
+
+    const frame = document.getElementById('keneticut-frame');
+    const beatDot = document.getElementById('beat-dot');
+    const bpmBadge = document.getElementById('bpm-badge');
+    const timeDisplay = document.getElementById('timecode-display');
+    const durDisplay = document.getElementById('duration-display');
+
+    let currentSongTime = 0;
+    let songDuration = 32;
+    let activeCues = [];
+
+    // Helper: format seconds to mm:ss.s
+    function formatTime(sec) {
+      if (isNaN(sec) || sec < 0) sec = 0;
+      const m = Math.floor(sec / 60);
+      const s = (sec % 60).toFixed(1);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(4, '0')}`;
+    }
+
+    // Helper: parse mm:ss or seconds to float
+    function parseTimeToSeconds(str) {
+      str = String(str).trim();
+      if (str.includes(':')) {
+        const parts = str.split(':');
+        return (parseFloat(parts[0]) || 0) * 60 + (parseFloat(parts[1]) || 0);
+      }
+      return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    // ── Listen to Live State & Beats from KenetiCut ──
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (!d || typeof d !== 'object') return;
+
+      if (d.type === 'KENETICUT_STATE') {
+        currentSongTime = d.currentTime || 0;
+        songDuration = d.duration || 32;
+        timeDisplay.textContent = formatTime(currentSongTime);
+        durDisplay.textContent = formatTime(songDuration);
+        if (d.bpm) bpmBadge.textContent = `${Math.round(d.bpm)} BPM`;
+
+        // Update active status on cue cards
+        document.querySelectorAll('.cue-card').forEach((card) => {
+          const start = parseFloat(card.dataset.start);
+          const end = parseFloat(card.dataset.end);
+          if (currentSongTime >= start && currentSongTime <= end) {
+            card.classList.add('active-now');
+          } else {
+            card.classList.remove('active-now');
+          }
+        });
+      }
+
+      if (d.type === 'KENETICUT_BEAT') {
+        beatDot.classList.add('active');
+        setTimeout(() => beatDot.classList.remove('active'), 75);
+      }
+    });
+
+    function snapCueToCurrentTime() {
+      document.getElementById('cue-in').value = formatTime(currentSongTime);
+    }
+
+    function onSelectPreset() {
+      const key = document.getElementById('preset-selector').value;
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('prompt-input').value = p.prompt;
+      if (p.style) {
+        frame.contentWindow?.postMessage({ type: 'SET_STYLE', style: p.style }, '*');
+      }
+    }
+
+    // ── Choreographed AI Reel Generation ──
+    async function generateChoreographedReel() {
+      const prompt = document.getElementById('prompt-input').value.trim();
+      if (!prompt) return;
+
+      const cueInSec = parseTimeToSeconds(document.getElementById('cue-in').value);
+      const cueDurSec = parseTimeToSeconds(document.getElementById('cue-dur').value) || 15;
+      const cueEndSec = cueInSec + cueDurSec;
+
+      const count = parseInt(document.getElementById('frame-count').value, 10);
+      const btn = document.getElementById('gen-btn');
+      const strip = document.getElementById('reel-strip');
+
+      const presetKey = document.getElementById('preset-selector').value;
+      const reelName = PRESETS[presetKey]?.name || 'Custom Reel';
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> Choreographing...';
+      strip.innerHTML = '';
+
+      // Add to sidebar cue board
+      addCueToBoard({
+        name: reelName,
+        start: cueInSec,
+        end: cueEndSec,
+        frameCount: count
+      });
+
+      for (let i = 0; i < count; i++) {
+        const seed = Math.floor(Math.random() * 9000000) + 1000000;
+        const cleanPrompt = encodeURIComponent(prompt + `, sequential frame ${i + 1}`);
+        const imgUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?seed=${seed}&width=1280&height=720&nologo=true`;
+
+        // Create thumb in strip
+        const thumb = document.createElement('img');
+        thumb.className = 'reel-thumb';
+        thumb.src = imgUrl;
+        thumb.title = `${reelName} · Frame #${i + 1} (${formatTime(cueInSec)} - ${formatTime(cueEndSec)})`;
+        strip.appendChild(thumb);
+        thumb.scrollIntoView({ behavior: 'smooth', inline: 'end' });
+
+        // Stream into KenetiCut with exact song cue window!
+        frame.contentWindow?.postMessage({
+          type: 'ADD_ASSET',
+          url: imgUrl,
+          name: `${reelName}_#${i + 1}`,
+          mediaType: 'image',
+          cueStart: cueInSec,
+          cueEnd: cueEndSec,
+          reelName: reelName
+        }, '*');
+
+        await new Promise((r) => setTimeout(r, 450));
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>🎬</span> Choreograph Reel';
+    }
+
+    function addCueToBoard(cue) {
+      activeCues.push(cue);
+      document.getElementById('cue-count').textContent = activeCues.length;
+
+      const list = document.getElementById('cue-list');
+      // Remove placeholder text if first cue
+      if (activeCues.length === 1) list.innerHTML = '';
+
+      const card = document.createElement('div');
+      card.className = 'cue-card';
+      card.dataset.start = cue.start;
+      card.dataset.end = cue.end;
+
+      card.innerHTML = `
+        <div class="cue-card-top">
+          <span class="cue-name" title="${cue.name}">${cue.name}</span>
+          <span class="cue-time">${formatTime(cue.start)} – ${formatTime(cue.end)}</span>
+        </div>
+        <div style="font-size:11px; color:#888;">${cue.frameCount} AI Frames</div>
+        <div class="cue-actions">
+          <button class="cue-btn-seek" onclick="seekSong(${cue.start})">▶ Seek to Cue</button>
+        </div>
+      `;
+      list.appendChild(card);
+    }
+
+    function seekSong(time) {
+      frame.contentWindow?.postMessage({ type: 'SEEK_TO', time: parseFloat(time) }, '*');
+    }
+
+    function flashSubliminal() {
+      const line = BURROUGHS_LINES[Math.floor(Math.random() * BURROUGHS_LINES.length)];
+      frame.contentWindow?.postMessage({ type: 'SET_SUBLIMINAL', text: line, duration: 600 }, '*');
+    }
+
+    function triggerChop() {
+      frame.contentWindow?.postMessage({ type: 'TRIGGER_CHOP' }, '*');
+    }
+
+    function togglePlay() {
+      frame.contentWindow?.postMessage({ type: 'TOGGLE_PLAY' }, '*');
+    }
+  </script>
+</body>
+</html>
