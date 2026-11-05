@@ -1,9 +1,9 @@
 {
-  "name": "strangelet-kineto-cut",
+  "name": "strangelet-kineticut-perchance",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Audio-reactive kinetic montage engine and vintage cinema synthesizer",
+  "description": "Audio-reactive kinetic montage engine — Perchance Edition",
   "author": "Interzone Drive-In",
   "main": "electron/main.cjs",
   "scripts": {
