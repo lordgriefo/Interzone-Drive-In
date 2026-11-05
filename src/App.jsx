@@ -46,9 +46,10 @@ export const DEFAULT_PLAYLIST = [
   },
   {
     id: 'pl_the_breach',
-    title: "The Breach — 'O' Shibboleth",
+    title: "The Breach (Chasing Shadows) — 'O' Shibboleth",
     url: './assets-bg/the-breach.mp3',
-    duration: 336,
+    lrcUrl: './assets-bg/the-breach.lrc',
+    duration: 338,
     preset: {
       selectedStyle: 'third_mind',
       selectedEra: 'lynchian_interzone',
