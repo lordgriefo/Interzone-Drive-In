@@ -271,6 +271,53 @@
       flex-shrink: 0;
       animation: popIn 0.25s ease-out;
     }
+    .video-loop-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #14141e;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 4px 10px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px var(--accent-glow);
+      animation: popIn 0.3s ease-out;
+    }
+    .video-loop-card video {
+      width: 84px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 3px;
+      background: #000;
+      border: 1px solid #333;
+    }
+    .video-loop-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .loop-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .btn-download-video {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      background: var(--accent);
+      color: #000;
+      text-decoration: none;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.15s;
+    }
+    .btn-download-video:hover {
+      opacity: 0.85;
+    }
     @keyframes popIn {
       from { transform: scale(0.6); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -356,6 +403,24 @@
         <option value="6">6 Frames</option>
         <option value="12" selected>12 Frames</option>
         <option value="24">24 Frames</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <span>Output:</span>
+      <select id="output-mode" onchange="toggleMotionControls()">
+        <option value="webm_loop" selected>🎥 WebM Video Loop</option>
+        <option value="flipbook_stills">🎞️ Flipbook Stills</option>
+      </select>
+    </div>
+
+    <div class="input-group" id="motion-mode-wrap">
+      <span>Motion:</span>
+      <select id="motion-style">
+        <option value="cinematic_cut" selected>⚡ Rapid Cinema (12fps)</option>
+        <option value="smooth_drift">🌊 Ken Burns Drift & Zoom</option>
+        <option value="pulse_strobe">💥 Strobe / Pulse</option>
+        <option value="hyper_speed">🚀 Hyper Speed (24fps)</option>
       </select>
     </div>
 
@@ -501,7 +566,121 @@
       }
     }
 
-    // ── Choreographed AI Reel Generation ──
+    function toggleMotionControls() {
+      const mode = document.getElementById('output-mode')?.value;
+      const wrap = document.getElementById('motion-mode-wrap');
+      if (wrap) wrap.style.display = (mode === 'webm_loop') ? 'inline-flex' : 'none';
+    }
+
+    // Helper: load image safely into an Image element
+    function loadImageElement(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(img); // Resolve anyway so compilation continues
+        img.src = src;
+      });
+    }
+
+    // ── In-Browser WebM Video Loop Compiler ──
+    async function compileFramesToWebM(loadedImages, fps, motionStyle, loopSeconds = 4.0) {
+      if (!loadedImages || !loadedImages.length) return null;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+
+      const stream = canvas.captureStream(fps);
+      let mimeType = 'video/webm; codecs=vp9';
+      if (!window.MediaRecorder || !MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/webm; codecs=vp8';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm';
+        }
+      }
+
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5000000 });
+      const chunks = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      const recordPromise = new Promise((resolve) => {
+        recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+      });
+
+      recorder.start();
+
+      const totalFrames = Math.round(loopSeconds * fps);
+      const frameMs = 1000 / fps;
+      const nImages = loadedImages.length;
+
+      for (let f = 0; f < totalFrames; f++) {
+        const progress = f / totalFrames;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 1280, 720);
+
+        if (motionStyle === 'smooth_drift') {
+          // Ken Burns drift: Smooth continuous pan & slow zoom across images
+          const imgIdx = Math.floor(progress * nImages) % nImages;
+          const nextIdx = (imgIdx + 1) % nImages;
+          const localP = (progress * nImages) % 1.0;
+          const zoom = 1.05 + 0.12 * localP;
+          const panX = Math.sin(progress * Math.PI * 2) * 45;
+          const panY = Math.cos(progress * Math.PI * 2) * 25;
+
+          const currentImg = loadedImages[imgIdx];
+          if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
+            ctx.save();
+            ctx.translate(640 + panX, 360 + panY);
+            ctx.scale(zoom, zoom);
+            ctx.drawImage(currentImg, -640, -360, 1280, 720);
+            ctx.restore();
+          }
+
+          // Crossfade transition between frames
+          if (localP > 0.70) {
+            const fade = (localP - 0.70) / 0.30;
+            const nextImg = loadedImages[nextIdx];
+            if (nextImg && nextImg.complete && nextImg.naturalWidth > 0) {
+              ctx.save();
+              ctx.globalAlpha = fade;
+              ctx.translate(640 - panX * 0.4, 360 - panY * 0.4);
+              ctx.scale(1.04, 1.04);
+              ctx.drawImage(nextImg, -640, -360, 1280, 720);
+              ctx.restore();
+            }
+          }
+        } else if (motionStyle === 'pulse_strobe') {
+          // High-energy strobe flash / pulse cut
+          const imgIdx = Math.floor(progress * nImages) % nImages;
+          const currentImg = loadedImages[imgIdx];
+          if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
+            ctx.drawImage(currentImg, 0, 0, 1280, 720);
+          }
+          if (f % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.24)';
+            ctx.fillRect(0, 0, 1280, 720);
+          }
+        } else {
+          // cinematic_cut (12fps) & hyper_speed (24fps) rapid flipbook cut-up
+          const imgIdx = Math.floor(progress * nImages) % nImages;
+          const currentImg = loadedImages[imgIdx];
+          if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
+            ctx.drawImage(currentImg, 0, 0, 1280, 720);
+          }
+        }
+
+        await new Promise((r) => setTimeout(r, frameMs));
+      }
+
+      recorder.stop();
+      return await recordPromise;
+    }
+
+    // ── Choreographed AI Reel Generation & Video Compiler ──
     async function generateChoreographedReel() {
       const prompt = document.getElementById('prompt-input').value.trim();
       if (!prompt) return;
@@ -511,6 +690,9 @@
       const cueEndSec = cueInSec + cueDurSec;
 
       const count = parseInt(document.getElementById('frame-count').value, 10);
+      const outputMode = document.getElementById('output-mode')?.value || 'webm_loop';
+      const motionStyle = document.getElementById('motion-style')?.value || 'cinematic_cut';
+
       const btn = document.getElementById('gen-btn');
       const strip = document.getElementById('reel-strip');
 
@@ -518,21 +700,25 @@
       const reelName = PRESETS[presetKey]?.name || 'Custom Reel';
 
       btn.disabled = true;
-      btn.innerHTML = '<span>⏳</span> Choreographing...';
+      btn.innerHTML = '<span>⏳</span> Generating Frames...';
       strip.innerHTML = '';
 
       // Add to sidebar cue board
       addCueToBoard({
-        name: reelName,
+        name: `${reelName} (${outputMode === 'webm_loop' ? '🎥 WebM' : '🎞️ Stills'})`,
         start: cueInSec,
         end: cueEndSec,
         frameCount: count
       });
 
+      const collectedUrls = [];
+      const imagePromises = [];
+
       for (let i = 0; i < count; i++) {
+        btn.innerHTML = `<span>⏳</span> Generating Frame ${i + 1}/${count}...`;
         const seed = Math.floor(Math.random() * 9000000) + 1000000;
         const cleanPrompt = encodeURIComponent(prompt + `, sequential frame ${i + 1}`);
-                let imgUrl = null;
+        let imgUrl = null;
 
         // 1. Native Perchance text-to-image-plugin
         if (typeof t2i !== 'undefined') {
@@ -560,6 +746,9 @@
           imgUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?seed=${seed}&width=1280&height=720&nologo=true`;
         }
 
+        collectedUrls.push(imgUrl);
+        imagePromises.push(loadImageElement(imgUrl));
+
         // Create thumb in strip
         const thumb = document.createElement('img');
         thumb.className = 'reel-thumb';
@@ -568,18 +757,60 @@
         strip.appendChild(thumb);
         thumb.scrollIntoView({ behavior: 'smooth', inline: 'end' });
 
-        // Stream into KenetiCut with exact song cue window!
-        frame.contentWindow?.postMessage({
-          type: 'ADD_ASSET',
-          url: imgUrl,
-          name: `${reelName}_#${i + 1}`,
-          mediaType: 'image',
-          cueStart: cueInSec,
-          cueEnd: cueEndSec,
-          reelName: reelName
-        }, '*');
+        // If in Stills mode, stream each frame immediately into KenetiCut
+        if (outputMode === 'flipbook_stills') {
+          frame.contentWindow?.postMessage({
+            type: 'ADD_ASSET',
+            url: imgUrl,
+            name: `${reelName}_#${i + 1}`,
+            mediaType: 'image',
+            cueStart: cueInSec,
+            cueEnd: cueEndSec,
+            reelName: reelName
+          }, '*');
+        }
 
-        await new Promise((r) => setTimeout(r, 450));
+        await new Promise((r) => setTimeout(r, 350));
+      }
+
+      // If WebM Loop mode: compile sequence into a native WebM video loop!
+      if (outputMode === 'webm_loop') {
+        btn.innerHTML = '<span>🎬</span> Compiling WebM Video Loop...';
+        const loadedImgs = await Promise.all(imagePromises);
+        const fps = (motionStyle === 'hyper_speed') ? 24 : 12;
+        const videoBlob = await compileFramesToWebM(loadedImgs, fps, motionStyle, 4.0);
+
+        if (videoBlob) {
+          const videoBlobUrl = URL.createObjectURL(videoBlob);
+          const safeReelName = reelName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+          const videoFileName = `${safeReelName}_loop.webm`;
+
+          // Stream compiled video loop into KenetiCut as native video!
+          frame.contentWindow?.postMessage({
+            type: 'ADD_ASSET',
+            url: videoBlobUrl,
+            name: videoFileName,
+            mediaType: 'video',
+            cueStart: cueInSec,
+            cueEnd: cueEndSec,
+            reelName: reelName
+          }, '*');
+
+          // Add playable video preview card to the bottom strip
+          const card = document.createElement('div');
+          card.className = 'video-loop-card';
+          card.innerHTML = `
+            <video src="${videoBlobUrl}" autoplay loop muted playsinline></video>
+            <div class="video-loop-info">
+              <span class="loop-badge">🎥 WEBM LOOP (${fps}fps)</span>
+              <a href="${videoBlobUrl}" download="${videoFileName}" class="btn-download-video">
+                ⬇️ Download .webm
+              </a>
+            </div>
+          `;
+          strip.insertBefore(card, strip.firstChild);
+          card.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+        }
       }
 
       btn.disabled = false;

@@ -1,0 +1,6 @@
+// ==========================================
+// PERCHANCE LISTS / CODE PANEL (LEFT SIDE)
+// ==========================================
+// Paste this into the left code/lists box on perchance.org:
+
+t2i = {import:text-to-image-plugin}
