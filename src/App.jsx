@@ -566,17 +566,20 @@ export default function App() {
       console.warn('[App] Default audio track init warning:', err);
     }
 
-    // Auto-load synchronized LRC lyrics
-    fetch('./assets-bg/excavating-neverland.lrc')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.text();
-      })
-      .then((raw) => {
-        const segs = parseLrcString(raw);
-        if (segs.length > 0) setLyricSegments(segs);
-      })
-      .catch((err) => console.warn('[App] Default LRC lyrics load info:', err));
+    // Auto-load synchronized LRC lyrics if the initial track has them
+    setLyricSegments([]);
+    if (DEFAULT_PLAYLIST[0].lrcUrl) {
+      fetch(DEFAULT_PLAYLIST[0].lrcUrl)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.text();
+        })
+        .then((raw) => {
+          const segs = parseLrcString(raw);
+          if (segs.length > 0) setLyricSegments(segs);
+        })
+        .catch((err) => console.warn('[App] Default LRC lyrics load info:', err));
+    }
   }, [loadAudioTrack]);
 
 
