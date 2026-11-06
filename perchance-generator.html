@@ -532,7 +532,33 @@
       for (let i = 0; i < count; i++) {
         const seed = Math.floor(Math.random() * 9000000) + 1000000;
         const cleanPrompt = encodeURIComponent(prompt + `, sequential frame ${i + 1}`);
-        const imgUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?seed=${seed}&width=1280&height=720&nologo=true`;
+                let imgUrl = null;
+
+        // 1. Native Perchance text-to-image-plugin
+        if (typeof t2i !== 'undefined') {
+          try {
+            const res = await t2i({ prompt: prompt + ', frame variation ' + (i + 1), seed: seed, shape: 'landscape' });
+            if (typeof res === 'string') imgUrl = res;
+            else if (res && res.url) imgUrl = res.url;
+            else if (res && res.src) imgUrl = res.src;
+          } catch (e) {
+            console.warn('Perchance t2i error:', e);
+          }
+        } else if (typeof image !== 'undefined' && typeof image === 'function') {
+          try {
+            const res = await image({ prompt: prompt + ', frame variation ' + (i + 1), seed: seed, shape: 'landscape' });
+            if (typeof res === 'string') imgUrl = res;
+            else if (res && res.url) imgUrl = res.url;
+            else if (res && res.src) imgUrl = res.src;
+          } catch (e) {
+            console.warn('Perchance image plugin error:', e);
+          }
+        }
+
+        // 2. Fallback if outside Perchance environment
+        if (!imgUrl) {
+          imgUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?seed=${seed}&width=1280&height=720&nologo=true`;
+        }
 
         // Create thumb in strip
         const thumb = document.createElement('img');
