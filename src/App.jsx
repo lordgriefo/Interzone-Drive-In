@@ -53,11 +53,12 @@ export const DEFAULT_PLAYLIST = [
     preset: {
       selectedStyle: 'third_mind',
       selectedEra: 'lynchian_interzone',
+      selectedRube: 'strangelet_event',
       bpm: 105,
-      chaosLevel: 0.5,
+      chaosLevel: 0.45,
       chaosEnabled: true,
-      sensitivity: 1.1,
-      reverbWet: 0.4,
+      sensitivity: 1.15,
+      reverbWet: 0.38,
     },
   },
   {
@@ -67,13 +68,14 @@ export const DEFAULT_PLAYLIST = [
     lrcUrl: './assets-bg/excavating-neverland.lrc',
     duration: 310,
     preset: {
-      selectedStyle: 'montage',
+      selectedStyle: 'mv_hypnotic_drift',
       selectedEra: '1902_melies',
+      selectedRube: 'cathode_burn',
       bpm: 120,
-      chaosLevel: 0.15,
+      chaosLevel: 0.22,
       chaosEnabled: true,
-      sensitivity: 1.0,
-      reverbWet: 0.2,
+      sensitivity: 1.1,
+      reverbWet: 0.25,
     },
   },
   {
@@ -350,12 +352,13 @@ export default function App() {
   const currentPreset = useMemo(() => ({
     selectedStyle,
     selectedEra,
+    selectedRube,
     chaosLevel,
     chaosEnabled,
     sensitivity,
     bpm,
     reverbWet,
-  }), [selectedStyle, selectedEra, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet]);
+  }), [selectedStyle, selectedEra, selectedRube, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet]);
 
   // ── Perchance Iframe postMessage Bridge ──
   useEffect(() => {
@@ -463,6 +466,7 @@ export default function App() {
     if (entry.preset) {
       if (entry.preset.selectedStyle !== undefined) setSelectedStyle(entry.preset.selectedStyle);
       if (entry.preset.selectedEra   !== undefined) setSelectedEra(entry.preset.selectedEra);
+      if (entry.preset.selectedRube  !== undefined) setSelectedRube(entry.preset.selectedRube);
       if (entry.preset.chaosLevel    !== undefined) setChaosLevel(entry.preset.chaosLevel);
       if (entry.preset.chaosEnabled  !== undefined) setChaosEnabled(entry.preset.chaosEnabled);
       if (entry.preset.sensitivity   !== undefined) setSensitivity(entry.preset.sensitivity);
