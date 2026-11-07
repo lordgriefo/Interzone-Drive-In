@@ -34,6 +34,7 @@ export function TransportBar({
   onUnlockAudio = () => {},
   // Export pipeline modal trigger
   onOpenExport = () => {},
+  onResetProject = () => {},
 }) {
 
   const tapTimesRef = useRef([]);
@@ -178,6 +179,30 @@ export function TransportBar({
             / {formatTimecode(duration)}
           </span>
         </div>
+
+        {/* Instant Reset / Fresh Slate Button */}
+        <button
+          type="button"
+          onClick={onResetProject}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '4px 9px',
+            borderRadius: 4,
+            border: '1px solid rgba(244, 63, 94, 0.5)',
+            backgroundColor: 'rgba(225, 29, 72, 0.18)',
+            color: '#fda4af',
+            cursor: 'pointer',
+            fontWeight: 700,
+            fontSize: 10,
+            letterSpacing: 0.6,
+            transition: 'all 0.15s ease',
+          }}
+          title="Reset Project to Blank Canvas (Unloads demo music & cuts for a fresh custom session)"
+        >
+          🔄 RESET
+        </button>
 
         {/* Dual-Pipeline Export Button */}
         <button

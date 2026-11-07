@@ -373,8 +373,31 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     };
   }, [unlockAudio]);
 
+  const isPurgedRef = useRef(false);
+
+  // ── clearAudioTrack ─────────────────────────────────────────────────────
+  const clearAudioTrack = useCallback(() => {
+    isPurgedRef.current = true;
+    const el = audioRef.current;
+    if (el) {
+      el.pause();
+      el.removeAttribute('src');
+      el.src = '';
+      try { el.load(); } catch (_) {}
+    }
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setWaveformPeaks([]);
+    setTransientMarkers([]);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (meydaAnalyzerRef.current) try { meydaAnalyzerRef.current.stop(); } catch (_) {}
+    setAudioSignals(zeroSignals());
+  }, []);
+
   // ── loadAudioTrack ─────────────────────────────────────────────────────
   const loadAudioTrack = useCallback((fileOrUrl) => {
+    isPurgedRef.current = false;
     const el = audioRef.current;
     if (!el) return;
 
@@ -402,8 +425,12 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     const el = audioRef.current;
     if (!el) return;
 
-    // Auto-generate fallback if no source loaded
-    if (!el.src || el.src === window.location.href || el.src === '') {
+    // Check if source loaded
+    if (!el.src || el.src === window.location.href || el.src === '' || isPurgedRef.current) {
+      if (isPurgedRef.current || !el.src) {
+        console.warn('[AudioEngine] No audio track loaded. Drop an audio track to play.');
+        return;
+      }
       const defaultTrackUrl = './assets-bg/excavating-neverland.mp3';
       el.src = defaultTrackUrl;
       el.preload = 'auto';
@@ -481,6 +508,7 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
 
     // Methods
     loadAudioTrack,
+    clearAudioTrack,
     togglePlay,
     stopEngine,
     seekTo,

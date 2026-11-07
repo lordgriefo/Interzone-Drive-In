@@ -217,6 +217,7 @@ export function FXConsole({
   setLyricSize = () => {},
   lyricFont = 'major_mono',
   setLyricFont = () => {},
+  onResetProject = () => {},
   onAudioUpload = () => {},
   isPlaying = false,
   onTogglePlay = () => {},
@@ -361,6 +362,31 @@ export function FXConsole({
           🎛 ANIMATIC FX CONSOLE
         </h3>
         <InlinethemeSwitcher />
+        <button
+          onClick={onResetProject}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            width: '100%',
+            marginTop: 8,
+            padding: '6px 10px',
+            backgroundColor: 'rgba(225, 29, 72, 0.16)',
+            border: '1px solid rgba(244, 63, 94, 0.55)',
+            color: '#ffe4e6',
+            borderRadius: 4,
+            fontSize: 10.5,
+            fontWeight: 700,
+            fontFamily: 'var(--font-mono)',
+            cursor: 'pointer',
+            letterSpacing: '0.8px',
+            transition: 'all 0.15s ease',
+          }}
+          title="Reset project to clean blank slate (unloads demo music, cuts, and assets)"
+        >
+          🔄 RESET PROJECT (FRESH SLATE)
+        </button>
       </div>
       {/* ── PLAYLIST PANEL ── */}
       <div style={panelSection}>

@@ -156,6 +156,7 @@ export default function App() {
     setLoopPoints,
     isAudioUnlocked,
     unlockAudio,
+    clearAudioTrack,
   } = useAudioEngine(sensitivity, bpm);
 
   // ── Dual-Pipeline Export Modal State ──
@@ -970,6 +971,57 @@ export default function App() {
     setAssets((prev) => prev.map((a) => (a.id === assetId ? { ...a, name: newName.trim() } : a)));
   }, []);
 
+  const handleResetProject = useCallback(() => {
+    const prompt1 = window.confirm(
+      "🔄 Clear Project & Reset to Blank Canvas?\n\nThis will unload the demo music, clear timeline cuts, and reset all visual presets so you can start a fresh custom project."
+    );
+    if (!prompt1) return;
+
+    const prompt2 = window.confirm(
+      "⚠️ Are you completely sure?\n\nAll demo audio, scratch cuts, and custom edits will be wiped. Click OK to proceed with a clean slate."
+    );
+    if (!prompt2) return;
+
+    // 1. Stop & purge audio
+    stopEngine();
+    if (typeof clearAudioTrack === 'function') {
+      clearAudioTrack();
+    }
+    setTrackTitle('No Music Loaded — Drop or Select Audio Track');
+    lastAudioFileRef.current = null;
+    setLyricSegments([]);
+    setPlaylistIndex(-1);
+
+    // 2. Clear timeline cuts & assets
+    clearVideoClips();
+    setAssets([]);
+    setSelectedAssetIndex(0);
+    setSelectedClipId(null);
+
+    // 3. Reset puppet slots
+    setPuppetSlots({
+      rest: null, open: null, narrow: null, wide: null,
+      teeth: null, pucker: null, midOpen: null, snap: null,
+    });
+
+    // 4. Reset FX, Style, Era, Markers
+    setSelectedStyle('montage');
+    setSelectedEra('1902_melies');
+    setSelectedRube('none');
+    setChaosLevel(0);
+    setChaosEnabled(false);
+    setFxMarkers([]);
+    setDepth3dEnabled(false);
+    setIsLooping(false);
+
+    try {
+      localStorage.removeItem('keneticut_session_backup');
+      sessionStorage.clear();
+    } catch (_) {}
+
+    alert("✨ Clean Slate Activated!\n\nAll demo music and clips cleared. You can now drag and drop your own audio and video/images to start fresh.");
+  }, [stopEngine, clearAudioTrack, clearVideoClips]);
+
   const handleAudioUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -1043,6 +1095,7 @@ export default function App() {
         )}
 
         <InterzoneFrame
+          onResetProject={handleResetProject}
           cinemaMode={cinemaMode}
           onToggleCinema={handleToggleCinema}
           isPlaying={isPlaying}
@@ -1116,6 +1169,7 @@ export default function App() {
               isAudioUnlocked={isAudioUnlocked}
               onUnlockAudio={unlockAudio}
               onOpenExport={() => setIsExportModalOpen(true)}
+              onResetProject={handleResetProject}
             />
           )}
 
@@ -1186,6 +1240,7 @@ export default function App() {
 
         {!cinemaMode && (
           <FXConsole
+            onResetProject={handleResetProject}
             selectedEra={selectedEra}
           setSelectedEra={setSelectedEra}
           isEraLocked={isEraLocked}
