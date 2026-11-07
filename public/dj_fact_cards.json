@@ -1,0 +1,628 @@
+{
+  "host": {
+    "name": "THE ARCHIVIST",
+    "station": "As Above, So Below",
+    "description": "Late-night radio station host broadcasting from somewhere between an Appalachian holler and the Pleroma. Calm, dry, unhurried, quietly amused, like a retired librarian who has read everything and been surprised by very little. Never shouts. Never uses exclamation marks.",
+    "rules": [
+      "You may only state historical facts that appear on the FACT CARD you are given. Never invent dates, names, quotes or numbers.",
+      "If a fact is marked LEGEND or DISPUTED, you must say so in the same sentence ('the story goes', 'nobody has ever confirmed').",
+      "If asked about something not on the card, say: 'That’s not in my files.'",
+      "Speak in 2 to 4 short sentences per segment. Plain words. One dry joke at most.",
+      "Never give advice, never perform rituals, never claim the occult is literally true. You report what people believed and did.",
+      "Occasionally (about 1 in 8 segments) have a TRANSMISSION ERROR: you mishear a phrase, repeat the wrong version once, then correct yourself flatly ('Nimrod blight here. No. Niemand bleibt hier. Nobody stays here.')."
+    ],
+    "segment_types": [
+      "Station ID",
+      "Back-announce",
+      "Tangent",
+      "Teaser",
+      "Weather",
+      "Transmission error"
+    ]
+  },
+  "cards": {
+    "01": {
+      "track_number": "01",
+      "title": "Babalon Working Blues",
+      "subtitle": "Jack Parsons & the JPL Moonchild",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ =---=► ]",
+      "era_place": "Pasadena, California, 1940s–1952",
+      "solid_facts": [
+        "John Whiteside 'Jack' Parsons was a self-taught chemist who co-founded the Caltech-linked rocket group (GALCIT) that led to the Jet Propulsion Laboratory, and he co-founded Aerojet.",
+        "He led the Agape Lodge of the Ordo Templi Orientis in Pasadena and was a devoted follower of Aleister Crowley’s Thelema.",
+        "In 1946 he performed the 'Babalon Working' with L. Ron Hubbard acting as scribe.",
+        "He died on June 17, 1952, in an explosion in his home laboratory in Pasadena.",
+        "A crater on the far side of the Moon is named for him."
+      ],
+      "legend_disputed": [
+        "Whether the 1952 explosion was an accident has been argued ever since; no one has proven anything else.",
+        "Parsons' followers later called the Working a success; he considered it unfinished."
+      ],
+      "do_not_say": [
+        "Avoid stating exact dollar figures in the Hubbard business dispute; sources vary.",
+        "Avoid quoting what Crowley supposedly wrote about Hubbard as an exact quote; the song paraphrases."
+      ],
+      "one_line_teaser": "A rocket scientist, a scribe, and an invocation in the desert. The paperwork is still arriving.",
+      "transmission_error": "Babylon working shoes. No. Babalon Working Blues. Correction noted."
+    },
+    "02": {
+      "track_number": "02",
+      "title": "Do What Thou Wilt (Hillbilly Hadit)",
+      "subtitle": "An Aleister Crowley Ballad",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ { o }===(___) ]",
+      "era_place": "Cairo, Egypt, April 1904",
+      "solid_facts": [
+        "In Cairo in April 1904, Aleister Crowley and his new wife Rose said a voice dictated a text over three days.",
+        "He called the voice Aiwass; the text was Liber AL vel Legis, The Book of the Law.",
+        "Its best-known line, 'Do what thou wilt shall be the whole of the Law', is the foundation of Thelema."
+      ],
+      "legend_disputed": [
+        "The nature and origin of Aiwass; Crowley himself changed his mind about it over the years."
+      ],
+      "do_not_say": [
+        "Don’t state his final-years drug use as detail; keep to 'ill and short of money.'",
+        "Do not claim Thelema is an ancient religion; it was founded in 1904."
+      ],
+      "one_line_teaser": "Three days in a Cairo hotel room, and a phrase that launched a thousand paperback books.",
+      "transmission_error": "Do what you will. No. Do what thou wilt. The grammar is specific."
+    },
+    "03": {
+      "track_number": "03",
+      "title": "The Lam & the Grey",
+      "subtitle": "Crowley's UFO Problem",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ( •_• ) ]",
+      "era_place": "New York, 1918 / Roswell, 1947",
+      "solid_facts": [
+        "In 1918 Crowley drew a portrait of an entity he called Lam during his stay in New York.",
+        "The portrait depicts an entity with a large domed head, small mouth, and narrow eyes.",
+        "In subsequent decades, readers and occultists noted the portrait's striking resemblance to modern depictions of grey aliens."
+      ],
+      "legend_disputed": [
+        "Later Typhonian writers tied Lam to extraterrestrial and extradimensional beings, claiming Parsons' Working opened a doorway that led to Roswell. These are interpretations and modern folklore, not findings."
+      ],
+      "do_not_say": [
+        "Do not state that Crowley drew an alien or predicted UFO crashes as fact."
+      ],
+      "one_line_teaser": "A portrait drawn in 1918 that looks remarkably like what everyone started seeing in 1947.",
+      "transmission_error": "Little lamb. No. Lam. With one m."
+    },
+    "04": {
+      "track_number": "04",
+      "title": "Thelema Mountain",
+      "subtitle": "A Weirdcore Country Hymn",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ^ 93 ^ ]",
+      "era_place": "Boleskine House, Loch Ness, 1900–1904",
+      "solid_facts": [
+        "Nuit, Hadit, and Ra-Hoor-Khuit are the three central deities of The Book of the Law.",
+        "The number 93 is the common greeting and closing in Thelema because the Greek words for Will (Thelema) and Love (Agape) both enumerate to 93 in isopsephy.",
+        "Crowley purchased Boleskine House on the shores of Loch Ness in 1899 to perform the Sacred Magic of Abramelin."
+      ],
+      "legend_disputed": [
+        "The Aeon of Horus as an objective cosmic epoch is a Thelemic religious belief, not an empirical historical claim."
+      ],
+      "do_not_say": [
+        "Do not treat Boleskine folklore regarding curses or hauntings as documented history."
+      ],
+      "one_line_teaser": "Old-time shape-note singing from a choir that only uses the number ninety-three.",
+      "transmission_error": "Ninety-four. No. Ninety-three."
+    },
+    "05": {
+      "track_number": "05",
+      "title": "The Con Man Sails Away (L. Ron's Excellent Adventure)",
+      "subtitle": "Talking Blues Grifter Narrative",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ~~~⛵~~~ ]",
+      "era_place": "Pasadena & Florida, 1945–1946",
+      "solid_facts": [
+        "L. Ron Hubbard joined Parsons' Pasadena household in 1945 and participated in the Babalon Working as scribe.",
+        "Parsons, Hubbard, and Sara Northrup formed an investment partnership called Allied Enterprises to purchase yachts in Florida.",
+        "Hubbard and Northrup departed with the funds; Parsons pursued them to Florida and sued.",
+        "The court awarded Parsons ownership of the two schooners and a promissory note.",
+        "Hubbard later founded Dianetics in 1950 and Scientology in 1952."
+      ],
+      "legend_disputed": [
+        "Dollar amounts vary widely across hostile and sympathetic accounts; the partnership was capitalized with thousands of dollars from Parsons' savings."
+      ],
+      "do_not_say": [
+        "Avoid quoting Crowley's letter about Hubbard as a verbatim quote; the song paraphrases.",
+        "Avoid stating exact dollar sums as unquestioned fact."
+      ],
+      "one_line_teaser": "A yacht purchase in Florida that went sideways, documented in court filings and frantic telegrams.",
+      "transmission_error": "Sail away on a cloud. No. On a boat. A forty-six-foot schooner."
+    },
+    "07": {
+      "track_number": "07",
+      "title": "Kenneth Grant & the Typhonian Transmission",
+      "subtitle": "Nightside of Eden & the Mauve Zone",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 🐙 ]",
+      "era_place": "London, 1944–2011",
+      "solid_facts": [
+        "Kenneth Grant was Aleister Crowley's personal secretary in the 1940s at Netherwood.",
+        "He founded the New Isis Lodge in 1952 and later led the Typhonian O.T.O.",
+        "His Typhonian Trilogies blended Crowley's Thelema, H.P. Lovecraft's Cthulhu Mythos, and Qliphothic Kabbalah.",
+        "He coined esoteric concepts including 'The Mauve Zone' and 'Universe B'."
+      ],
+      "legend_disputed": [
+        "Grant claimed Lovecraft was tapping genuine astral currents in his dreams; this is Grant's occult interpretation."
+      ],
+      "do_not_say": [
+        "Do not state that Lovecraft and Crowley knew each other; they never met or corresponded."
+      ],
+      "one_line_teaser": "Banjo breaks in the Mauve Zone. The tuning is deliberately slightly off.",
+      "transmission_error": "The mauve phone. No. The Mauve Zone."
+    },
+    "08": {
+      "track_number": "08",
+      "title": "Six Months in the Desert (Abramelin Boogie)",
+      "subtitle": "The Holy Guardian Angel",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ~~~🏜️~~~ ]",
+      "era_place": "Boleskine House, Scotland, 1899–1900",
+      "solid_facts": [
+        "The Book of the Sacred Magic of Abramelin the Mage was translated into English by S.L. MacGregor Mathers in 1898.",
+        "It describes an elaborate retreat designed to achieve the Knowledge and Conversation of the Holy Guardian Angel.",
+        "Crowley bought Boleskine House specifically to undertake the operation, but abandoned it halfway through to attend to the Golden Dawn schism."
+      ],
+      "legend_disputed": [
+        "Mathers' translation specifies an 18-month retreat, though German manuscripts suggest six months; folklore about the operation driving local villagers mad is rumor."
+      ],
+      "do_not_say": [
+        "The lyric says six months; historical French/Mathers manuscripts prescribed eighteen months.",
+        "Do not state that demons escaped across Loch Ness as fact."
+      ],
+      "one_line_teaser": "Eighteen months of fasting, praying, and demon-binding, interrupted by order politics.",
+      "transmission_error": "Abramelin cookie. No. Abramelin Boogie."
+    },
+    "09": {
+      "track_number": "09",
+      "title": "The Beast in His Boarding House",
+      "subtitle": "Crowley's Last Winter at Netherwood",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 666 ]",
+      "era_place": "Netherwood, Hastings, England, 1947",
+      "solid_facts": [
+        "Aleister Crowley died on December 1, 1947, at Netherwood boarding house in Hastings at age 72.",
+        "His final major works were The Book of Thoth and the accompanying Thoth tarot deck, painted by Lady Frieda Harris.",
+        "His funeral in Brighton was termed a 'Black Mass' by the tabloids after Louis Wilkinson read Crowley's 'Hymn to Pan'."
+      ],
+      "legend_disputed": [
+        "His reputed last words, 'I am perplexed', are secondhand reports; his doctor reportedly said he died peacefully in his sleep."
+      ],
+      "do_not_say": [
+        "Don’t sensationalize his final-years medical heroin prescriptions; keep to 'ill and short of funds.'",
+        "Do not confirm the 'curse on the doctor' rumor."
+      ],
+      "one_line_teaser": "The wickedest man in the world spent his last winter by the sea, writing letters and playing chess.",
+      "transmission_error": "Netherworld. No. Netherwood. A guest house in Hastings."
+    },
+    "10": {
+      "track_number": "10",
+      "title": "Doctor Dee & the Angel Table",
+      "subtitle": "The Enochian Calls & the Obsidian Mirror",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ [ 🪞 ] ]",
+      "era_place": "Mortlake & Bohemia, 1582–1589",
+      "solid_facts": [
+        "John Dee was a mathematician, geographer, and advisor to Queen Elizabeth I.",
+        "From 1582 to 1589 he conducted scrying sessions with medium Edward Kelley, recording an angelic language now called Enochian.",
+        "Dee's Aztec obsidian scrying mirror is preserved in the British Museum.",
+        "In 1587 in Bohemia, Kelley reported an angelic mandate for the two men to share everything, including their wives, recorded by Dee."
+      ],
+      "legend_disputed": [
+        "The popular legend that Kelley had his ears cropped for forgery is repeated in old histories but lacks primary court documentation."
+      ],
+      "do_not_say": [
+        "The lyric claims 'five thousand words' and that Enochian is 'too coherent to be made up'; linguists treat it as constructed, not a natural tongue.",
+        "Do not state Kelley was definitely a fraud or definitely a prophet."
+      ],
+      "one_line_teaser": "A mathematician to the Queen, an Aztec black mirror, and an angel that gave questionable domestic advice.",
+      "transmission_error": "Edward Kelly. Kelley with an e before the y."
+    },
+    "11": {
+      "track_number": "11",
+      "title": "Zos Kia (Austin Osman Spare's Alphabet of Desire)",
+      "subtitle": "Automatic Drawing & Sigil Magic",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ✳️ ]",
+      "era_place": "South London, 1900s–1956",
+      "solid_facts": [
+        "Austin Osman Spare was a visual prodigy who exhibited at the Royal Academy at age seventeen.",
+        "He developed a personal occult philosophy called the Zos Kia Cultus, based on the Alphabet of Desire and sigilization.",
+        "His technique of condensing intent into graphical sigils was rediscovered in the 1970s and became the core mechanic of Chaos Magic.",
+        "He lived quietly in South London, surrounded by stray cats, painting portraits in local pubs."
+      ],
+      "legend_disputed": [
+        "His claim of being initiated by an elderly witch named 'Mrs. Paterson' who could shapeshift is widely told by Spare but unverified."
+      ],
+      "do_not_say": [
+        "The lyric calls Mrs. Paterson his grandmother; she was a neighborhood acquaintance.",
+        "Do not present the cat-healing anecdotes as documented fact."
+      ],
+      "one_line_teaser": "Royal Academy prodigy at seventeen, South London pub portraitist at sixty, and father of the modern sigil.",
+      "transmission_error": "Sausage and mash. No. Zos and Kia."
+    },
+    "12": {
+      "track_number": "12",
+      "title": "The Golden Dawn Is Mine (The Great Schism)",
+      "subtitle": "Mathers vs. Crowley",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ -=- ☀️ -=- ]",
+      "era_place": "London & Paris, 1900",
+      "solid_facts": [
+        "The Hermetic Order of the Golden Dawn was founded in 1888 by William Wynn Westcott, Samuel Liddell MacGregor Mathers, and William Robert Woodman.",
+        "Prominent members included W.B. Yeats, Maud Gonne, Arthur Machen, and Florence Farr.",
+        "In 1900, Mathers attempted to assert autocracy from Paris, sending Crowley to take over the London vault at Blythe Road, sparking the schism.",
+        "Yeats and the London adepts successfully ousted Crowley and Mathers, fracturing the order."
+      ],
+      "legend_disputed": [
+        "Crowley's claims of psychic attacks involving astral vampires and bloodhounds sent by Mathers are Crowley's personal dramatic memoirs."
+      ],
+      "do_not_say": [
+        "Bram Stoker was rumored to be a member, but no lodge roll confirms it; do not state Stoker was a member.",
+        "Do not say Crowley 'won' the vault; he was ejected."
+      ],
+      "one_line_teaser": "W.B. Yeats defending a London magical vault against Aleister Crowley in Highland dress. A true story.",
+      "transmission_error": "The Golden Horn. No. The Golden Dawn."
+    },
+    "14": {
+      "track_number": "14",
+      "title": "Chaos Magic (The Permission Slip)",
+      "subtitle": "Nothing Is True, Everything Is Permitted",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ( 9999 ) ]",
+      "era_place": "Yorkshire, England, 1978",
+      "solid_facts": [
+        "Chaos Magic originated in the late 1970s through Peter J. Carroll and Ray Sherwin, founders of the Illuminates of Thanateros (IOT).",
+        "Carroll published Liber Null & Psychonaut, synthesizing Austin Osman Spare's sigil techniques with pragmatic belief-shifting.",
+        "The core premise is that belief is a tool rather than an absolute truth."
+      ],
+      "legend_disputed": [
+        "The attribution of 'Nothing is true, everything is permitted' to Hassan-i Sabbah comes via William S. Burroughs and Friedrich Nietzsche, not direct historical records."
+      ],
+      "do_not_say": [
+        "Do not state that Chaos Magic has ancient lineage; it is entirely a late-20th-century postmodern movement."
+      ],
+      "one_line_teaser": "When you strip the Latin and the velvet robes away, all you have left is a pen, some paper, and a lot of confidence.",
+      "transmission_error": "Permission chip. No. Permission slip."
+    },
+    "15": {
+      "track_number": "15",
+      "title": "The Eighth Sphere (Steiner's Moon-Demon Problem)",
+      "subtitle": "Lucifer, Ahriman & Anthroposophy",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ( 🌑 ) ]",
+      "era_place": "Dornach, Switzerland, 1915–1925",
+      "solid_facts": [
+        "Rudolf Steiner founded Anthroposophy after separating from the Theosophical Society.",
+        "In his 1915 lectures, Steiner described the 'Eighth Sphere' as a detour of planetary evolution where human souls could be trapped between Lucifer and Ahriman.",
+        "The first Goetheanum, a wooden architectural marvel in Dornach, burned down on New Year's Eve 1922–1923.",
+        "Steiner died in March 1925."
+      ],
+      "legend_disputed": [
+        "Steiner's descriptions of cosmic evolution and planetary incarnations are clairvoyant assertions, not empirical science."
+      ],
+      "do_not_say": [
+        "The lyric says the Goetheanum burned just before he died; it burned two years prior in 1922.",
+        "The line about '1998' is not Steiner's; he spoke only of the 'third millennium'."
+      ],
+      "one_line_teaser": "A Swiss wooden palace burned to ashes, and a lecture series warning listeners not to get stuck on the Moon.",
+      "transmission_error": "The eighth spear. No. The Eighth Sphere."
+    },
+    "16": {
+      "track_number": "16",
+      "title": "Blavatsky & the Mahatmas",
+      "subtitle": "The Secret Doctrine & the Train to Adyar",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 🚂 ]",
+      "era_place": "New York, India, London, 1875–1891",
+      "solid_facts": [
+        "Helena Petrovna Blavatsky co-founded the Theosophical Society in New York in 1875 alongside Henry Steel Olcott.",
+        "She wrote Isis Unveiled (1877) and The Secret Doctrine (1888).",
+        "She claimed her teachings were dictated by hidden masters called the Mahatmas (Koot Hoomi and Morya).",
+        "The 1885 Hodgson Report for the Society for Psychical Research concluded she was an impostor; the SPR issued a press release in 1986 noting flaws in the original investigation."
+      ],
+      "legend_disputed": [
+        "Whether the Mahatma Letters precipitated from the ceiling or were humanly written remains a celebrated historic dispute."
+      ],
+      "do_not_say": [
+        "Do not quote Crowley's assessment as a verbatim quote; the song paraphrases.",
+        "Krishnamurti dissolved the Order of the Star in 1929; do not confuse dates."
+      ],
+      "one_line_teaser": "Letters dropping from the ceiling, a worldwide society, and twenty years of ink on Russian cigarettes.",
+      "transmission_error": "Madame Blue-sky. No. Madame Blavatsky."
+    },
+    "17": {
+      "track_number": "17",
+      "title": "Eliphas Lévi Invokes Apollonius",
+      "subtitle": "High Magic in Victorian London",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 🪗 ]",
+      "era_place": "London, 1854",
+      "solid_facts": [
+        "Alphonse Louis Constant wrote under the Hebrew pseudonym Éliphas Lévi.",
+        "His 1854–1856 work Dogme et Rituel de la Haute Magie shaped modern Western occultism and popularized the Baphomet goat diagram.",
+        "In July 1854 in London, at the request of an Englishwoman, Lévi attempted to invoke the spirit of ancient philosopher Apollonius of Tyana using a pantacle.",
+        "He died in 1875, the year Aleister Crowley was born."
+      ],
+      "legend_disputed": [
+        "Crowley's lifelong claim to be the literal reincarnation of Éliphas Lévi."
+      ],
+      "do_not_say": [
+        "Lévi was ordained a deacon, not a priest, so 'defrocked priest' is technically loose.",
+        "Do not state that Apollonius physically materialized as fact."
+      ],
+      "one_line_teaser": "A Parisian ex-cleric in a London attic, wearing a linen robe and holding a consecrated blade.",
+      "transmission_error": "Elephant Levi. No. Éliphas Lévi."
+    },
+    "18": {
+      "track_number": "18",
+      "title": "The Rosicrucian Manifestos",
+      "subtitle": "Nobody Knows Who Wrote Them",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ { R+C } ]",
+      "era_place": "Kassel, Germany, 1614–1616",
+      "solid_facts": [
+        "Between 1614 and 1616, three anonymous pamphlets appeared in Germany: Fama Fraternitatis, Confessio Fraternitatis, and The Chymical Wedding of Christian Rosenkreutz.",
+        "They announced a secret brotherhood founded by Christian Rosenkreutz, whose tomb was supposedly discovered uncorrupted after 120 years.",
+        "The publications caused an international sensation, with philosophers across Europe publishing letters pleading to contact the invisible order.",
+        "Johann Valentin Andreae later claimed authorship of The Chymical Wedding."
+      ],
+      "legend_disputed": [
+        "Whether any historical fraternity existed before the manifestos were printed; historians widely consider it a Lutheran utopian allegory."
+      ],
+      "do_not_say": [
+        "The tomb inscription in the Fama reads 'post 120 annos patebo' ('after 120 years I shall open'), not 'I shall rise.'",
+        "Stories linking Descartes or Leibniz directly to active lodge memberships are unverified."
+      ],
+      "one_line_teaser": "Three pamphlets published four hundred years ago that everybody replied to and nobody could find.",
+      "transmission_error": "Rosy cruiser. No. Rosicrucian."
+    },
+    "19": {
+      "track_number": "19",
+      "title": "The Aldebaran Transmission",
+      "subtitle": "Maria Orsic & the Vril Legend",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ (( ⚡ )) ]",
+      "era_place": "Munich, 1919 onward (as legend)",
+      "solid_facts": [
+        "The term 'vril' originates in Edward Bulwer-Lytton's 1871 science-fiction novel The Coming Race.",
+        "Aldebaran (Alpha Tauri) is an orange giant star located approximately 65 light years from Earth.",
+        "Stories alleging a 'Vril Society' of female telepaths led by Maria Orsic channeling spacecraft blueprints spread through postwar French and German fringe literature."
+      ],
+      "legend_disputed": [
+        "Almost everything concerning Maria Orsic, Aldebaran telepathic transmissions, and anti-gravity saucers is unverified myth and postwar pulp folklore. The host must always say: 'the story goes'."
+      ],
+      "do_not_say": [
+        "Never state as fact that the Vril Society existed as described or that Orsic disappeared in a UFO in 1945."
+      ],
+      "one_line_teaser": "A medium, a signal from sixty-five light years away, and one sentence in German. The story goes.",
+      "transmission_error": "Nimrod blight here. No. Niemand bleibt hier. Nobody stays here."
+    },
+    "20": {
+      "track_number": "20",
+      "title": "Carcosa (The Lake of Hali)",
+      "subtitle": "The King in Yellow",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 🎭 ]",
+      "era_place": "Paris & the Dim Carcosa, 1886–1895",
+      "solid_facts": [
+        "Ambrose Bierce coined the city 'Carcosa' and 'Hali' in his 1886 short story 'An Inhabitant of Carcosa'.",
+        "Robert W. Chambers expanded the motif in his 1895 collection The King in Yellow, featuring a fictional play that drives its readers insane.",
+        "August Derleth and later Cthulhu Mythos authors placed Carcosa near the star Aldebaran in the Hyades cluster."
+      ],
+      "legend_disputed": [
+        "Connecting fictional Carcosa to real occult lineages is a modern literary game."
+      ],
+      "do_not_say": [
+        "Do not treat the King in Yellow or the Pallid Mask as genuine ancient folklore; they were authored by Chambers in 1895."
+      ],
+      "one_line_teaser": "A fictional play in a yellow cover that drove readers out of their minds, written in Paris in the nineties.",
+      "transmission_error": "Calcutta. No. Carcosa."
+    },
+    "21": {
+      "track_number": "21",
+      "title": "The Yellow Sign",
+      "subtitle": "Transmission from the Hyades",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 👑 ]",
+      "era_place": "The Hyades, Robert W. Chambers, 1895",
+      "solid_facts": [
+        "In Chambers' story 'The Yellow Sign' (1895), an artist and his model encounter a sinister talisman inscribed with an unearthly glyph.",
+        "H.P. Lovecraft praised Chambers' work in Supernatural Horror in Literature, adopting elements into his own Cthulhu Mythos."
+      ],
+      "legend_disputed": [
+        "Claims that the Yellow Sign has genuine magical efficacy are internet roleplay and fiction."
+      ],
+      "do_not_say": [
+        "Do not attribute the Yellow Sign to ancient Sumeria or Egypt; it was invented by Chambers."
+      ],
+      "one_line_teaser": "Have you seen it? The church watchman has, and he isn't speaking.",
+      "transmission_error": "The yellow shine. No. The Yellow Sign."
+    },
+    "23": {
+      "track_number": "23",
+      "title": "The Voynich Manuscript (Nobody's Read It)",
+      "subtitle": "Beinecke MS 408",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 📜 ]",
+      "era_place": "Central Europe, early 1400s; Yale University today",
+      "solid_facts": [
+        "Radiocarbon dating of the vellum calfskin dates it between 1404 and 1438.",
+        "It is preserved in Yale University's Beinecke Rare Book & Manuscript Library under catalog call number MS 408.",
+        "Wilfrid Voynich bought it in 1912 from the Jesuit college at Villa Mondragone in Italy.",
+        "Master codebreakers including William Friedman and teams from the military have studied it without deciphering it."
+      ],
+      "legend_disputed": [
+        "Whether the script represents an unknown natural language, an elaborate cryptographic cipher, or a sophisticated medieval hoax is completely unresolved."
+      ],
+      "do_not_say": [
+        "The song says '408 pages'. That is incorrect; 408 is the manuscript's call number (MS 408); the physical volume is approximately 240 pages.",
+        "Do not state that artificial intelligence or any scholar has officially 'cracked' it."
+      ],
+      "one_line_teaser": "Real fifteenth-century vellum, real ink, botanical drawings of plants that don't exist, and nobody can read a single word.",
+      "transmission_error": "Four hundred and eight pages. No. Call number four-oh-eight. Two hundred and forty pages."
+    },
+    "24": {
+      "track_number": "24",
+      "title": "The Comte de Saint-Germain (The Man Who Wouldn't Die)",
+      "subtitle": "Courtier of Europe & Ascended Master",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ⌛ ]",
+      "era_place": "European Courts, 1710–1784",
+      "solid_facts": [
+        "The Comte de Saint-Germain was a real historical gentleman, virtuoso violinist, and chemist who moved through high European courts in the 18th century.",
+        "Voltaire famously described him in a letter to Frederick the Great as 'a man who never dies, and who knows everything.'",
+        "Official parish records note his death in Eckernförde, Schleswig, on February 27, 1784."
+      ],
+      "legend_disputed": [
+        "Memoirs by Madame d'Adhémar claiming he appeared repeatedly during the French Revolution and 19th century are widely considered apocryphal.",
+        "Theosophy and the 1930s 'I AM' Activity revere him as an immortal Ascended Master."
+      ],
+      "do_not_say": [
+        "Do not state that he lived for centuries as documented fact."
+      ],
+      "one_line_teaser": "He spoke a dozen languages, never ate in public, and Voltaire called him the man who knows everything.",
+      "transmission_error": "Count of Monte Cristo. No. Comte de Saint-Germain."
+    },
+    "25": {
+      "track_number": "25",
+      "title": "Bruno's Fire (The Campo de' Fiori, 1600)",
+      "subtitle": "The Infinite Worlds of Giordano Bruno",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ ((((🔥)))) ]",
+      "era_place": "Campo de' Fiori, Rome, February 17, 1600",
+      "solid_facts": [
+        "Giordano Bruno was a Dominican friar, mathematician, and Hermetic philosopher who asserted that the universe is infinite and filled with countless populated worlds.",
+        "He was imprisoned by the Roman Inquisition for approximately eight years.",
+        "He was burned at the stake in the Campo de' Fiori in Rome on February 17, 1600.",
+        "A bronze monument by Ettore Ferrari was erected on the execution site in 1889."
+      ],
+      "legend_disputed": [
+        "Traditional accounts claim his tongue was clamped in an iron vise on the way to the pyre."
+      ],
+      "do_not_say": [
+        "The lyric says the Inquisition charges were sealed in the Vatican and lost; a summary of the trial proceedings was discovered and published in 1940.",
+        "Do not state he was executed solely for Copernican astronomy; his theological heresies (denial of the Trinity and divinity of Christ) were prominent in the charges."
+      ],
+      "one_line_teaser": "Eight years in an Inquisition cell, and a refusal to recant that the stars went on forever.",
+      "transmission_error": "Bruno's wire. No. Bruno's Fire."
+    },
+    "26": {
+      "track_number": "26",
+      "title": "Nicolas Flamel's Empty Grave",
+      "subtitle": "Scrivener of Paris & Alchemical Myth",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ [ ⚰️ ] ]",
+      "era_place": "Paris, 1330–1418, and its afterlives",
+      "solid_facts": [
+        "Nicolas Flamel was a real Parisian scrivener, copyist, and manuscript seller who died in 1418.",
+        "He and his wife Perenelle donated substantial wealth to parish churches and hospitals; property deeds and foundation records survive.",
+        "His home built in 1407 at 51 rue de Montmorency is the oldest documented private stone house in Paris and now operates as an inn and restaurant.",
+        "His carved funerary tombstone is preserved at the Musée de Cluny."
+      ],
+      "legend_disputed": [
+        "The legend that Flamel obtained the Book of Abraham the Jew, achieved the Philosopher's Stone, and faked his death first appeared in print in 1612, nearly two centuries after his burial.",
+        "Stories that his tomb was opened and found empty are 17th-century folklore."
+      ],
+      "do_not_say": [
+        "Do not claim his grave was verified empty by modern archaeology.",
+        "Do not say the restaurant serves duck; that is a joke from the song."
+      ],
+      "one_line_teaser": "The oldest house in Paris is a bistro, and the copyist who built it was accused of living forever.",
+      "transmission_error": "Flaming grave. No. Flamel's empty grave."
+    },
+    "27": {
+      "track_number": "27",
+      "title": "The Priory of Sion",
+      "subtitle": "Pierre Plantard's Magnificent Nonsense",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ { ⚜️ } ]",
+      "era_place": "Annemasse & Rennes-le-Château, France, 1956–1993",
+      "solid_facts": [
+        "Pierre Plantard registered a modest social club called the Priory of Sion in 1956 under the French Associations Act.",
+        "In the 1960s, Plantard and his associate Philippe de Chérisey fabricated genealogies and deposited them in the Bibliothèque nationale de France as the 'Dossiers Secrets'.",
+        "These forged documents became the basis for the 1982 bestseller Holy Blood, Holy Grail, which influenced Dan Brown's The Da Vinci Code in 2003.",
+        "Under judicial oath before a French judge in 1993, Plantard admitted that the entire grand lineage and medieval Priory were fabrications."
+      ],
+      "legend_disputed": [
+        "The notion of a medieval Merovingian bloodline guarded by Leonardo da Vinci and Isaac Newton has zero authentic documentation."
+      ],
+      "do_not_say": [
+        "Do not cite the book sales figures in the lyric as precise; say 'tens of millions.'",
+        "Never suggest the Priory of Sion was an actual ancient secret society."
+      ],
+      "one_line_teaser": "A low-stakes social club in the French Alps filed some paperwork and accidentally convinced forty million people.",
+      "transmission_error": "Priory of Zionism. No. Priory of Sion. With an S."
+    },
+    "28": {
+      "track_number": "28",
+      "title": "As Above, So Below",
+      "subtitle": "The Emerald Tablet Closer",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 🔺🔻 ]",
+      "era_place": "Alexandria & the Hermetic Current",
+      "solid_facts": [
+        "The Latin phrase 'Quod est inferius est sicut quod est superius' ('That which is below is like that which is above') originates from the Emerald Tablet of Hermes Trismegistus.",
+        "The oldest known surviving version of the text appears in Arabic treatises dating to the 8th and 9th centuries.",
+        "It was translated into Latin in the 12th century by Hugo of Santalla, and translated into English by Sir Isaac Newton.",
+        "It forms the foundational axiom of Western alchemy, Hermeticism, and ceremonial magic."
+      ],
+      "legend_disputed": [
+        "Legends attributing the tablet's discovery in a cave by Alexander the Great or Sarah the wife of Abraham are traditional lore."
+      ],
+      "do_not_say": [
+        "Do not state that Hermes Trismegistus was a single historical person; scholars regard the Hermetica as Hellenistic syncretic texts."
+      ],
+      "one_line_teaser": "The oldest sentence in Western esotericism, recorded in Arabic, translated by Newton, and sung in the hills.",
+      "transmission_error": "As below, so below. No. As above, so below."
+    },
+    "29": {
+      "track_number": "29",
+      "title": "Welcome to the Parsonage",
+      "subtitle": "1003 South Orange Grove, Pasadena",
+      "artist": "'O' Shibboleth",
+      "ascii_badge": "[ 🏡 ]",
+      "era_place": "Pasadena, California, 1940–1946",
+      "solid_facts": [
+        "1003 South Orange Grove Avenue in Pasadena was an eleven-room craftsman mansion leased by Jack Parsons.",
+        "It housed members of the Agape Lodge, science-fiction writers, Caltech bohemians, and eccentric roomers.",
+        "Robert Heinlein and other members of the Los Angeles sci-fi community visited or heard of the house.",
+        "The mansion was later demolished; a commercial complex stands on the site today."
+      ],
+      "legend_disputed": [
+        "Neighborhood gossip regarding yard rituals was sensationalized in postwar local reporting."
+      ],
+      "do_not_say": [
+        "Do not state that the building is still standing; it was demolished."
+      ],
+      "one_line_teaser": "Rocket fuel in the bathtub, poets in the attic, and an FBI file growing thicker by the week.",
+      "transmission_error": "Welcome to the orphanage. No. The Parsonage."
+    },
+    "30": {
+      "track_number": "30",
+      "title": "The Breach (Chasing Shadows)",
+      "subtitle": "The Veil Between Worlds & The Grand Opus",
+      "artist": "The Magic Static Society",
+      "ascii_badge": "[ (( 🕳️ )) ]",
+      "era_place": "Appalachian Transmissions & Beyond",
+      "solid_facts": [
+        "Composed, produced, and performed by The Magic Static Society.",
+        "5-minute 38-second epic closer synthesizing high funk, cosmic weirdcore, and the definitive author lyrics.",
+        "Anchors the transition from the historical country-occult figures into the live cosmic static frequency."
+      ],
+      "legend_disputed": [
+        "Whether the signal is being received from the radio tower or the mountain itself."
+      ],
+      "do_not_say": [
+        "Do not attribute this track to 'O' Shibboleth; it is recorded by The Magic Static Society."
+      ],
+      "one_line_teaser": "Five minutes and thirty-eight seconds of funk, shadows, and the breach in the static.",
+      "transmission_error": "Chasing shallow. No. Chasing Shadows."
+    }
+  }
+}
