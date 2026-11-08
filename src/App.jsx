@@ -30,18 +30,20 @@ import { parseLrcString } from './utils/lrcParser';
 
 export const DEFAULT_PLAYLIST = [
   {
-    id: 'pl_babalon_jato',
-    title: "Babalon [JATO] — 'O' Shibboleth",
-    url: './assets-bg/babalon-jato.mp3',
-    duration: 214,
+    id: 'pl_excavating_neverland',
+    title: "Excavating Neverland — The Magic Static Society",
+    url: './assets-bg/excavating-neverland.mp3',
+    lrcUrl: './assets-bg/excavating-neverland.lrc',
+    duration: 310,
     preset: {
-      selectedStyle: 'narrative',
-      selectedEra: '1940_noir',
-      bpm: 132,
-      chaosLevel: 0.35,
+      selectedStyle: 'lsd_acid_melt',
+      selectedEra: 'lynchian_interzone',
+      selectedRube: 'strangelet_event',
+      bpm: 120,
+      chaosLevel: 0.45,
       chaosEnabled: true,
-      sensitivity: 1.2,
-      reverbWet: 0.25,
+      sensitivity: 1.3,
+      reverbWet: 0.32,
     },
   },
   {
@@ -62,20 +64,18 @@ export const DEFAULT_PLAYLIST = [
     },
   },
   {
-    id: 'pl_excavating_neverland',
-    title: "Excavating Neverland — The Magic Static Society",
-    url: './assets-bg/excavating-neverland.mp3',
-    lrcUrl: './assets-bg/excavating-neverland.lrc',
-    duration: 310,
+    id: 'pl_babalon_jato',
+    title: "Babalon [JATO] — 'O' Shibboleth",
+    url: './assets-bg/babalon-jato.mp3',
+    duration: 214,
     preset: {
-      selectedStyle: 'lsd_acid_melt',
-      selectedEra: 'lynchian_interzone',
-      selectedRube: 'strangelet_event',
-      bpm: 120,
-      chaosLevel: 0.45,
+      selectedStyle: 'narrative',
+      selectedEra: '1940_noir',
+      bpm: 132,
+      chaosLevel: 0.35,
       chaosEnabled: true,
-      sensitivity: 1.3,
-      reverbWet: 0.32,
+      sensitivity: 1.2,
+      reverbWet: 0.25,
     },
   },
   {
@@ -85,7 +85,7 @@ export const DEFAULT_PLAYLIST = [
     duration: 334,
     preset: {
       selectedStyle: 'dmt_breakthrough',
-      selectedEra: '1927_metropolis',
+      selectedEra: '2020_cyber',
       bpm: 128,
       chaosLevel: 0.45,
       chaosEnabled: true,
@@ -126,7 +126,7 @@ export const DEFAULT_PLAYLIST = [
 ];
 
 export default function App() {
-  const [sensitivity, setSensitivity] = useState(1.0);
+  const [sensitivity, setSensitivity] = useState(1.3);
 
   // ── Master BPM from timeline ──
   const [bpm, setBpm] = useState(120);
@@ -266,13 +266,13 @@ export default function App() {
   });
 
   // ── FX / era state ──
-  const [selectedEra,   setSelectedEra]   = useState('1902_melies');
+  const [selectedEra,   setSelectedEra]   = useState('lynchian_interzone');
   const [isEraLocked,   setIsEraLocked]   = useState(false);
   const [eraChangeCooldown, setEraChangeCooldown] = useState(8000); // 8000ms default
   const lastEraChangeTimeRef = useRef(0);
-  const [selectedStyle, setSelectedStyle] = useState('montage');
-  const [selectedRube,  setSelectedRube]  = useState('none');
-  const [chaosLevel,    setChaosLevel]    = useState(0);
+  const [selectedStyle, setSelectedStyle] = useState('lsd_acid_melt');
+  const [selectedRube,  setSelectedRube]  = useState('strangelet_event');
+  const [chaosLevel,    setChaosLevel]    = useState(0.45);
   const [rubeDecay,     setRubeDecay]     = useState(800);
   const [trackTitle,    setTrackTitle]    = useState('Excavating Neverland by The Magic Static Society');
 
@@ -567,6 +567,17 @@ export default function App() {
       loadAudioTrack(DEFAULT_TRACK_URL);
       setTrackTitle(DEFAULT_TRACK_TITLE);
       lastAudioFileRef.current = DEFAULT_TRACK_URL;
+      const p = DEFAULT_PLAYLIST[0]?.preset;
+      if (p) {
+        if (p.selectedStyle) setSelectedStyle(p.selectedStyle);
+        if (p.selectedEra) setSelectedEra(p.selectedEra);
+        if (p.selectedRube) setSelectedRube(p.selectedRube);
+        if (p.bpm) setBpm(p.bpm);
+        if (p.chaosLevel !== undefined) setChaosLevel(p.chaosLevel);
+        if (p.chaosEnabled !== undefined) setChaosEnabled(p.chaosEnabled);
+        if (p.sensitivity) setSensitivity(p.sensitivity);
+        if (p.reverbWet !== undefined) setReverbWet(p.reverbWet);
+      }
     } catch (err) {
       console.warn('[App] Default audio track init warning:', err);
     }
