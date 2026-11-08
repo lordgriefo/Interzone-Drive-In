@@ -40,7 +40,7 @@ export const DEFAULT_PLAYLIST = [
       selectedEra: 'lynchian_interzone',
       selectedRube: 'strangelet_event',
       bpm: 120,
-      chaosLevel: 0.45,
+      chaosLevel: 0.10,
       chaosEnabled: true,
       sensitivity: 1.3,
       reverbWet: 0.32,
@@ -57,7 +57,7 @@ export const DEFAULT_PLAYLIST = [
       selectedEra: 'lynchian_interzone',
       selectedRube: 'strangelet_event',
       bpm: 105,
-      chaosLevel: 0.45,
+      chaosLevel: 0.10,
       chaosEnabled: true,
       sensitivity: 1.15,
       reverbWet: 0.38,
@@ -87,7 +87,7 @@ export const DEFAULT_PLAYLIST = [
       selectedStyle: 'dmt_breakthrough',
       selectedEra: '2020_cyber',
       bpm: 128,
-      chaosLevel: 0.45,
+      chaosLevel: 0.10,
       chaosEnabled: true,
       sensitivity: 1.2,
       reverbWet: 0.35,
@@ -272,7 +272,7 @@ export default function App() {
   const lastEraChangeTimeRef = useRef(0);
   const [selectedStyle, setSelectedStyle] = useState('lsd_acid_melt');
   const [selectedRube,  setSelectedRube]  = useState('strangelet_event');
-  const [chaosLevel,    setChaosLevel]    = useState(0.45);
+  const [chaosLevel,    setChaosLevel]    = useState(0.10);
   const [rubeDecay,     setRubeDecay]     = useState(800);
   const [trackTitle,    setTrackTitle]    = useState('Excavating Neverland by The Magic Static Society');
 

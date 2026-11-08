@@ -1452,13 +1452,17 @@ export function CanvasWorkspace({
 
     const bass = Number(audioSignals.bass) || 0;
     const mid = Number(audioSignals.mid) || 0;
-    const chaosJitter = chaosLevel > 0 ? (Math.random() - 0.5) * chaosLevel * 10 : 0;
+    // Smooth organic breathing sway instead of harsh white-noise jitter
+    const t = Date.now() * 0.0018;
+    const chaosDrift = chaosLevel > 0
+      ? (Math.sin(t * 0.7) * 0.6 + Math.cos(t * 1.3) * 0.4) * (chaosLevel * 1.8)
+      : 0;
 
     let scale = 1 + bass * 0.1 + (chaosLevel > 0 ? chaosLevel * 0.05 : 0);
     if (chromaticPunch && audioSignals?.isTransient && bass > 0.35) {
       scale *= 1.08;
     }
-    let rotate = (mid - 0.5) * 3 + chaosJitter;
+    let rotate = (mid - 0.5) * 1.8 + chaosDrift;
     let translateY = 0;
 
     if (rubeVisuals.tiltAngle) {
@@ -1471,10 +1475,10 @@ export function CanvasWorkspace({
       scale *= rubeVisuals.dollyScale;
     }
     if (rubeStage === 2) {
-      rotate += Math.sin(Date.now() * 0.01) * 4;
+      rotate += Math.sin(Date.now() * 0.003) * 1.5;
     }
     if (rubeStage === 3) {
-      rotate += Math.sin(Date.now() * 0.02) * 2;
+      rotate += Math.sin(Date.now() * 0.006) * 1.0;
     }
 
     const tvCollapse = rubeVisuals.tvCollapse || 0;
@@ -1687,7 +1691,7 @@ export function CanvasWorkspace({
       display: 'block',
       filter: composedFilter,
       opacity: rubeVisuals.opacityBleed,
-      transition: chaosLevel > 0 || !isPlaying ? 'none' : 'filter 0.15s ease',
+      transition: !isPlaying ? 'none' : 'filter 0.15s ease',
       mixBlendMode: styleExtras.mixBlendMode,
       ...splitStyle,
       ...styleExtras,
@@ -2080,7 +2084,7 @@ export function CanvasWorkspace({
               alignItems: 'center',
               justifyContent: 'center',
               transform: getTransform(),
-              transition: chaosLevel > 0 || !isPlaying ? 'none' : 'transform 0.08s ease-out',
+              transition: !isPlaying ? 'none' : 'transform 0.12s ease-out',
               filter: liquidWarpEnabled ? 'url(#liquid-warp-filter)' : undefined,
             }}>
               {renderWithKaleidoscope(renderActiveMediaContent())}
