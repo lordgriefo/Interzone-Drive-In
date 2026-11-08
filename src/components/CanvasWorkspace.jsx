@@ -561,7 +561,22 @@ export function CanvasWorkspace({
   }, [advanceSlide, bpm]);
 
     // Era filter — applied at container level so it blankets ALL content in the viewport
-  const getEraFilter = () => ERA_FILTER_MAP[activeEra] || ERA_FILTER_MAP.default;
+  // Era filter — blankets ALL content in the viewport with smooth cross-dissolve
+  const getEraFilter = () => {
+    if (activeEra === '1902_melies') {
+      // Dynamic Méliès Hand-Tint Bath Cycle:
+      // Smoothly cycles every 15s through:
+      // 1. Amber Sepia (Laboratory & Earth)
+      // 2. Emerald Jade (Lunar Jungle & Alchemical Grove)
+      // 3. Cobalt Cyan (Starlight & Selenite Night)
+      // 4. Crimson Rose (Royal Palace & Solar Flare)
+      const sec = Math.floor((currentTime || 0) / 15) % 4;
+      const tints = [-15, 65, 165, 295];
+      const hue = tints[sec];
+      return `saturate(2.0) contrast(1.4) sepia(0.6) hue-rotate(${hue}deg) brightness(1.1)`;
+    }
+    return ERA_FILTER_MAP[activeEra] || ERA_FILTER_MAP.default;
+  };
 
   // Image-level filter — envelope (beat-reactive contrast/brightness) + rube visual overrides
   // Era filter is NOT included here; it lives on the container div above
@@ -2076,6 +2091,7 @@ export function CanvasWorkspace({
             width: '100%',
             height: '100%',
             filter: getEraFilter(),
+            transition: 'filter 1.2s ease',
           }}>
             <div style={{
               width: '100%',

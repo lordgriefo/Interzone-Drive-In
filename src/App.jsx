@@ -37,7 +37,7 @@ export const DEFAULT_PLAYLIST = [
     duration: 310,
     preset: {
       selectedStyle: 'lsd_acid_melt',
-      selectedEra: 'lynchian_interzone',
+      selectedEra: '1902_melies',
       selectedRube: 'strangelet_event',
       bpm: 120,
       chaosLevel: 0.10,
@@ -54,7 +54,7 @@ export const DEFAULT_PLAYLIST = [
     duration: 338,
     preset: {
       selectedStyle: 'third_mind',
-      selectedEra: 'lynchian_interzone',
+      selectedEra: '1902_melies',
       selectedRube: 'strangelet_event',
       bpm: 105,
       chaosLevel: 0.10,
@@ -266,7 +266,7 @@ export default function App() {
   });
 
   // ── FX / era state ──
-  const [selectedEra,   setSelectedEra]   = useState('lynchian_interzone');
+  const [selectedEra,   setSelectedEra]   = useState('1902_melies');
   const [isEraLocked,   setIsEraLocked]   = useState(false);
   const [eraChangeCooldown, setEraChangeCooldown] = useState(8000); // 8000ms default
   const lastEraChangeTimeRef = useRef(0);
