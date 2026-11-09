@@ -11,15 +11,14 @@ export function InterzoneDriveInTheater({
 }) {
   // 'gate' (box office / entry) or 'lot' (parked in the desert watching screen)
   const [driveInView, setDriveInView] = useState('gate');
-  // 'feature' or 'ufo_broll' or 'malibu_flight'
+  // 'feature' | 'ufo_broll' | 'hey_books'
   const [screenChannel, setScreenChannel] = useState('feature');
   const [malibuFlying, setMalibuFlying] = useState(false);
-  const [speakerVolume, setSpeakerVolume] = useState(0.85);
 
   const bass = Number(audioSignals?.bass) || 0;
   const isTransient = Boolean(audioSignals?.isTransient);
 
-  // Auto-reset flying state after acceleration clip finishes (~10s)
+  // Auto-reset flying state after acceleration clip finishes (~11s)
   useEffect(() => {
     if (malibuFlying) {
       const timer = setTimeout(() => {
@@ -293,7 +292,7 @@ export function InterzoneDriveInTheater({
                   textShadow: '0 0 8px rgba(0, 229, 255, 0.6)',
                 }}
               >
-                HIGH DESERT HIGHWAY 66 · VEGAS UFOS · REPO MAN MALIBU · ARCHON WORMHOLES
+                HIGH DESERT HIGHWAY 66 · VEGAS UFOS · REPO MAN MALIBU · HEY BOOKS
               </div>
             </div>
 
@@ -326,12 +325,12 @@ export function InterzoneDriveInTheater({
               DRIVE IN: ENTER THEATER LOT ➔
             </button>
 
-            {/* ── TICKET BOOTH SUITE LAUNCHERS ── */}
+            {/* ── TICKET BOOTH SUITE LAUNCHERS & LOCAL SPONSOR ── */}
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                gap: 18,
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: 16,
                 width: '100%',
               }}
             >
@@ -339,7 +338,7 @@ export function InterzoneDriveInTheater({
               <div
                 onClick={onSwitchToStudio}
                 style={{
-                  padding: 20,
+                  padding: 18,
                   backgroundColor: 'rgba(15, 15, 30, 0.82)',
                   borderRadius: 6,
                   border: '1px solid rgba(255, 107, 0, 0.4)',
@@ -357,11 +356,45 @@ export function InterzoneDriveInTheater({
                 }}
               >
                 <div style={{ fontSize: 20, marginBottom: 6 }}>🎬</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 11, fontWeight: 700, color: '#ff6b00' }}>
+                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#ff6b00' }}>
                   SONG CHOREOGRAPHY STUDIO
                 </div>
-                <div style={{ fontSize: 10, color: '#a1a1aa', marginTop: 4, lineHeight: 1.5 }}>
-                  The full multi-track timeline, beat-synced editing cuts, lyric marquee, and audio-reactive VJ engine.
+                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 4, lineHeight: 1.4 }}>
+                  The multi-track timeline, beat-synced cutting, puppet slots, and audio-reactive VJ engine.
+                </div>
+              </div>
+
+              {/* Hey Books Sponsor Card */}
+              <div
+                onClick={() => {
+                  setDriveInView('lot');
+                  setScreenChannel('hey_books');
+                }}
+                style={{
+                  padding: 18,
+                  backgroundColor: 'rgba(25, 15, 30, 0.85)',
+                  borderRadius: 6,
+                  border: '1px solid rgba(244, 63, 94, 0.5)',
+                  boxShadow: '0 0 12px rgba(244, 63, 94, 0.25)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'border-color 0.2s, transform 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#f43f5e';
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(244, 63, 94, 0.5)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div style={{ fontSize: 20, marginBottom: 6 }}>📚</div>
+                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#f43f5e' }}>
+                  HEY BOOKS · SAN DIEGO
+                </div>
+                <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                  Official drive-in sponsor! Matthew's bookstore of rare, occult, & unusual folios. Watch Intermission Ad ➔
                 </div>
               </div>
 
@@ -371,7 +404,7 @@ export function InterzoneDriveInTheater({
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  padding: 20,
+                  padding: 18,
                   backgroundColor: 'rgba(15, 15, 30, 0.82)',
                   borderRadius: 6,
                   border: '1px solid rgba(0, 229, 255, 0.4)',
@@ -389,11 +422,11 @@ export function InterzoneDriveInTheater({
                 }}
               >
                 <div style={{ fontSize: 20, marginBottom: 6 }}>🧵</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 11, fontWeight: 700, color: '#00e5ff' }}>
+                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#00e5ff' }}>
                   STRANGELET STITCH
                 </div>
-                <div style={{ fontSize: 10, color: '#a1a1aa', marginTop: 4, lineHeight: 1.5 }}>
-                  Dual-bay generative music video orchestrator, AI stitcher & DJ Fact Card transmitter. (Port 8765)
+                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 4, lineHeight: 1.4 }}>
+                  Dual-bay generative music video orchestrator & DJ Fact Cards (Port 8765).
                 </div>
               </a>
 
@@ -403,7 +436,7 @@ export function InterzoneDriveInTheater({
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  padding: 20,
+                  padding: 18,
                   backgroundColor: 'rgba(15, 15, 30, 0.82)',
                   borderRadius: 6,
                   border: '1px solid rgba(57, 255, 20, 0.4)',
@@ -421,11 +454,11 @@ export function InterzoneDriveInTheater({
                 }}
               >
                 <div style={{ fontSize: 20, marginBottom: 6 }}>🧪</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 11, fontWeight: 700, color: '#39ff14' }}>
+                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#39ff14' }}>
                   STRANGELET LAB
                 </div>
-                <div style={{ fontSize: 10, color: '#a1a1aa', marginTop: 4, lineHeight: 1.5 }}>
-                  The research lab, lyric graph networks, D3 visualizer, and GenAI experiment console. (Port 8081)
+                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 4, lineHeight: 1.4 }}>
+                  The research lab, lyric graph networks, D3 visualizer, and GenAI console (Port 8081).
                 </div>
               </a>
             </div>
@@ -441,7 +474,7 @@ export function InterzoneDriveInTheater({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            padding: '20px 16px 40px',
+            padding: '16px 16px 40px',
             position: 'relative',
           }}
         >
@@ -449,13 +482,13 @@ export function InterzoneDriveInTheater({
           <div
             style={{
               width: '100%',
-              maxWidth: 1080,
+              maxWidth: 1040,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: 16,
+              marginBottom: 14,
               flexWrap: 'wrap',
-              gap: 12,
+              gap: 10,
             }}
           >
             <button
@@ -465,8 +498,8 @@ export function InterzoneDriveInTheater({
                 color: '#fff',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 borderRadius: 4,
-                padding: '6px 14px',
-                fontSize: 10,
+                padding: '5px 12px',
+                fontSize: 9.5,
                 fontFamily: "'Syncopate', sans-serif",
                 cursor: 'pointer',
               }}
@@ -475,8 +508,8 @@ export function InterzoneDriveInTheater({
             </button>
 
             {/* Screen Channel Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, color: '#71717a', textTransform: 'uppercase' }}>Drive-In Screen:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 9, color: '#71717a', textTransform: 'uppercase' }}>Screen:</span>
               <button
                 onClick={() => setScreenChannel('feature')}
                 style={{
@@ -484,8 +517,8 @@ export function InterzoneDriveInTheater({
                   color: screenChannel === 'feature' ? '#000' : '#fff',
                   border: '1px solid #ff6b00',
                   borderRadius: 3,
-                  padding: '5px 12px',
-                  fontSize: 10,
+                  padding: '4px 10px',
+                  fontSize: 9.5,
                   fontWeight: 700,
                   cursor: 'pointer',
                 }}
@@ -499,13 +532,28 @@ export function InterzoneDriveInTheater({
                   color: screenChannel === 'ufo_broll' ? '#000' : '#fff',
                   border: '1px solid #00e5ff',
                   borderRadius: 3,
-                  padding: '5px 12px',
-                  fontSize: 10,
+                  padding: '4px 10px',
+                  fontSize: 9.5,
                   fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >
                 SCREEN 2: 1960s VEGAS UFO B-ROLL
+              </button>
+              <button
+                onClick={() => setScreenChannel('hey_books')}
+                style={{
+                  background: screenChannel === 'hey_books' ? '#f43f5e' : 'rgba(20,20,35,0.8)',
+                  color: screenChannel === 'hey_books' ? '#000' : '#f43f5e',
+                  border: '1px solid #f43f5e',
+                  borderRadius: 3,
+                  padding: '4px 10px',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                SCREEN 3: 📚 HEY BOOKS AD
               </button>
             </div>
 
@@ -519,10 +567,10 @@ export function InterzoneDriveInTheater({
                 color: malibuFlying ? '#000' : '#39ff14',
                 border: '1px solid #39ff14',
                 borderRadius: 4,
-                padding: '6px 16px',
+                padding: '5px 14px',
                 fontFamily: "'Syncopate', sans-serif",
                 fontWeight: 800,
-                fontSize: 10,
+                fontSize: 9.5,
                 letterSpacing: 1.5,
                 cursor: 'pointer',
                 boxShadow: malibuFlying ? '0 0 25px #39ff14' : 'none',
@@ -558,6 +606,90 @@ export function InterzoneDriveInTheater({
                 playsInline
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
+            ) : screenChannel === 'hey_books' ? (
+              /* Screen 3: Hey Books Intermission Trailer */
+              <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
+                <video
+                  src="./assets-bg/puppet-man/Puppet_man_overseeing_glowing_books_202608202034.mp4"
+                  autoPlay
+                  loop
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: 'contrast(1.3) saturate(1.4)',
+                  }}
+                />
+                {/* Hey Books Intermission Ad Overlay */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '24px 32px',
+                    background: 'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, transparent 40%, rgba(0,0,0,0.88) 100%)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span
+                      style={{
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontSize: 10,
+                        letterSpacing: 4,
+                        color: '#f43f5e',
+                        fontWeight: 700,
+                        textShadow: '0 0 10px #f43f5e',
+                      }}
+                    >
+                      ★ LOCAL DRIVE-IN INTERMISSION SPONSOR ★
+                    </span>
+                    <span style={{ fontSize: 10, color: '#fbbf24', letterSpacing: 2 }}>SAN DIEGO, CA</span>
+                  </div>
+
+                  <div>
+                    <h2
+                      style={{
+                        margin: 0,
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        fontSize: 'clamp(2rem, 5vw, 4rem)',
+                        letterSpacing: 8,
+                        color: '#fff',
+                        textShadow: '0 0 20px rgba(244, 63, 94, 0.9), 0 0 40px rgba(0,0,0,0.9)',
+                        lineHeight: 1,
+                      }}
+                    >
+                      HEY BOOKS
+                    </h2>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: '#fbbf24',
+                        letterSpacing: 3,
+                        marginTop: 4,
+                        textShadow: '0 1px 4px #000',
+                        fontWeight: 700,
+                      }}
+                    >
+                      SAN DIEGO · SANCTUARY OF RARE, STRANGE, & OCCULT BOOKS
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        color: '#e4e4e7',
+                        marginTop: 6,
+                        lineHeight: 1.5,
+                        maxWidth: 620,
+                      }}
+                    >
+                      Matthew's haven of glowing occult texts, vintage pulp, rare paperbacks, and curiosities. Stop in and explore the archives before the Repo Man Malibu takes off!
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : screenChannel === 'ufo_broll' ? (
               /* Screen 2: 1960s Vegas UFO B-roll footage */
               <video
