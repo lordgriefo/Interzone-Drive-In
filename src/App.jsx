@@ -13,6 +13,7 @@ import { AppProvider }        from './AppContext';
 import { AssetBin }           from './components/AssetBin';
 import { FXConsole }          from './components/FXConsole';
 import { InterzoneFrame }     from './components/InterZoneFrame';
+import { InterzoneDriveInTheater } from './components/InterzoneDriveInTheater';
 import { MultiTrackTimeline } from './components/MultiTrackTimeline';
 import { CanvasWorkspace }    from './components/CanvasWorkspace';
 import { TransportBar }       from './components/TransportBar';
@@ -224,6 +225,7 @@ export default function App() {
 
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('drivein');
 
   // ── Cinema Mode: hides panels + goes fullscreen for clean viewport recording ──
   const [cinemaMode, setCinemaMode] = useState(false);
@@ -1142,6 +1144,18 @@ export default function App() {
         position: 'relative',
       }}>
 
+        {activeTab === 'drivein' ? (
+          <InterzoneDriveInTheater
+            onSwitchToStudio={() => setActiveTab('studio')}
+            currentTrackTitle={trackTitle}
+            isPlaying={isPlaying}
+            onTogglePlay={togglePlayPause}
+            audioSignals={audioSignals}
+            playlist={playlist}
+            onSelectTrack={(entry) => handlePlayTrack(entry, playlist.findIndex((p) => p.id === entry.id))}
+          />
+        ) : (
+          <>
         {!cinemaMode && (
           <AssetBin
           assets={assets}
@@ -1171,6 +1185,8 @@ export default function App() {
         )}
 
         <InterzoneFrame
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
           onResetProject={handleResetProject}
           cinemaMode={cinemaMode}
           onToggleCinema={handleToggleCinema}
@@ -1434,6 +1450,8 @@ export default function App() {
           lyricAnim={lyricAnim}
           setLyricAnim={setLyricAnim}
         />
+        )}
+          </>
         )}
 
         <ExportModal

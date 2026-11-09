@@ -12,7 +12,7 @@ const TIMELINE_MAX_H = 600;
 const TIMELINE_DEFAULT_H = 240;
 const TIMELINE_COLLAPSED_H = 30;
 
-export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none', onToggleCinema = null, cinemaMode = false }) {
+export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none', onToggleCinema = null, cinemaMode = false, activeTab = 'studio', onTabChange = () => {} }) {
   const [timelineHeight, setTimelineHeight] = useState(TIMELINE_DEFAULT_H);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -269,35 +269,63 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
             }}
           />
 
-          {/* Main banner */}
+          {/* Main banner & Suite Tab Switcher */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             lineHeight: 1,
           }}>
-            <h1 style={{
-              margin: 0,
-              fontFamily: "'Bebas Neue', var(--font-mono)",
-              fontSize: 'clamp(1.2rem, 2.6vw, 1.65rem)',
-              letterSpacing: '10px',
-              color: 'var(--accent-orange)',
-              textShadow: '0 0 18px var(--accent-orange-glow), 0 0 36px rgba(255,107,0,0.22)',
-              textTransform: 'uppercase',
-              fontWeight: 'normal',
-            }}>
-              INTERZONE DRIVE-IN
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <button
+                onClick={() => onTabChange && onTabChange('drivein')}
+                style={{
+                  background: activeTab === 'drivein' ? 'linear-gradient(90deg, #ff6b00, #ff8800)' : 'rgba(20, 20, 35, 0.75)',
+                  color: activeTab === 'drivein' ? '#000' : '#ff6b00',
+                  border: '1px solid #ff6b00',
+                  borderRadius: 4,
+                  padding: '4px 12px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 9.5,
+                  letterSpacing: 2,
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'drivein' ? '0 0 14px rgba(255,107,0,0.8)' : 'none',
+                  transition: 'all 0.15s',
+                }}
+              >
+                🛸 INTERZONE DRIVE-IN
+              </button>
+
+              <button
+                onClick={() => onTabChange && onTabChange('studio')}
+                style={{
+                  background: activeTab === 'studio' ? 'linear-gradient(90deg, #00e5ff, #00b0ff)' : 'rgba(20, 20, 35, 0.75)',
+                  color: activeTab === 'studio' ? '#000' : '#00e5ff',
+                  border: '1px solid #00e5ff',
+                  borderRadius: 4,
+                  padding: '4px 12px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 9.5,
+                  letterSpacing: 2,
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'studio' ? '0 0 14px rgba(0,229,255,0.8)' : 'none',
+                  transition: 'all 0.15s',
+                }}
+              >
+                🎬 CHOREOGRAPHY STUDIO
+              </button>
+            </div>
             <div style={{
               fontFamily: "'Syncopate', var(--font-mono)",
-              fontSize: 'clamp(0.42rem, 0.95vw, 0.56rem)',
-              letterSpacing: '6px',
-              color: 'var(--accent-blue)',
-              textShadow: '0 0 10px var(--accent-blue-glow)',
-              marginTop: 4,
+              fontSize: 'clamp(0.40rem, 0.85vw, 0.50rem)',
+              letterSpacing: '5px',
+              color: 'var(--accent-orange)',
+              opacity: 0.85,
               fontWeight: 700,
             }}>
-              THE STRANGELET · KenetiCut
+              THE STRANGELET · KenetiCut Suite
             </div>
           </div>
 
