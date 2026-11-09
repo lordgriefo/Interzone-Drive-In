@@ -1,0 +1,46 @@
+[
+  {
+    "id": "reel-001",
+    "title": "Annunaki-d Lunch (Interzone Cut)",
+    "creator": "@matthew_heybooks",
+    "preset": "1970 Grindhouse · LSD Acid Melt",
+    "audioTrack": "Archon — Strangelet",
+    "videoUrl": "./assets-bg/puppet-man/Puppet_man_dancing_on_stage_202608202035.mp4",
+    "description": "Burroughs typewriters meet Sumerian sky watchers in North Park San Diego.",
+    "runtime": "03:34",
+    "upvotes": 42
+  },
+  {
+    "id": "reel-002",
+    "title": "Reform School Archon Girls",
+    "creator": "@repo_drifter",
+    "preset": "1902 Méliès Hand-Tint · Strangelet Event",
+    "audioTrack": "High Roller — MonoAtomiX",
+    "videoUrl": "./assets-bg/drive-in/Chevy_Malibu_parked_at_drive-in_202608202035.mp4",
+    "description": "Detention in the 4th dimension. Hot neon, chrome bumpers, and astral jailbreaks.",
+    "runtime": "03:30",
+    "upvotes": 67
+  },
+  {
+    "id": "reel-003",
+    "title": "The Radioactive Malibu Stomp",
+    "creator": "@otto_paranoia",
+    "preset": "2020 Cyber · Apple Kinetic",
+    "audioTrack": "Wait Till You SEE It — The Magic Static Society",
+    "videoUrl": "./assets-bg/drive-in/Malibu_accelerates_into_cosmic_v._202608202035.mp4",
+    "description": "Alex Cox cosmic acceleration remix. You don't look in the trunk, you just hit hyperdrive.",
+    "runtime": "05:56",
+    "upvotes": 89
+  },
+  {
+    "id": "reel-004",
+    "title": "Night Window at Hey Books",
+    "creator": "@san_diego_nocturne",
+    "preset": "Lynchian Interzone · Cathode Burn",
+    "audioTrack": "Thelema Mountain — 'O' Shibboleth",
+    "videoUrl": "./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4",
+    "description": "Late night North Park rare book browsing while UFOs cross over the Pacific.",
+    "runtime": "04:40",
+    "upvotes": 53
+  }
+]

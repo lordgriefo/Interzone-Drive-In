@@ -1,4 +1,53 @@
 import React, { useState, useRef, useEffect } from 'react';
+import communityReelData from '../constants/communityReel.json';
+
+export const FAKE_MARQUEE_MOVIES = [
+  {
+    feature1: "REFORM SCHOOL ARCHON GIRLS",
+    feature2: "HOT NEON & ROSWELL CHROME",
+    tagline: "Detention in the 4th Dimension! Bad girls, rayguns, and hotrod astral jailbreaks!",
+    rating: "RATED XXX (EXTRATERRESTRIAL)",
+    snackSpecial: "CONCESSION STAND: ASTRAL NACHOS & MESCALINE MALTS",
+    posterGlow: '#ff0055',
+    neonColor: '#ff2d75',
+  },
+  {
+    feature1: "ANNUNAKI-D LUNCH",
+    feature2: "EXTERMINATE ALL RATIONAL THOUGHT",
+    tagline: "William S. Burroughs meets the Sumerian Sky Reptilians at the Mojave Diner!",
+    rating: "RATED NC-666",
+    snackSpecial: "INTERZONE SPECIAL: CENTIPEDE BURGERS & RADIOACTIVE SLUSHIES",
+    posterGlow: '#39ff14',
+    neonColor: '#39ff14',
+  },
+  {
+    feature1: "THE 1964 RADIOACTIVE MALIBU",
+    feature2: "DON'T LOOK IN THE TRUNK!",
+    tagline: "It's got four wheels, 400 horsepower, and it flies straight through the time-space continuum!",
+    rating: "APPROVED BY OTTO (REPO CODE #7)",
+    snackSpecial: "REPO SPECIAL: PURE BLINDING WHITE LIGHT CORN DOGS",
+    posterGlow: '#00e5ff',
+    neonColor: '#00e5ff',
+  },
+  {
+    feature1: "ATTACK OF THE 50-FOOT THELEMITE",
+    feature2: "BABALON WORKING: VEGAS OVERCLOCK",
+    tagline: "Do what thou wilt shall be the whole of the lawness! Archons take cover!",
+    rating: "MAGICK IN CINEMASCOPE",
+    snackSpecial: "CONCESSION STAND: ABBEY OF THELEMA POPCORN & ABSINTHE FIZZ",
+    posterGlow: '#c084fc',
+    neonColor: '#c084fc',
+  },
+  {
+    feature1: "THE ARCHON OVERCLOCKERS",
+    feature2: "NIGHT OF THE DEMONIC AREA 51 CHILDREN",
+    tagline: "They crashed the 1966 Vegas Strip... and now they run the slot machines!",
+    rating: "B-ROLL DELIRIUM",
+    snackSpecial: "HIGH ROLLER SPECIAL: MONOATOMIC COLD BREW & GLOWING DICE",
+    posterGlow: '#eab308',
+    neonColor: '#eab308',
+  },
+];
 
 export function InterzoneDriveInTheater({
   onSwitchToStudio,
@@ -11,12 +60,22 @@ export function InterzoneDriveInTheater({
 }) {
   // 'gate' (box office / entry) or 'lot' (parked in the desert watching screen)
   const [driveInView, setDriveInView] = useState('gate');
-  // 'feature' | 'ufo_broll' | 'hey_books'
+  // 'feature' | 'ufo_broll' | 'hey_books' | 'community_reel'
   const [screenChannel, setScreenChannel] = useState('feature');
   const [malibuFlying, setMalibuFlying] = useState(false);
 
+  // Marquee movie cycling
+  const [marqueeIndex, setMarqueeIndex] = useState(0);
+
+  // Community Reel cycling & modal
+  const [communityIndex, setCommunityIndex] = useState(0);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+
   const bass = Number(audioSignals?.bass) || 0;
   const isTransient = Boolean(audioSignals?.isTransient);
+
+  const currentMarquee = FAKE_MARQUEE_MOVIES[marqueeIndex % FAKE_MARQUEE_MOVIES.length];
+  const currentCommunityCut = communityReelData[communityIndex % communityReelData.length];
 
   // Auto-reset flying state after acceleration clip finishes (~11s)
   useEffect(() => {
@@ -27,6 +86,10 @@ export function InterzoneDriveInTheater({
       return () => clearTimeout(timer);
     }
   }, [malibuFlying]);
+
+  const handleRollMarquee = () => {
+    setMarqueeIndex((prev) => (prev + 1) % FAKE_MARQUEE_MOVIES.length);
+  };
 
   return (
     <div
@@ -245,54 +308,175 @@ export function InterzoneDriveInTheater({
               textAlign: 'center',
             }}
           >
-            {/* Flashing Neon Roadside Sign */}
+            {/* Flashing Neon Roadside Marquee with Fake B-Movie Double Feature */}
             <div
               style={{
-                padding: '24px 36px',
+                padding: '24px 32px',
                 borderRadius: 8,
-                backgroundColor: 'rgba(10, 10, 22, 0.88)',
-                border: '2px solid #ff6b00',
-                boxShadow: `0 0 ${20 + bass * 30}px rgba(255, 107, 0, 0.7), inset 0 0 20px rgba(255, 107, 0, 0.25)`,
-                marginBottom: 28,
+                backgroundColor: 'rgba(10, 10, 22, 0.92)',
+                border: `2px solid ${currentMarquee.neonColor}`,
+                boxShadow: `0 0 ${20 + bass * 35}px ${currentMarquee.posterGlow}, inset 0 0 25px rgba(0,0,0,0.8)`,
+                marginBottom: 24,
+                width: '100%',
+                maxWidth: 880,
+                transition: 'border-color 0.4s, box-shadow 0.4s',
               }}
             >
               <div
                 style={{
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontSize: 11,
-                  letterSpacing: 6,
-                  color: '#39ff14',
-                  textShadow: '0 0 10px #39ff14',
-                  marginBottom: 8,
-                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 10,
+                  flexWrap: 'wrap',
+                  gap: 8,
                 }}
               >
-                ⚡ NOW SHOWING: INTERDIMENSIONAL DOUBLE FEATURE ⚡
+                <div
+                  style={{
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontSize: 10,
+                    letterSpacing: 4,
+                    color: currentMarquee.neonColor,
+                    textShadow: `0 0 10px ${currentMarquee.neonColor}`,
+                    fontWeight: 700,
+                  }}
+                >
+                  ⚡ NOW SHOWING: INTERDIMENSIONAL DOUBLE FEATURE ⚡
+                </div>
+                <div
+                  style={{
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontSize: 9,
+                    letterSpacing: 2,
+                    color: '#fbbf24',
+                    background: 'rgba(251, 191, 36, 0.15)',
+                    padding: '3px 8px',
+                    borderRadius: 3,
+                    border: '1px solid rgba(251, 191, 36, 0.4)',
+                  }}
+                >
+                  {currentMarquee.rating}
+                </div>
               </div>
+
+              {/* Main Feature 1 Title */}
               <h1
                 style={{
-                  margin: 0,
+                  margin: '4px 0',
                   fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-                  letterSpacing: 12,
-                  color: '#ff6b00',
-                  textShadow: '0 0 25px rgba(255, 107, 0, 0.9), 0 0 50px rgba(255, 107, 0, 0.5)',
+                  fontSize: 'clamp(2.4rem, 6vw, 4.4rem)',
+                  letterSpacing: 8,
+                  color: '#fff',
+                  textShadow: `0 0 20px ${currentMarquee.neonColor}, 0 0 40px rgba(0,0,0,0.9)`,
                   lineHeight: 1,
                 }}
               >
-                INTERZONE DRIVE-IN
+                {currentMarquee.feature1}
               </h1>
+
+              {/* Feature 2 Subtitle */}
+              <div
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: 'clamp(1.4rem, 3.5vw, 2.2rem)',
+                  color: currentMarquee.neonColor,
+                  letterSpacing: 5,
+                  textShadow: `0 0 12px ${currentMarquee.neonColor}`,
+                  marginTop: 2,
+                }}
+              >
+                ★ PLUS CO-FEATURE: {currentMarquee.feature2} ★
+              </div>
+
+              {/* B-Movie Tagline */}
               <div
                 style={{
                   fontFamily: "'Space Mono', monospace",
-                  fontSize: 12,
-                  color: '#00e5ff',
-                  letterSpacing: 3,
+                  fontSize: 11.5,
+                  color: '#e4e4e7',
+                  letterSpacing: 1.5,
                   marginTop: 10,
-                  textShadow: '0 0 8px rgba(0, 229, 255, 0.6)',
+                  fontStyle: 'italic',
                 }}
               >
-                HIGH DESERT HIGHWAY 66 · VEGAS UFOS · REPO MAN MALIBU · HEY BOOKS
+                "{currentMarquee.tagline}"
+              </div>
+
+              {/* Concession Stand Special */}
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '6px 12px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  borderRadius: 4,
+                  border: '1px dashed rgba(255, 255, 255, 0.25)',
+                  fontSize: 9.5,
+                  color: '#fbbf24',
+                  letterSpacing: 2,
+                }}
+              >
+                🍿 {currentMarquee.snackSpecial}
+              </div>
+
+              {/* Marquee Cycle & Randomizer Controls */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 12,
+                  marginTop: 14,
+                }}
+              >
+                <button
+                  onClick={() =>
+                    setMarqueeIndex((prev) => (prev - 1 + FAKE_MARQUEE_MOVIES.length) % FAKE_MARQUEE_MOVIES.length)
+                  }
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 3,
+                    padding: '4px 10px',
+                    fontSize: 9,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ◀ PREV BILL
+                </button>
+                <button
+                  onClick={handleRollMarquee}
+                  style={{
+                    background: `linear-gradient(90deg, ${currentMarquee.neonColor}, #ff8800)`,
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: 3,
+                    padding: '5px 14px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontWeight: 800,
+                    fontSize: 9.5,
+                    letterSpacing: 1.5,
+                    cursor: 'pointer',
+                    boxShadow: `0 0 14px ${currentMarquee.posterGlow}`,
+                  }}
+                >
+                  🎲 ROLL NEW FAKE B-MOVIE MARQUEE
+                </button>
+                <button
+                  onClick={handleRollMarquee}
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 3,
+                    padding: '4px 10px',
+                    fontSize: 9,
+                    cursor: 'pointer',
+                  }}
+                >
+                  NEXT BILL ▶
+                </button>
               </div>
             </div>
 
@@ -329,7 +513,7 @@ export function InterzoneDriveInTheater({
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
                 gap: 16,
                 width: '100%',
               }}
@@ -395,6 +579,40 @@ export function InterzoneDriveInTheater({
                 </div>
                 <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
                   Official drive-in sponsor! Matthew's bookstore of rare, occult, & unusual folios. Watch Intermission Ad ➔
+                </div>
+              </div>
+
+              {/* Community Reel Card */}
+              <div
+                onClick={() => {
+                  setDriveInView('lot');
+                  setScreenChannel('community_reel');
+                }}
+                style={{
+                  padding: 18,
+                  backgroundColor: 'rgba(20, 15, 35, 0.85)',
+                  borderRadius: 6,
+                  border: '1px solid rgba(168, 85, 247, 0.5)',
+                  boxShadow: '0 0 12px rgba(168, 85, 247, 0.25)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'border-color 0.2s, transform 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#c084fc';
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div style={{ fontSize: 20, marginBottom: 6 }}>📼</div>
+                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#c084fc' }}>
+                  COMMUNITY REEL SHOWCASE
+                </div>
+                <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                  Screen 4! Watch music videos made by the community using KenetiCut and Strangelet Stitch ➔
                 </div>
               </div>
 
@@ -555,6 +773,21 @@ export function InterzoneDriveInTheater({
               >
                 SCREEN 3: 📚 HEY BOOKS AD
               </button>
+              <button
+                onClick={() => setScreenChannel('community_reel')}
+                style={{
+                  background: screenChannel === 'community_reel' ? '#c084fc' : 'rgba(20,20,35,0.8)',
+                  color: screenChannel === 'community_reel' ? '#000' : '#c084fc',
+                  border: '1px solid #c084fc',
+                  borderRadius: 3,
+                  padding: '4px 10px',
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                SCREEN 4: 📼 COMMUNITY REEL
+              </button>
             </div>
 
             {/* Repo Man Flying Malibu Ignition Button */}
@@ -577,30 +810,30 @@ export function InterzoneDriveInTheater({
                 transition: 'all 0.2s',
               }}
             >
-              {malibuFlying ? '🛸 REPO MAN MALIBU: IN ORBIT' : '🛸 IGNITE FLYING MALIBU'}
+              {malibuFlying ? '🚀 MALIBU FLIGHT ACTIVE' : '🛸 IGNITE FLYING MALIBU'}
             </button>
           </div>
 
-          {/* ── THE GIANT DRIVE-IN THEATER SCREEN ── */}
+          {/* ── GIANT OUTDOOR DRIVE-IN SCREEN FRAME ── */}
           <div
             style={{
+              position: 'relative',
               width: '100%',
               maxWidth: 1040,
-              aspectRatio: '16/9',
-              backgroundColor: '#000',
+              aspectRatio: '16 / 9',
               borderRadius: 6,
-              border: '8px solid #181824',
-              boxShadow: `0 0 ${30 + bass * 40}px rgba(0, 229, 255, 0.25), 0 20px 60px rgba(0, 0, 0, 0.9)`,
-              position: 'relative',
               overflow: 'hidden',
-              marginBottom: 16,
+              border: '3px solid #1a1a2e',
+              boxShadow: `0 0 ${35 + bass * 45}px rgba(0, 229, 255, 0.4), 0 20px 60px rgba(0, 0, 0, 0.95)`,
+              marginBottom: 20,
+              backgroundColor: '#000',
             }}
           >
-            {/* Screen Content */}
+            {/* Screen Projection Content */}
             {malibuFlying ? (
-              /* Flying Malibu into cosmic void (Repo Man ending!) */
+              /* Repo Man Malibu Flying Acceleration Mode */
               <video
-                src="./assets-bg/drive-in/Malibu_accelerates_into_cosmic_v…_202608202035.mp4"
+                src="./assets-bg/drive-in/Malibu_accelerates_into_cosmic_v._202608202035.mp4"
                 autoPlay
                 loop
                 playsInline
@@ -690,6 +923,148 @@ export function InterzoneDriveInTheater({
                   </div>
                 </div>
               </div>
+            ) : screenChannel === 'community_reel' ? (
+              /* Screen 4: Community Reel Showcase */
+              <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
+                <video
+                  key={currentCommunityCut.id}
+                  src={currentCommunityCut.videoUrl}
+                  autoPlay
+                  loop
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: 'contrast(1.25) saturate(1.3)',
+                  }}
+                />
+
+                {/* Community Reel Lower-Third & Top Tag */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '20px 28px',
+                    background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 35%, rgba(0,0,0,0.85) 100%)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pointerEvents: 'auto' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span
+                        style={{
+                          fontFamily: "'Syncopate', sans-serif",
+                          fontSize: 9.5,
+                          letterSpacing: 3,
+                          color: '#c084fc',
+                          fontWeight: 700,
+                          textShadow: '0 0 10px #c084fc',
+                        }}
+                      >
+                        📼 COMMUNITY GUEST REEL
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          color: '#a1a1aa',
+                          background: 'rgba(255,255,255,0.1)',
+                          padding: '2px 8px',
+                          borderRadius: 3,
+                        }}
+                      >
+                        CUT {communityIndex + 1} OF {communityReelData.length}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => setShowSubmitModal(true)}
+                      style={{
+                        background: 'linear-gradient(90deg, #c084fc, #ff6b00)',
+                        color: '#000',
+                        border: 'none',
+                        borderRadius: 3,
+                        padding: '4px 10px',
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontWeight: 800,
+                        fontSize: 8.5,
+                        letterSpacing: 1,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🛸 SUBMIT YOUR CUT
+                    </button>
+                  </div>
+
+                  <div style={{ pointerEvents: 'auto' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, color: '#39ff14', fontWeight: 700, letterSpacing: 1.5 }}>
+                        NOW SCREENING:
+                      </span>
+                      <span style={{ fontSize: 10, color: '#fbbf24', letterSpacing: 1 }}>
+                        AUDIO: {currentCommunityCut.audioTrack}
+                      </span>
+                    </div>
+                    <h2
+                      style={{
+                        margin: 0,
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        fontSize: 'clamp(1.8rem, 4.5vw, 3.2rem)',
+                        letterSpacing: 6,
+                        color: '#fff',
+                        textShadow: '0 0 16px rgba(192, 132, 252, 0.9), 0 0 30px #000',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {currentCommunityCut.title}
+                    </h2>
+                    <div style={{ fontSize: 11, color: '#c084fc', marginTop: 4, fontWeight: 700 }}>
+                      CHOREOGRAPHED BY: {currentCommunityCut.creator} · PRESET: {currentCommunityCut.preset}
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#d4d4d8', marginTop: 4, maxWidth: 650 }}>
+                      "{currentCommunityCut.description}"
+                    </div>
+
+                    {/* Community Cut Stepper Controls */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                      <button
+                        onClick={() =>
+                          setCommunityIndex((prev) => (prev - 1 + communityReelData.length) % communityReelData.length)
+                        }
+                        style={{
+                          background: 'rgba(255,255,255,0.12)',
+                          color: '#fff',
+                          border: '1px solid rgba(255,255,255,0.3)',
+                          borderRadius: 3,
+                          padding: '3px 10px',
+                          fontSize: 9,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ◀ PREV GUEST CUT
+                      </button>
+                      <button
+                        onClick={() => setCommunityIndex((prev) => (prev + 1) % communityReelData.length)}
+                        style={{
+                          background: '#c084fc',
+                          color: '#000',
+                          border: 'none',
+                          borderRadius: 3,
+                          padding: '3px 12px',
+                          fontSize: 9,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        NEXT GUEST CUT ▶
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : screenChannel === 'ufo_broll' ? (
               /* Screen 2: 1960s Vegas UFO B-roll footage */
               <video
@@ -748,7 +1123,16 @@ export function InterzoneDriveInTheater({
                 <div style={{ fontSize: 8, color: '#39ff14', fontWeight: 800, letterSpacing: 1 }}>
                   WINDOW SPEAKER ACTIVE
                 </div>
-                <div style={{ fontSize: 9.5, color: '#fff', maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div
+                  style={{
+                    fontSize: 9.5,
+                    color: '#fff',
+                    maxWidth: 180,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
                   {currentTrackTitle || 'Transmission'}
                 </div>
               </div>
@@ -824,6 +1208,113 @@ export function InterzoneDriveInTheater({
                 ))}
               </select>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── COMMUNITY REEL SUBMISSION POPUP MODAL ── */}
+      {showSubmitModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+          onClick={() => setShowSubmitModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#0c0c18',
+              border: '2px solid #c084fc',
+              borderRadius: 8,
+              padding: '28px 32px',
+              maxWidth: 580,
+              width: '100%',
+              boxShadow: '0 0 35px rgba(192, 132, 252, 0.5)',
+              position: 'relative',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <span style={{ fontSize: 10, color: '#39ff14', fontWeight: 700, letterSpacing: 2 }}>
+                  INTERZONE COMMUNITY INGESTION
+                </span>
+                <h3
+                  style={{
+                    margin: '4px 0 10px',
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: 28,
+                    letterSpacing: 4,
+                    color: '#fff',
+                  }}
+                >
+                  BEAM YOUR CUT TO THE BIG SCREEN
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowSubmitModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#71717a',
+                  fontSize: 20,
+                  cursor: 'pointer',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p style={{ fontSize: 11, color: '#e4e4e7', lineHeight: 1.6, margin: '8px 0 16px' }}>
+              Did you choreograph a video in <strong>KenetiCut</strong> or generate a cut in <strong>Strangelet Stitch</strong>?
+              You can opt-in to have your creation screened right here on Screen 4 of the Interzone Drive-In!
+            </p>
+
+            <div
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.04)',
+                borderRadius: 6,
+                padding: '14px 16px',
+                fontSize: 10.5,
+                color: '#a1a1aa',
+                lineHeight: 1.6,
+                border: '1px solid rgba(255,255,255,0.1)',
+                marginBottom: 20,
+              }}
+            >
+              <div style={{ color: '#c084fc', fontWeight: 700, marginBottom: 4 }}>
+                HOW TO SUBMIT:
+              </div>
+              <div>1. In KenetiCut Studio or Stitch, export your finished WebM/MP4 video.</div>
+              <div>2. Check the <strong>"Beam to Interzone Drive-In"</strong> box on export.</div>
+              <div>3. Your cut is synced to the Cloudflare R2 / Google Drive community pool and queued for screening!</div>
+            </div>
+
+            <button
+              onClick={() => setShowSubmitModal(false)}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(90deg, #c084fc, #ff6b00)',
+                color: '#000',
+                border: 'none',
+                borderRadius: 4,
+                padding: '10px 20px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontWeight: 800,
+                fontSize: 11,
+                letterSpacing: 2,
+                cursor: 'pointer',
+              }}
+            >
+              GOT IT · READY TO CUT
+            </button>
           </div>
         </div>
       )}
