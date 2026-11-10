@@ -67,6 +67,7 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_wait_till_you_see_it',
     title: "Wait Till You SEE It — The Magic Static Society",
     url: './assets-bg/wait-till-you-see-it.mp3',
+    lrcUrl: './assets-bg/wait-till-you-see-it.lrc',
     duration: 356,
     preset: {
       selectedStyle: 'montage',
