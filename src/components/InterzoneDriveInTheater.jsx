@@ -566,7 +566,7 @@ export function InterzoneDriveInTheater({
                 </div>
               </div>
 
-              {/* Hey Books Sponsor Card */}
+              {/* Hey Books Scene Card */}
               <div
                 onClick={() => {
                   setDriveInView('lot');
@@ -596,7 +596,7 @@ export function InterzoneDriveInTheater({
                   HEY BOOKS · SAN DIEGO
                 </div>
                 <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                  Official drive-in sponsor! Matthew's bookstore of rare, occult, & unusual folios. Watch Intermission Ad ➔
+                  Matthew's neighborhood bookstore in North Park. Watch the late-night storefront scene ➔
                 </div>
               </div>
 
@@ -789,7 +789,7 @@ export function InterzoneDriveInTheater({
                   cursor: 'pointer',
                 }}
               >
-                SCREEN 3: 📚 HEY BOOKS AD
+                SCREEN 3: 📚 HEY BOOKS (SAN DIEGO)
               </button>
               <button
                 onClick={() => setScreenChannel('community_reel')}
@@ -858,10 +858,10 @@ export function InterzoneDriveInTheater({
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : screenChannel === 'hey_books' ? (
-              /* Screen 3: Hey Books Intermission Trailer */
+              /* Screen 3: Hey Books Storefront Scene */
               <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
                 <video
-                  src="./assets-bg/puppet-man/Puppet_man_overseeing_glowing_books_202608202034.mp4"
+                  src="./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4"
                   autoPlay
                   loop
                   playsInline
@@ -869,76 +869,83 @@ export function InterzoneDriveInTheater({
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    filter: 'contrast(1.3) saturate(1.4)',
+                    filter: 'contrast(1.15) saturate(1.2)',
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = "./assets-bg/puppet-man/Puppet_man_walking_past_bookstore_202608202034.mp4";
                   }}
                 />
-                {/* Hey Books Intermission Ad Overlay */}
+                {/* Store Logo in Background of Video */}
                 <div
                   style={{
                     position: 'absolute',
-                    inset: 0,
+                    top: 24,
+                    left: 28,
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    padding: '24px 32px',
-                    background: 'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, transparent 40%, rgba(0,0,0,0.88) 100%)',
+                    alignItems: 'flex-start',
                     pointerEvents: 'none',
+                    background: 'rgba(0, 0, 0, 0.45)',
+                    padding: '8px 14px',
+                    borderRadius: 4,
+                    border: '1px solid rgba(251, 146, 60, 0.4)',
+                    boxShadow: '0 0 16px rgba(251, 146, 60, 0.25)',
+                    backdropFilter: 'blur(3px)',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span
-                      style={{
-                        fontFamily: "'Syncopate', sans-serif",
-                        fontSize: 10,
-                        letterSpacing: 4,
-                        color: '#f43f5e',
-                        fontWeight: 700,
-                        textShadow: '0 0 10px #f43f5e',
-                      }}
-                    >
-                      ★ LOCAL DRIVE-IN INTERMISSION SPONSOR ★
-                    </span>
-                    <span style={{ fontSize: 10, color: '#fbbf24', letterSpacing: 2 }}>SAN DIEGO, CA</span>
+                  <div
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: 'clamp(1.8rem, 3.8vw, 3rem)',
+                      letterSpacing: 6,
+                      color: '#ffedd5',
+                      textShadow: '0 0 14px rgba(251, 146, 60, 0.9), 0 0 25px rgba(234, 88, 12, 0.5), 0 2px 4px rgba(0,0,0,0.9)',
+                      lineHeight: 1,
+                    }}
+                  >
+                    HEY BOOKS
                   </div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: 3,
+                      color: '#fed7aa',
+                      textShadow: '0 1px 3px #000',
+                      fontFamily: "'Space Mono', monospace",
+                      fontWeight: 700,
+                      marginTop: 2,
+                    }}
+                  >
+                    SAN DIEGO · NORTH PARK
+                  </div>
+                </div>
 
-                  <div>
-                    <h2
-                      style={{
-                        margin: 0,
-                        fontFamily: "'Bebas Neue', sans-serif",
-                        fontSize: 'clamp(2rem, 5vw, 4rem)',
-                        letterSpacing: 8,
-                        color: '#fff',
-                        textShadow: '0 0 20px rgba(244, 63, 94, 0.9), 0 0 40px rgba(0,0,0,0.9)',
-                        lineHeight: 1,
-                      }}
-                    >
-                      HEY BOOKS
-                    </h2>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: '#fbbf24',
-                        letterSpacing: 3,
-                        marginTop: 4,
-                        textShadow: '0 1px 4px #000',
-                        fontWeight: 700,
-                      }}
-                    >
-                      SAN DIEGO · SANCTUARY OF RARE, STRANGE, & OCCULT BOOKS
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 10.5,
-                        color: '#e4e4e7',
-                        marginTop: 6,
-                        lineHeight: 1.5,
-                        maxWidth: 620,
-                      }}
-                    >
-                      Matthew's haven of glowing occult texts, vintage pulp, rare paperbacks, and curiosities. Stop in and explore the archives before the Repo Man Malibu takes off!
-                    </div>
-                  </div>
+                {/* Subtle Location Caption at Bottom */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 18,
+                    left: 28,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    pointerEvents: 'none',
+                    background: 'rgba(0,0,0,0.6)',
+                    padding: '4px 10px',
+                    borderRadius: 3,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontFamily: "'Space Mono', monospace",
+                      color: '#e4e4e7',
+                      letterSpacing: 1.5,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Scene: Matthew's Bookstore at Night · North Park, CA
+                  </span>
                 </div>
               </div>
             ) : screenChannel === 'community_reel' ? (

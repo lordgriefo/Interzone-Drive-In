@@ -2,7 +2,7 @@
   {
     "id": "reel-001",
     "title": "Annunaki-d Lunch (Interzone Cut)",
-    "creator": "@matthew_heybooks",
+    "creator": "@interzone_archivist",
     "preset": "1970 Grindhouse · LSD Acid Melt",
     "audioTrack": "Archon — Strangelet",
     "videoUrl": "./assets-bg/puppet-man/Puppet_man_dancing_on_stage_202608202035.mp4",
@@ -34,12 +34,12 @@
   },
   {
     "id": "reel-004",
-    "title": "Night Window at Hey Books",
+    "title": "Midnight Bookstore Window",
     "creator": "@san_diego_nocturne",
     "preset": "Lynchian Interzone · Cathode Burn",
     "audioTrack": "Thelema Mountain — 'O' Shibboleth",
     "videoUrl": "./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4",
-    "description": "Late night North Park rare book browsing while UFOs cross over the Pacific.",
+    "description": "Late night bookstore browsing while UFOs cross over the Pacific.",
     "runtime": "04:40",
     "upvotes": 53
   }
