@@ -27,7 +27,18 @@ const SMPTE_FALLBACK_URL = TRANSPARENT_1PX;
 //   • inPoint   → trimmed-off head of a video clip is skipped.
 // Video time is locked to the timeline clock so a clip always begins at its own
 // in-point when the playhead enters it (instead of looping freely from page load).
-function TimelineClipMedia({ url, name, clip, localTime, isPlaying, isVideo, isOfflineRendering = false, mediaStyle, onError }) {
+function TimelineClipMedia({
+  url,
+  name,
+  clip,
+  localTime,
+  isPlaying,
+  isVideo,
+  isOfflineRendering = false,
+  mediaStyle,
+  onError,
+  audioSignals = {},
+}) {
   const videoRef = useRef(null);
   const [metaReady, setMetaReady] = useState(false);
 
@@ -70,6 +81,37 @@ function TimelineClipMedia({ url, name, clip, localTime, isPlaying, isVideo, isO
 
   const flip = clip.mirrored || (clip.reversed && !isVideo);
 
+  // ── LIVING STILL IMAGE ENGINE: Organic Ken Burns & Audio-Reactive Motion ──
+  let finalMediaStyle = mediaStyle;
+  if (!isVideo) {
+    const progress = clip.duration > 0 ? Math.max(0, Math.min(1, localTime / clip.duration)) : 0;
+    const hash = (clip.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const zoomDir = hash % 2 === 0 ? 1 : -1;
+    const panXDir = hash % 3 === 0 ? 1 : -1;
+    const panYDir = hash % 4 === 0 ? 1 : -1;
+
+    const bass = Number(audioSignals?.bass) || 0;
+    const isTransient = Boolean(audioSignals?.isTransient);
+    const beatPulse = isTransient ? 0.045 : bass * 0.025;
+
+    // Smooth sinusoidal parallax drift across the clip's duration
+    const baseScale = zoomDir > 0 ? 1.06 + progress * 0.14 : 1.20 - progress * 0.12;
+    const scale = Number((baseScale + beatPulse).toFixed(3));
+    const panX = (Math.sin(progress * Math.PI) * 3.5 * panXDir).toFixed(2);
+    const panY = (Math.sin(progress * Math.PI) * 2.2 * panYDir).toFixed(2);
+    const rot = (Math.sin(localTime * 1.4) * (0.5 + bass * 0.35) * (zoomDir > 0 ? 1 : -1)).toFixed(2);
+
+    finalMediaStyle = {
+      ...mediaStyle,
+      objectFit: 'cover',
+      transform: `${mediaStyle.transform || ''} translate3d(${panX}%, ${panY}%, 0) scale(${scale}) rotate(${rot}deg)`.trim(),
+      transformOrigin: 'center center',
+      transition: 'transform 0.08s ease-out, filter 0.12s ease-out',
+      filter: `${mediaStyle.filter || ''} brightness(${1 + (isTransient ? 0.14 : 0) + bass * 0.06})`.trim(),
+      willChange: 'transform, filter',
+    };
+  }
+
   return (
     <div
       style={{
@@ -77,6 +119,7 @@ function TimelineClipMedia({ url, name, clip, localTime, isPlaying, isVideo, isO
         inset: 0,
         transform: flip ? 'scaleX(-1)' : 'none',
         pointerEvents: 'none',
+        overflow: 'hidden',
       }}
     >
       {isVideo ? (
@@ -88,12 +131,12 @@ function TimelineClipMedia({ url, name, clip, localTime, isPlaying, isVideo, isO
           muted
           loop
           preload="auto"
-          style={mediaStyle}
+          style={finalMediaStyle}
           onLoadedMetadata={() => setMetaReady(true)}
           onError={onError}
         />
       ) : (
-        <img src={url} alt={name} style={mediaStyle} onError={onError} />
+        <img src={url} alt={name} style={finalMediaStyle} onError={onError} />
       )}
     </div>
   );
@@ -1712,8 +1755,31 @@ export function CanvasWorkspace({
       ...styleExtras,
     };
 
+    // ── LIVING STILL IMAGE ENGINE: Organic Ken Burns & Audio-Reactive Motion ──
+    let imageSharedStyle = sharedStyle;
+    if (!isVideo) {
+      const bass = Number(audioSignals?.bass) || 0;
+      const isTransient = Boolean(audioSignals?.isTransient);
+      const beatPulse = isTransient ? 0.05 : bass * 0.03;
+
+      const t = currentTime;
+      const scale = Number((1.08 + Math.sin(t * 0.35) * 0.06 + beatPulse).toFixed(3));
+      const panX = (Math.sin(t * 0.25) * 3.5).toFixed(2);
+      const panY = (Math.cos(t * 0.3) * 2.2).toFixed(2);
+      const rot = (Math.sin(t * 0.8) * (0.4 + bass * 0.3)).toFixed(2);
+
+      imageSharedStyle = {
+        ...sharedStyle,
+        objectFit: 'cover',
+        transform: `${sharedStyle.transform || ''} translate3d(${panX}%, ${panY}%, 0) scale(${scale}) rotate(${rot}deg)`.trim(),
+        transition: !isPlaying ? 'none' : 'transform 0.08s ease-out, filter 0.12s ease-out',
+        filter: `${composedFilter} brightness(${1 + (isTransient ? 0.15 : 0) + bass * 0.06})`.trim(),
+        willChange: 'transform, filter',
+      };
+    }
+
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         {isVideo ? (
           <video
             key={displayUrl}
@@ -1744,7 +1810,7 @@ export function CanvasWorkspace({
             key={displayUrl}
             src={displayUrl}
             alt="Asset Cut"
-            style={sharedStyle}
+            style={imageSharedStyle}
             onError={() => {
               // Only trigger fallback if we were attempting a non-fallback URL
               if (displayUrl !== SMPTE_FALLBACK_URL) {
@@ -1908,6 +1974,7 @@ export function CanvasWorkspace({
               isVideo={isVideo}
               isOfflineRendering={isOfflineRendering}
               mediaStyle={sharedStyle}
+              audioSignals={audioSignals}
               onError={() => {
                 console.warn('[Timeline] clip load error', clip.id);
                 if (clipUrl !== SMPTE_FALLBACK_URL) {
