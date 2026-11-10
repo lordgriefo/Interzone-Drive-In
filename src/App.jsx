@@ -246,6 +246,10 @@ export default function App() {
     stopEngine,
     seekTo,
     isPlaying,
+    isMuted,
+    toggleMute,
+    volume,
+    setVolume,
     currentTime,
     duration,
     waveformPeaks,
@@ -273,6 +277,10 @@ export default function App() {
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('drivein');
+
+  // ── Global Video Motion State (Pause / Play background screen video loops) ──
+  const [videoEnabled, setVideoEnabled] = useState(true);
+  const toggleVideo = useCallback(() => setVideoEnabled((prev) => !prev), []);
 
   // ── Cinema Mode: hides panels + goes fullscreen for clean viewport recording ──
   const [cinemaMode, setCinemaMode] = useState(false);
@@ -1212,6 +1220,11 @@ export default function App() {
             currentTrackTitle={trackTitle}
             isPlaying={isPlaying}
             onTogglePlay={togglePlay}
+            onStop={stopEngine}
+            isMuted={isMuted}
+            onToggleMute={toggleMute}
+            videoPlaying={videoEnabled}
+            onToggleVideo={toggleVideo}
             audioSignals={audioSignals}
             playlist={playlist}
             onSelectTrack={(entry) => handlePlayTrack(entry, playlist.findIndex((p) => p.id === entry.id))}
@@ -1253,6 +1266,10 @@ export default function App() {
           cinemaMode={cinemaMode}
           onToggleCinema={handleToggleCinema}
           isPlaying={isPlaying}
+          isMuted={isMuted}
+          onToggleMute={toggleMute}
+          videoEnabled={videoEnabled}
+          onToggleVideo={toggleVideo}
           trackTitle={trackTitle}
           audioSignals={audioSignals}
           moonVariant={moonVariant}
@@ -1306,6 +1323,12 @@ export default function App() {
               isPlaying={isPlaying}
               onTogglePlay={togglePlay}
               onStop={stopEngine}
+              isMuted={isMuted}
+              onToggleMute={toggleMute}
+              volume={volume}
+              onVolumeChange={setVolume}
+              videoPlaying={videoEnabled}
+              onToggleVideo={toggleVideo}
               currentTime={currentTime}
               duration={duration}
               bpm={bpm}

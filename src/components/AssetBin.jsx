@@ -1332,6 +1332,8 @@ export function AssetBin({
                   controls
                   autoPlay
                   loop
+                  muted
+                  playsInline
                   style={{ maxWidth: '100%', maxHeight: '65vh', borderRadius: 4 }}
                 />
               ) : (

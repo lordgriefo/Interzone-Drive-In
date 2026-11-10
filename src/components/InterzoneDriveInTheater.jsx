@@ -69,6 +69,11 @@ export function InterzoneDriveInTheater({
   currentTrackTitle,
   isPlaying,
   onTogglePlay,
+  onStop = () => {},
+  isMuted = false,
+  onToggleMute = () => {},
+  videoPlaying: externalVideoPlaying = true,
+  onToggleVideo: externalToggleVideo = null,
   audioSignals,
   playlist = [],
   onSelectTrack,
@@ -78,6 +83,10 @@ export function InterzoneDriveInTheater({
   // 'feature' | 'ufo_broll' | 'hey_books' | 'community_reel'
   const [screenChannel, setScreenChannel] = useState('feature');
   const [malibuFlying, setMalibuFlying] = useState(false);
+  const [internalVideoPlaying, setInternalVideoPlaying] = useState(true);
+
+  const videoPlaying = externalToggleVideo ? externalVideoPlaying : internalVideoPlaying;
+  const toggleVideo = externalToggleVideo || (() => setInternalVideoPlaying((prev) => !prev));
 
   // Marquee movie cycling
   const [marqueeIndex, setMarqueeIndex] = useState(0);
@@ -181,40 +190,108 @@ export function InterzoneDriveInTheater({
           </div>
         </div>
 
-        {/* ── RADIO TUNER / NOW PLAYING ── */}
+        {/* ── RADIO TUNER / NOW PLAYING & SOUND/VIDEO CONTROLS ── */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 8,
             padding: '4px 12px',
-            backgroundColor: 'rgba(20, 20, 35, 0.75)',
+            backgroundColor: 'rgba(20, 20, 35, 0.85)',
             borderRadius: 4,
             border: '1px solid rgba(57, 255, 20, 0.35)',
             boxShadow: isTransient ? '0 0 14px rgba(57, 255, 20, 0.4)' : 'none',
             transition: 'box-shadow 0.1s',
           }}
         >
+          {/* Play/Pause */}
           <button
             onClick={onTogglePlay}
             style={{
-              background: isPlaying ? '#ff6b00' : 'rgba(255, 255, 255, 0.1)',
+              background: isPlaying ? '#ff6b00' : 'rgba(255, 255, 255, 0.12)',
               color: isPlaying ? '#000' : '#fff',
               border: 'none',
               borderRadius: 3,
               padding: '4px 10px',
               fontFamily: 'inherit',
               fontWeight: 800,
-              fontSize: 11,
+              fontSize: 10,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: 4,
             }}
+            title={isPlaying ? "Pause music playback" : "Play music"}
           >
             {isPlaying ? '⏸ PAUSE' : '▶ TRANSMIT'}
           </button>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+          {/* Stop Audio */}
+          {isPlaying && (
+            <button
+              onClick={onStop}
+              style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                color: '#f87171',
+                border: '1px solid #ef4444',
+                borderRadius: 3,
+                padding: '4px 7px',
+                fontFamily: 'inherit',
+                fontWeight: 800,
+                fontSize: 9.5,
+                cursor: 'pointer',
+              }}
+              title="Stop audio transmission"
+            >
+              ⏹ STOP
+            </button>
+          )}
+
+          {/* Sound Mute Toggle */}
+          <button
+            onClick={onToggleMute}
+            style={{
+              background: isMuted ? '#ef4444' : 'rgba(255, 255, 255, 0.1)',
+              color: isMuted ? '#fff' : '#e4e4e7',
+              border: `1px solid ${isMuted ? '#ef4444' : 'rgba(255, 255, 255, 0.2)'}`,
+              borderRadius: 3,
+              padding: '4px 8px',
+              fontFamily: 'inherit',
+              fontWeight: 700,
+              fontSize: 9.5,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+            }}
+            title={isMuted ? "Unmute audio" : "Turn off audio (Mute)"}
+          >
+            {isMuted ? '🔇 MUTED' : '🔊 SOUND'}
+          </button>
+
+          {/* Video / Screen Motion Pause Toggle */}
+          <button
+            onClick={toggleVideo}
+            style={{
+              background: videoPlaying ? 'rgba(0, 229, 255, 0.15)' : 'rgba(239, 68, 68, 0.25)',
+              color: videoPlaying ? '#00e5ff' : '#fca5a5',
+              border: `1px solid ${videoPlaying ? '#00e5ff' : '#ef4444'}`,
+              borderRadius: 3,
+              padding: '4px 8px',
+              fontFamily: 'inherit',
+              fontWeight: 700,
+              fontSize: 9.5,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+            }}
+            title={videoPlaying ? "Pause all looping videos and screen motion" : "Resume video playback"}
+          >
+            {videoPlaying ? '🎬 VIDEO: ON' : '⏸ VIDEO: OFF'}
+          </button>
+
+          <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 4 }}>
             <span style={{ fontSize: 8, color: '#39ff14', letterSpacing: 1.5, fontWeight: 700 }}>
               📻 99.3 FM CAR SPEAKER TUNER
             </span>
@@ -222,7 +299,7 @@ export function InterzoneDriveInTheater({
               style={{
                 fontSize: 10,
                 color: '#e4e4e7',
-                maxWidth: 240,
+                maxWidth: 200,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -852,18 +929,21 @@ export function InterzoneDriveInTheater({
               /* Repo Man Malibu Flying Acceleration Mode */
               <video
                 src="./assets-bg/drive-in/Malibu_accelerates_into_cosmic_v._202608202035.mp4"
-                autoPlay
+                autoPlay={videoPlaying}
                 loop
+                muted
                 playsInline
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
               />
             ) : screenChannel === 'hey_books' ? (
               /* Screen 3: Hey Books Storefront Scene */
               <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
                 <video
                   src="./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4"
-                  autoPlay
+                  autoPlay={videoPlaying}
                   loop
+                  muted
                   playsInline
                   style={{
                     width: '100%',
@@ -874,6 +954,7 @@ export function InterzoneDriveInTheater({
                   onError={(e) => {
                     e.currentTarget.src = "./assets-bg/puppet-man/Puppet_man_walking_past_bookstore_202608202034.mp4";
                   }}
+                  ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
                 />
                 {/* Store Logo in Background of Video */}
                 <div
@@ -954,8 +1035,9 @@ export function InterzoneDriveInTheater({
                 <video
                   key={currentCommunityCut.id}
                   src={currentCommunityCut.videoUrl}
-                  autoPlay
+                  autoPlay={videoPlaying}
                   loop
+                  muted
                   playsInline
                   style={{
                     width: '100%',
@@ -963,6 +1045,7 @@ export function InterzoneDriveInTheater({
                     objectFit: 'cover',
                     filter: 'contrast(1.25) saturate(1.3)',
                   }}
+                  ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
                 />
 
                 {/* Community Reel Lower-Third & Top Tag */}
@@ -1099,8 +1182,9 @@ export function InterzoneDriveInTheater({
                     <video
                       key={currentUfoClip.id}
                       src={currentUfoClip.url}
-                      autoPlay
+                      autoPlay={videoPlaying}
                       loop
+                      muted
                       playsInline
                       style={{
                         width: '100%',
@@ -1108,6 +1192,7 @@ export function InterzoneDriveInTheater({
                         objectFit: 'cover',
                         filter: 'contrast(1.25) saturate(1.3) sepia(0.15)',
                       }}
+                      ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
                     />
                     {/* Screen 2 Lower-Third Overlay */}
                     <div
@@ -1172,10 +1257,12 @@ export function InterzoneDriveInTheater({
               /* Screen 1: Feature Parked at Drive-In */
               <video
                 src="./assets-bg/drive-in/1964_Chevy_Malibu_parked_drive-in_202608202035.mp4"
-                autoPlay
+                autoPlay={videoPlaying}
                 loop
+                muted
                 playsInline
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
               />
             )}
 

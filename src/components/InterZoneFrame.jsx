@@ -12,7 +12,27 @@ const TIMELINE_MAX_H = 600;
 const TIMELINE_DEFAULT_H = 240;
 const TIMELINE_COLLAPSED_H = 30;
 
-export function InterzoneFrame({ children, timeline, transportBar, isPlaying, trackTitle, audioSignals, moonVariant, moonFilter, rubeStage = 0, rubeVisuals = {}, selectedRube = 'none', onToggleCinema = null, cinemaMode = false, activeTab = 'studio', onTabChange = () => {} }) {
+export function InterzoneFrame({
+  children,
+  timeline,
+  transportBar,
+  isPlaying,
+  isMuted = false,
+  onToggleMute = () => {},
+  videoEnabled = true,
+  onToggleVideo = () => {},
+  trackTitle,
+  audioSignals,
+  moonVariant,
+  moonFilter,
+  rubeStage = 0,
+  rubeVisuals = {},
+  selectedRube = 'none',
+  onToggleCinema = null,
+  cinemaMode = false,
+  activeTab = 'studio',
+  onTabChange = () => {}
+}) {
   const [timelineHeight, setTimelineHeight] = useState(TIMELINE_DEFAULT_H);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -22,6 +42,16 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
   const viewportRef = useRef(null);
   const dragStateRef = useRef(null);
   const frameRef = useRef(null);
+  const moonVideoRef = useRef(null);
+
+  useEffect(() => {
+    if (!moonVideoRef.current) return;
+    if (videoEnabled) {
+      moonVideoRef.current.play().catch(() => {});
+    } else {
+      moonVideoRef.current.pause();
+    }
+  }, [videoEnabled]);
 
   // Auto-hide Cinema exit button and cursor after 2.5s of no mouse movement
   useEffect(() => {
@@ -205,6 +235,7 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
             }}
           >
             <video
+              ref={moonVideoRef}
               src="./assets-bg/moon_trip-round.webm"
               autoPlay
               loop
@@ -315,6 +346,48 @@ export function InterzoneFrame({ children, timeline, transportBar, isPlaying, tr
                 }}
               >
                 🎬 CHOREOGRAPHY STUDIO
+              </button>
+
+              {/* Master Global Sound / Video Controls in Header */}
+              <button
+                onClick={onToggleMute}
+                title={isMuted ? "Sound MUTED (Click or press 'M' to unmute)" : "Sound ACTIVE (Click or press 'M' to mute)"}
+                style={{
+                  background: isMuted ? 'rgba(244, 63, 94, 0.22)' : 'rgba(255, 107, 0, 0.15)',
+                  color: isMuted ? '#f43f5e' : 'var(--accent-orange, #ff6b00)',
+                  border: `1px solid ${isMuted ? '#f43f5e' : 'rgba(255, 107, 0, 0.6)'}`,
+                  borderRadius: 4,
+                  padding: '4px 10px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  cursor: 'pointer',
+                  marginLeft: 8,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {isMuted ? '🔇 MUTED' : '🔊 SOUND'}
+              </button>
+
+              <button
+                onClick={onToggleVideo}
+                title={videoEnabled ? "Video loops RUNNING (Click or press 'V' to pause)" : "Video loops PAUSED (Click or press 'V' to resume)"}
+                style={{
+                  background: videoEnabled ? 'rgba(0, 229, 255, 0.18)' : 'rgba(30, 41, 59, 0.7)',
+                  color: videoEnabled ? '#00e5ff' : '#94a3b8',
+                  border: `1px solid ${videoEnabled ? '#00e5ff' : 'rgba(148, 163, 184, 0.4)'}`,
+                  borderRadius: 4,
+                  padding: '4px 10px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {videoEnabled ? '🎬 VIDEO: ON' : '⏸ VIDEO: OFF'}
               </button>
             </div>
             <div style={{

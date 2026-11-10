@@ -117,6 +117,7 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
   const rafRef              = useRef(null);
   const audioContextRef     = useRef(null);
   const analyserRef         = useRef(null);
+  const masterGainRef       = useRef(null);
   const audioDestinationRef = useRef(null);
   const sourceNodeRef       = useRef(null);
   const meydaAnalyzerRef    = useRef(null);
@@ -213,10 +214,16 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
       const dest = ctx.createMediaStreamDestination();
       audioDestinationRef.current = dest;
 
-      // Chain: source → analyser → destination + speakers
+      // Master Gain Node for bulletproof Web Audio mute + volume control
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(isMuted ? 0 : volume, ctx.currentTime);
+      masterGainRef.current = masterGain;
+
+      // Chain: source → analyser → masterGain → destination + speakers
       source.connect(analyser);
-      analyser.connect(ctx.destination);
-      analyser.connect(dest);
+      analyser.connect(masterGain);
+      masterGain.connect(ctx.destination);
+      masterGain.connect(dest);
 
       // Meyda
       try {
@@ -395,6 +402,49 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     setAudioSignals(zeroSignals());
   }, []);
 
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolumeState] = useState(1.0);
+
+  const setVolume = useCallback((v) => {
+    const clamped = Math.max(0, Math.min(1, v));
+    setVolumeState(clamped);
+    if (audioRef.current) {
+      audioRef.current.volume = clamped;
+    }
+    if (masterGainRef.current && audioContextRef.current) {
+      try {
+        masterGainRef.current.gain.setValueAtTime(isMuted ? 0 : clamped, audioContextRef.current.currentTime);
+      } catch (_) {}
+    }
+  }, [isMuted]);
+
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (audioRef.current) {
+        audioRef.current.muted = next;
+      }
+      if (masterGainRef.current && audioContextRef.current) {
+        try {
+          masterGainRef.current.gain.setValueAtTime(next ? 0 : volume, audioContextRef.current.currentTime);
+        } catch (_) {}
+      }
+      return next;
+    });
+  }, [volume]);
+
+  // Global hotkey 'M' for mute
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.key === 'm' || e.key === 'M') && !e.target.closest('input, textarea, select, [contenteditable]')) {
+        e.preventDefault();
+        toggleMute();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [toggleMute]);
+
   // ── loadAudioTrack ─────────────────────────────────────────────────────
   const loadAudioTrack = useCallback((fileOrUrl) => {
     isPurgedRef.current = false;
@@ -409,6 +459,8 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     const url = typeof fileOrUrl === 'string' ? fileOrUrl : URL.createObjectURL(fileOrUrl);
     el.src = url;
     el.preload = 'metadata';
+    el.muted = isMuted;
+    el.volume = volume;
     el.load();
 
     setWaveformPeaks([]);
@@ -505,6 +557,10 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     transientMarkers,
     audioSignals,
     isAudioUnlocked,
+    isMuted,
+    toggleMute,
+    volume,
+    setVolume,
 
     // Methods
     loadAudioTrack,

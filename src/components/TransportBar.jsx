@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Play, Pause, Square, Volume2, Sparkles, Film } from 'lucide-react';
+import { Play, Pause, Square, Volume2, VolumeX, Video, VideoOff, Sparkles, Film } from 'lucide-react';
 import { REVERB_PRESETS, DEFAULT_REVERB_WET } from '../constants/reverbPresets';
 
 function formatTimecode(seconds = 0) {
@@ -21,6 +21,16 @@ export function TransportBar({
   setReverbPreset = () => {},
   reverbWet = DEFAULT_REVERB_WET,
   setReverbWet = () => {},
+
+  // Master Sound & Volume
+  isMuted = false,
+  onToggleMute = () => {},
+  volume = 1.0,
+  onVolumeChange = () => {},
+
+  // Master Video toggle
+  videoPlaying = true,
+  onToggleVideo = () => {},
 
   // Phase 2: A/B Region Looping
   isLooping = false,
@@ -63,6 +73,22 @@ export function TransportBar({
       }
     }
   }, [setBpm]);
+
+  // Keyboard shortcut: 'M' for Mute, 'V' for Video
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+      if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        onToggleMute();
+      } else if (e.key === 'v' || e.key === 'V') {
+        e.preventDefault();
+        onToggleVideo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onToggleMute, onToggleVideo]);
 
   return (
     <div
@@ -426,8 +452,79 @@ export function TransportBar({
         </button>
       </div>
 
-      {/* ── RIGHT: Reverb — simple ON/OFF + wet amount ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {/* ── RIGHT: Master Audio (Mute / Volume), Video Toggle, Reverb ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Master Mute / Sound Button */}
+        <button
+          onClick={onToggleMute}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '3px 8px',
+            borderRadius: 3,
+            border: `1px solid ${isMuted ? '#f43f5e' : 'var(--accent-orange, #ff6b00)'}`,
+            backgroundColor: isMuted ? 'rgba(244, 63, 94, 0.22)' : 'rgba(255, 107, 0, 0.15)',
+            color: isMuted ? '#f43f5e' : 'var(--accent-orange, #ff6b00)',
+            fontWeight: 700,
+            fontSize: 9,
+            cursor: 'pointer',
+            transition: 'all 0.12s ease',
+          }}
+          title={isMuted ? "Audio MUTED (Click or press 'M' to unmute)" : "Audio ACTIVE (Click or press 'M' to mute)"}
+        >
+          {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+          <span>{isMuted ? 'MUTED' : 'SOUND'}</span>
+        </button>
+
+        {/* Master Volume Slider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <input
+            type="range"
+            min="0.0"
+            max="1.0"
+            step="0.01"
+            value={isMuted ? 0 : volume}
+            onChange={(e) => {
+              if (isMuted) onToggleMute();
+              onVolumeChange(parseFloat(e.target.value));
+            }}
+            style={{
+              width: 52,
+              height: 4,
+              accentColor: 'var(--accent-orange, #ff6b00)',
+              cursor: 'pointer',
+            }}
+            title={`Master Volume: ${isMuted ? '0' : Math.round(volume * 100)}%`}
+          />
+          <span style={{ fontSize: 9, color: isMuted ? '#f43f5e' : 'var(--text-dim)', minWidth: 26 }}>
+            {isMuted ? '0%' : `${Math.round(volume * 100)}%`}
+          </span>
+        </div>
+
+        {/* Master Video On/Off Toggle Button */}
+        <button
+          onClick={onToggleVideo}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '3px 8px',
+            borderRadius: 3,
+            border: `1px solid ${videoPlaying ? 'var(--accent-cyan, #00e5ff)' : 'rgba(148, 163, 184, 0.4)'}`,
+            backgroundColor: videoPlaying ? 'rgba(0, 229, 255, 0.15)' : 'rgba(30, 41, 59, 0.6)',
+            color: videoPlaying ? 'var(--accent-cyan, #00e5ff)' : '#94a3b8',
+            fontWeight: 700,
+            fontSize: 9,
+            cursor: 'pointer',
+            transition: 'all 0.12s ease',
+          }}
+          title={videoPlaying ? "Video Motion ACTIVE (Click or press 'V' to pause background videos)" : "Video Motion PAUSED (Click or press 'V' to resume)"}
+        >
+          {videoPlaying ? <Video size={12} /> : <VideoOff size={12} />}
+          <span>{videoPlaying ? 'VIDEO ON' : 'VIDEO PAUSED'}</span>
+        </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Sparkles size={12} color={reverbWet > 0 ? 'var(--accent-blue)' : 'var(--text-dim)'} />
           {/* On/Off toggle button */}
