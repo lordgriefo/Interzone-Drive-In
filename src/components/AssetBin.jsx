@@ -1,7 +1,7 @@
 // src/components/AssetBin.jsx
 // Media Bin — thumbnail grid, lightbox preview, Synchro-Vox puppet slot tagging
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { PUPPET_SLOTS, getSlotsForMode } from '../hooks/usePuppetEngine';
 import { GOOGLE_FLOW_SYNCRO_VOX_URL } from '../constants/urls';
 
@@ -101,11 +101,46 @@ export function AssetBin({
   onDuplicateAsset = () => {},
   onRenameAsset = () => {},
   onAddToTimeline = () => {},
+  onAutoChoreograph = () => {},
 }) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameText, setRenameText] = useState('');
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  // Category filter and live search
+  const [activeCategory, setActiveCategory] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const counts = useMemo(() => {
+    let excavating = 0, waitSee = 0, videos = 0, stills = 0, driveIn = 0;
+    assets.forEach((a) => {
+      const isVid = a.mediaType === 'video' || a.type === 'video' || a.url?.endsWith('.webm') || a.url?.endsWith('.mp4');
+      if (a.url?.includes('excavating')) excavating++;
+      if (a.url?.includes('wait-till-you-see-it')) waitSee++;
+      if (isVid) videos++; else stills++;
+      if (a.url?.includes('iz-') || a.url?.includes('drive-in')) driveIn++;
+    });
+    return { all: assets.length, excavating, waitSee, videos, stills, driveIn };
+  }, [assets]);
+
+  const filteredItems = useMemo(() => {
+    return assets.map((a, origIndex) => ({ ...a, origIndex })).filter((asset) => {
+      const isVid = asset.mediaType === 'video' || asset.type === 'video' || asset.url?.endsWith('.webm') || asset.url?.endsWith('.mp4');
+      if (activeCategory === 'EXCAVATING' && !asset.url?.includes('excavating')) return false;
+      if (activeCategory === 'WAIT_SEE' && !asset.url?.includes('wait-till-you-see-it')) return false;
+      if (activeCategory === 'VIDEOS' && !isVid) return false;
+      if (activeCategory === 'STILLS' && isVid) return false;
+      if (activeCategory === 'DRIVE_IN' && !asset.url?.includes('iz-') && !asset.url?.includes('drive-in')) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchName = (asset.name || '').toLowerCase().includes(q);
+        const matchUrl = (asset.url || '').toLowerCase().includes(q);
+        if (!matchName && !matchUrl) return false;
+      }
+      return true;
+    });
+  }, [assets, activeCategory, searchQuery]);
 
   const selectedAsset = assets[selectedAssetIndex] || null;
   const selectedIsVideo = selectedAsset?.mediaType === 'video' || selectedAsset?.type === 'video' || selectedAsset?.url?.endsWith('.webm') || selectedAsset?.url?.endsWith('.mp4');
@@ -697,6 +732,87 @@ export function AssetBin({
         </div>
       )}
 
+      {/* ── FILTER TABS & SEARCH BAR ── */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 5,
+        paddingBottom: 4,
+        borderBottom: '1px solid var(--border-dim)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <input
+            type="text"
+            placeholder="🔍 Search bin assets..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              flex: 1,
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-mid)',
+              color: 'var(--text-bright)',
+              borderRadius: 3,
+              padding: '3px 6px',
+              fontSize: 9,
+              fontFamily: 'var(--font-mono, monospace)',
+              outline: 'none',
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-dim)',
+                fontSize: 10,
+                cursor: 'pointer',
+                padding: '0 4px',
+              }}
+              title="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Filter Pills */}
+        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          {[
+            { id: 'ALL', label: `ALL (${counts.all})` },
+            { id: 'EXCAVATING', label: `🛸 EXCAVATING (${counts.excavating})` },
+            { id: 'WAIT_SEE', label: `👁 WAIT SEE (${counts.waitSee})` },
+            { id: 'VIDEOS', label: `🎬 VID (${counts.videos})` },
+            { id: 'STILLS', label: `🖼 STILLS (${counts.stills})` },
+            { id: 'DRIVE_IN', label: `📼 DRIVE-IN (${counts.driveIn})` },
+          ].map(({ id, label }) => {
+            const active = activeCategory === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveCategory(id)}
+                style={{
+                  background: active ? 'var(--accent-orange)' : 'var(--bg-secondary)',
+                  color: active ? '#000' : 'var(--text-dim)',
+                  border: `1px solid ${active ? 'var(--accent-orange)' : 'var(--border-dim)'}`,
+                  borderRadius: 2,
+                  padding: '2px 5px',
+                  fontSize: 8,
+                  fontWeight: active ? 800 : 600,
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  letterSpacing: 0.2,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* ── ASSET GRID (Drag & drop reorder + quick shift buttons) ── */}
       <div style={{
         flexGrow: 1,
@@ -706,7 +822,8 @@ export function AssetBin({
         gap: 7,
         alignContent: 'start',
       }}>
-        {assets.map((asset, index) => {
+        {filteredItems.map((asset) => {
+          const index      = asset.origIndex;
           const isSelected = selectedAssetIndex === index;
           const isVideo    = asset.mediaType === 'video' || asset.type === 'video' || asset.url?.endsWith('.webm') || asset.url?.endsWith('.mp4');
           const isDropTarget = dragOverIndex === index;

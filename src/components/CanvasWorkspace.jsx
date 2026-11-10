@@ -82,7 +82,10 @@ function TimelineClipMedia({
   const flip = clip.mirrored || (clip.reversed && !isVideo);
 
   // ── LIVING STILL IMAGE ENGINE: Organic Ken Burns & Audio-Reactive Motion ──
-  let finalMediaStyle = mediaStyle;
+  let finalMediaStyle = {
+    ...mediaStyle,
+    objectFit: 'cover',
+  };
   if (!isVideo) {
     const progress = clip.duration > 0 ? Math.max(0, Math.min(1, localTime / clip.duration)) : 0;
     const hash = (clip.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);

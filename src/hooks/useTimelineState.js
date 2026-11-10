@@ -7,6 +7,7 @@
 // ref (never stale inside a single event handler) and records an undo snapshot.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { STORYBOARD_PRESETS } from '../constants/storyboardPresets';
 
 const DEFAULT_CLIP_DURATION = 2.5;
 // Crossfade overlap injected when duplicating a clip (seconds)
@@ -72,10 +73,23 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
   // `knownAssetIds` remembers which assets already got an auto-clip, so a clip you
   // deliberately deleted does not magically reappear when you add other media.
   const knownAssetIdsRef = useRef(new Set());
+  const initialStoryboardLoadedRef = useRef(false);
+
   useEffect(() => {
     const assetIds = new Set(assets.map((a) => a.id));
     const known = knownAssetIdsRef.current;
     for (const id of [...known]) if (!assetIds.has(id)) known.delete(id);
+
+    // On initial startup with full media catalog, bootstrap with the curated High Roller cut
+    if (!initialStoryboardLoadedRef.current && assets.length > 50 && clipsRef.current.length === 0) {
+      initialStoryboardLoadedRef.current = true;
+      for (const a of assets) known.add(a.id);
+      const defaultSb = STORYBOARD_PRESETS.pl_high_roller;
+      if (defaultSb && defaultSb.clips) {
+        loadCutTemplate(defaultSb);
+        return;
+      }
+    }
 
     applyClips((prev) => {
       const kept = prev.filter((clip) => assetIds.has(clip.assetId));
@@ -545,15 +559,25 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
     if (!templateData || !Array.isArray(templateData.clips) || templateData.clips.length === 0) return;
     applyClips(() => {
       return templateData.clips.map((c, i) => {
-        let matchedAsset = assets[c.assetIndex];
+        let matchedAsset = null;
+        if (c.assetId) {
+          matchedAsset = assets.find((a) => a.id === c.assetId);
+        }
+        if (!matchedAsset && c.assetUrl) {
+          const norm = c.assetUrl.replace('\\', '/').toLowerCase();
+          matchedAsset = assets.find((a) => a.url && a.url.replace('\\', '/').toLowerCase() === norm);
+        }
         if (!matchedAsset && c.assetName) {
           matchedAsset = assets.find((a) => a.name === c.assetName);
+        }
+        if (!matchedAsset && c.assetIndex !== undefined && assets[c.assetIndex]) {
+          matchedAsset = assets[c.assetIndex];
         }
         if (!matchedAsset) {
           matchedAsset = assets[i % Math.max(assets.length, 1)];
         }
         return {
-          id: uid('imported-clip'),
+          id: c.id || uid('imported-clip'),
           assetId: matchedAsset ? matchedAsset.id : `asset-${i}`,
           startTime: Number(c.startTime) || 0,
           duration: Math.max(MIN_CLIP_DURATION, Number(c.duration) || DEFAULT_CLIP_DURATION),
@@ -564,6 +588,16 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
       });
     }, true);
   }, [assets, applyClips]);
+
+  // Load a built-in storyboard choreography by key
+  const loadStoryboard = useCallback((storyboardId) => {
+    const sb = STORYBOARD_PRESETS[storyboardId];
+    if (sb) {
+      loadCutTemplate(sb);
+      return true;
+    }
+    return false;
+  }, [loadCutTemplate]);
 
   return {
     // Clip state
@@ -591,6 +625,7 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
     fitClipToAssetDuration,
     exportCutTemplate,
     loadCutTemplate,
+    loadStoryboard,
     // History
     beginClipEdit,
     undo,

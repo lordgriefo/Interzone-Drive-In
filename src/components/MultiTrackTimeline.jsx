@@ -2,6 +2,7 @@ import React, { useRef, useCallback, useMemo, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom';
 import { interpolateAutomation } from '../utils/timelineCrossfade';
 import { TimelineAutomationLane } from './TimelineAutomationLane';
+import { STORYBOARD_PRESETS } from '../constants/storyboardPresets';
 
 const TRACK_LABEL_W = 108;
 const ROW_H = 56;
@@ -931,6 +932,45 @@ export function MultiTrackTimeline({
             e.target.value = '';
           }}
         />
+
+        <ToolSep />
+
+        {/* Storyboard Presets */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 9, fontWeight: 800, color: '#f59e0b', letterSpacing: 0.5 }}>
+            STORYBOARD:
+          </span>
+          <select
+            defaultValue=""
+            onChange={(e) => {
+              const val = e.target.value;
+              if (!val) return;
+              if (val.startsWith('sb:')) {
+                const sbId = val.replace('sb:', '');
+                edit.loadStoryboard?.(sbId);
+              }
+              onUseTimelineStyle?.();
+              e.target.value = '';
+            }}
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid #f59e0b',
+              color: 'var(--text-bright)',
+              borderRadius: 3,
+              padding: '2px 6px',
+              fontSize: 9,
+              fontFamily: 'var(--font-mono, monospace)',
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+            title="Load pre-choreographed cinematic storyboards for showcase tracks"
+          >
+            <option value="">🎬 Load Storyboard Choreography...</option>
+            <option value="sb:pl_excavating_neverland">🛸 Excavating Neverland (45 clips · Vegas UFO 5-Act)</option>
+            <option value="sb:pl_wait_till_you_see_it">👁 Wait Till You SEE It (78 clips · Dark Perchance)</option>
+            <option value="sb:pl_high_roller">🎰 High Roller (55 clips · Neon Grindhouse)</option>
+          </select>
+        </div>
 
         <ToolSep />
 

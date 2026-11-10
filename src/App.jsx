@@ -24,10 +24,7 @@ import { interpolateAutomation } from './utils/timelineCrossfade';
 import { evaluateCssEffect }     from './constants/cssEffectLibrary';
 import { DEFAULT_MEDIA_ITEMS, createProceduralAudioTrack, createProceduralAudioDataUri } from './constants/initialMedia';
 import { parseLrcString } from './utils/lrcParser';
-
-
-
-
+import { STORYBOARD_PRESETS } from './constants/storyboardPresets';
 
 export const DEFAULT_PLAYLIST = [
   {
@@ -35,8 +32,9 @@ export const DEFAULT_PLAYLIST = [
     title: "High Roller — MonoAtomiX",
     url: './assets-bg/high-roller.mp3',
     duration: 210,
+    storyboardId: 'pl_high_roller',
     preset: {
-      selectedStyle: 'apple_kinetic',
+      selectedStyle: 'timeline',
       selectedEra: '1970_grindhouse',
       selectedRube: 'cathode_burn',
       bpm: 124,
@@ -52,8 +50,9 @@ export const DEFAULT_PLAYLIST = [
     url: './assets-bg/excavating-neverland.mp3',
     lrcUrl: './assets-bg/excavating-neverland.lrc',
     duration: 310,
+    storyboardId: 'pl_excavating_neverland',
     preset: {
-      selectedStyle: 'lsd_acid_melt',
+      selectedStyle: 'timeline',
       selectedEra: '1902_melies',
       selectedRube: 'strangelet_event',
       bpm: 120,
@@ -69,8 +68,9 @@ export const DEFAULT_PLAYLIST = [
     url: './assets-bg/wait-till-you-see-it.mp3',
     lrcUrl: './assets-bg/wait-till-you-see-it.lrc',
     duration: 356,
+    storyboardId: 'pl_wait_till_you_see_it',
     preset: {
-      selectedStyle: 'montage',
+      selectedStyle: 'timeline',
       selectedEra: 'lynchian_interzone',
       bpm: 118,
       chaosLevel: 0.12,
@@ -566,6 +566,96 @@ export default function App() {
 
 
 
+  // ── Timeline state (includes full editing operations & undo/redo) ──
+  const {
+    videoClips,
+    setVideoClips,
+    updateClipStart,
+    updateClip,
+    clearVideoClips,
+    splitClipAtTime,
+    splitAtTime,
+    toggleClipReverse,
+    toggleClipMirror,
+    duplicateClip,
+    deleteClip,
+    moveClipInOrder,
+    packClips,
+    shuffleClips,
+    sortClipsByAssetOrder,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    addClipFromAsset,
+    generateAutoMvCut,
+    exportCutTemplate,
+    loadCutTemplate,
+    loadStoryboard,
+    beginClipEdit,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    automationKeyframes,
+    setAutomationKeyframes,
+    addAutomationKeyframe,
+    updateAutomationKeyframe,
+    removeAutomationKeyframe,
+  } = useTimelineState(assets, duration || 60, bpm, setBpm);
+
+  // Consolidated editing operations bundle passed down to timeline and toolbar
+  const timelineEdit = useMemo(() => ({
+    beginClipEdit,
+    updateClip,
+    toggleClipReverse,
+    toggleClipMirror,
+    duplicateClip,
+    deleteClip,
+    moveClipInOrder,
+    packClips,
+    shuffleClips,
+    sortClipsByAssetOrder,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    addClipFromAsset,
+    generateAutoMvCut,
+    exportCutTemplate,
+    loadCutTemplate,
+    loadStoryboard,
+    splitAtTime,
+    splitClipAtTime,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  }), [
+    beginClipEdit,
+    updateClip,
+    toggleClipReverse,
+    toggleClipMirror,
+    duplicateClip,
+    deleteClip,
+    moveClipInOrder,
+    packClips,
+    shuffleClips,
+    sortClipsByAssetOrder,
+    copyClip,
+    pasteClip,
+    hasClipboard,
+    addClipFromAsset,
+    generateAutoMvCut,
+    exportCutTemplate,
+    loadCutTemplate,
+    loadStoryboard,
+    splitAtTime,
+    splitClipAtTime,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  ]);
+
   // Load a playlist entry: load audio + apply its preset + (optionally) restore asset bin
   const handlePlayTrack = useCallback((entry, idx) => {
     setPlaylistIndex(idx);
@@ -583,6 +673,10 @@ export default function App() {
       if (entry.preset.bpm           !== undefined) setBpm(entry.preset.bpm);
       if (entry.preset.reverbWet     !== undefined) setReverbWet(entry.preset.reverbWet);
     }
+    // Auto-load storyboard choreography if defined for this track
+    if (entry.storyboardId && STORYBOARD_PRESETS[entry.storyboardId]) {
+      loadStoryboard(entry.storyboardId);
+    }
     setLyricSegments([]);
     if (entry.lrcUrl) {
       fetch(entry.lrcUrl)
@@ -596,7 +690,7 @@ export default function App() {
         })
         .catch(() => {});
     }
-  }, [loadAudioTrack, setReverbWet]);
+  }, [loadAudioTrack, setReverbWet, loadStoryboard]);
 
   // Advance to the next track in the playlist
   const handlePlaylistAdvance = useCallback(() => {
@@ -706,89 +800,10 @@ export default function App() {
         })
         .catch((err) => console.warn('[App] Default LRC lyrics load info:', err));
     }
-  }, [loadAudioTrack]);
-
-
-  // ── Timeline state (includes full editing operations & undo/redo) ──
-  const {
-    videoClips,
-    setVideoClips,
-    updateClipStart,
-    updateClip,
-    clearVideoClips,
-    splitClipAtTime,
-    splitAtTime,
-    toggleClipReverse,
-    toggleClipMirror,
-    duplicateClip,
-    deleteClip,
-    moveClipInOrder,
-    packClips,
-    shuffleClips,
-    sortClipsByAssetOrder,
-    copyClip,
-    pasteClip,
-    hasClipboard,
-    addClipFromAsset,
-    generateAutoMvCut,
-    beginClipEdit,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    automationKeyframes,
-    setAutomationKeyframes,
-    addAutomationKeyframe,
-    updateAutomationKeyframe,
-    removeAutomationKeyframe,
-  } = useTimelineState(assets, duration || 60, bpm, setBpm);
-
-  // Consolidated editing operations bundle passed down to timeline and toolbar
-  const timelineEdit = useMemo(() => ({
-    beginClipEdit,
-    updateClip,
-    toggleClipReverse,
-    toggleClipMirror,
-    duplicateClip,
-    deleteClip,
-    moveClipInOrder,
-    packClips,
-    shuffleClips,
-    sortClipsByAssetOrder,
-    copyClip,
-    pasteClip,
-    hasClipboard,
-    addClipFromAsset,
-    generateAutoMvCut,
-    splitAtTime,
-    splitClipAtTime,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-  }), [
-    beginClipEdit,
-    updateClip,
-    toggleClipReverse,
-    toggleClipMirror,
-    duplicateClip,
-    deleteClip,
-    moveClipInOrder,
-    packClips,
-    shuffleClips,
-    sortClipsByAssetOrder,
-    copyClip,
-    pasteClip,
-    hasClipboard,
-    addClipFromAsset,
-    generateAutoMvCut,
-    splitAtTime,
-    splitClipAtTime,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-  ]);
+    if (DEFAULT_PLAYLIST[0]?.storyboardId && STORYBOARD_PRESETS[DEFAULT_PLAYLIST[0].storyboardId]) {
+      loadStoryboard(DEFAULT_PLAYLIST[0].storyboardId);
+    }
+  }, [loadAudioTrack, loadStoryboard]);
 
   // ── Modular CSS Automation Effect ──
   const [selectedCssEffect, setSelectedCssEffect] = useState('solarize_invert');
