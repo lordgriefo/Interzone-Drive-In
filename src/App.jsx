@@ -1211,7 +1211,7 @@ export default function App() {
             onSwitchToStudio={() => setActiveTab('studio')}
             currentTrackTitle={trackTitle}
             isPlaying={isPlaying}
-            onTogglePlay={togglePlayPause}
+            onTogglePlay={togglePlay}
             audioSignals={audioSignals}
             playlist={playlist}
             onSelectTrack={(entry) => handlePlayTrack(entry, playlist.findIndex((p) => p.id === entry.id))}
