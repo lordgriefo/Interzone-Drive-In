@@ -49,6 +49,21 @@ export const FAKE_MARQUEE_MOVIES = [
   },
 ];
 
+export const VEGAS_UFO_BROLL_CLIPS = [
+  { id: 'ufo-1', title: 'Sands Casino Neon Explosion', url: './assets-bg/excavating/Scene_20__Sands_Explosion_202609031307.mp4' },
+  { id: 'ufo-2', title: 'Sky Jellyfish Over 1960s Strip', url: './assets-bg/excavating/Scene_29__Sky_Jellyfish_(Action)_202609031307.mp4' },
+  { id: 'ufo-3', title: 'Archon Tendrils Swirl in Vegas Sky', url: './assets-bg/excavating/Archon_tendrils_swirl_in_sky_202609031307.mp4' },
+  { id: 'ufo-4', title: '1950s Classroom Reality Fracture', url: './assets-bg/excavating/Scene_2__Classroom_Manifest_202609031307.mp4' },
+  { id: 'ufo-5', title: 'Cosmic Eye Opens Over Strip', url: './assets-bg/excavating/Scene_35__Cosmic_Eye_202609031307.mp4' },
+  { id: 'ufo-6', title: 'CRT Control Room Static Breach', url: './assets-bg/excavating/Scene_8__CRT_Control_Room_202609031307.mp4' },
+  { id: 'ufo-7', title: 'Maniacal Laugh Astral Projection', url: './assets-bg/excavating/Scene_38__Maniacal_Laugh_202609031307.mp4' },
+  { id: 'ufo-8', title: 'Oily Computer Lab Archons', url: './assets-bg/excavating/Scene_32__Oily_Computer_Lab_202609031307.mp4' },
+  { id: 'ufo-9', title: 'Neon Overload Finale Explosion', url: './assets-bg/excavating/Scene_44__Neon_Overload_Final_202609031307.mp4' },
+  { id: 'ufo-10', title: 'Black-Robed Figures in Repo Malibu', url: './assets-bg/excavating/Black-robed_figures_in_car_202607231531.mp4' },
+  { id: 'ufo-11', title: 'Shrimp on Dash at High Speed', url: './assets-bg/excavating/Shrimp_on_dash_figures_highway_202607231531.mp4' },
+  { id: 'ufo-12', title: 'Malibu Accelerates into Sky Vortex', url: './assets-bg/excavating/Malibu_accelerates_into_sky_vortex_202607231532.mp4' },
+];
+
 export function InterzoneDriveInTheater({
   onSwitchToStudio,
   currentTrackTitle,
@@ -66,6 +81,9 @@ export function InterzoneDriveInTheater({
 
   // Marquee movie cycling
   const [marqueeIndex, setMarqueeIndex] = useState(0);
+
+  // Screen 2: 1960s Vegas UFO B-Roll cycling
+  const [ufoClipIndex, setUfoClipIndex] = useState(0);
 
   // Community Reel cycling & modal
   const [communityIndex, setCommunityIndex] = useState(0);
@@ -1066,19 +1084,83 @@ export function InterzoneDriveInTheater({
                 </div>
               </div>
             ) : screenChannel === 'ufo_broll' ? (
-              /* Screen 2: 1960s Vegas UFO B-roll footage */
-              <video
-                src="./assets-bg/drive-in/Chevy_Malibu_parked_at_drive-in_202608202035.mp4"
-                autoPlay
-                loop
-                playsInline
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  filter: 'contrast(1.25) saturate(1.3) sepia(0.2)',
-                }}
-              />
+              /* Screen 2: 1960s Vegas UFO B-roll footage (Excavating Neverland Archive) */
+              (() => {
+                const currentUfoClip = VEGAS_UFO_BROLL_CLIPS[ufoClipIndex % VEGAS_UFO_BROLL_CLIPS.length];
+                return (
+                  <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
+                    <video
+                      key={currentUfoClip.id}
+                      src={currentUfoClip.url}
+                      autoPlay
+                      loop
+                      playsInline
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        filter: 'contrast(1.25) saturate(1.3) sepia(0.15)',
+                      }}
+                    />
+                    {/* Screen 2 Lower-Third Overlay */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: '16px 24px',
+                        background: 'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9, color: '#00e5ff', letterSpacing: 2 }}>
+                          🛸 SCREEN 2: 1960s VEGAS UFO B-ROLL ARCHIVE ({ufoClipIndex + 1}/{VEGAS_UFO_BROLL_CLIPS.length})
+                        </div>
+                        <div style={{ fontSize: 13, color: '#fff', fontWeight: 700, marginTop: 2 }}>
+                          {currentUfoClip.title}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button
+                          onClick={() =>
+                            setUfoClipIndex((prev) => (prev - 1 + VEGAS_UFO_BROLL_CLIPS.length) % VEGAS_UFO_BROLL_CLIPS.length)
+                          }
+                          style={{
+                            background: 'rgba(255,255,255,0.12)',
+                            color: '#fff',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            borderRadius: 3,
+                            padding: '4px 10px',
+                            fontSize: 9,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          ◀ PREV CLIP
+                        </button>
+                        <button
+                          onClick={() => setUfoClipIndex((prev) => (prev + 1) % VEGAS_UFO_BROLL_CLIPS.length)}
+                          style={{
+                            background: '#00e5ff',
+                            color: '#000',
+                            border: 'none',
+                            borderRadius: 3,
+                            padding: '4px 12px',
+                            fontSize: 9,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          NEXT CLIP ▶
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()
             ) : (
               /* Screen 1: Feature Parked at Drive-In */
               <video
