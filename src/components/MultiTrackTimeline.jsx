@@ -137,6 +137,9 @@ export function MultiTrackTimeline({
   onAddFxMarker,
   onRemoveFxMarker,
   onUpdateFxMarker,
+  onSetFxMarkers = null,
+  currentPreset = null,
+  onApplyPreset = null,
   onSeek,
   bpm = 120,
   // A/B Region Looping
@@ -873,7 +876,10 @@ export function MultiTrackTimeline({
           title="Save and export the current cut sequence as a reusable JSON template"
           color="#06b6d4"
           onClick={() => {
-            const data = edit.exportCutTemplate?.();
+            const data = edit.exportCutTemplate?.({
+              fxMarkers,
+              preset: currentPreset || { selectedStyle, bpm },
+            });
             if (!data) return;
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -924,6 +930,12 @@ export function MultiTrackTimeline({
               try {
                 const json = JSON.parse(ev.target.result);
                 edit.loadCutTemplate?.(json);
+                if (Array.isArray(json.fxMarkers) && onSetFxMarkers) {
+                  onSetFxMarkers(json.fxMarkers);
+                }
+                if (json.preset && onApplyPreset) {
+                  onApplyPreset(json.preset);
+                }
               } catch (err) {
                 alert('Could not load cut template: ' + err.message);
               }
@@ -966,7 +978,7 @@ export function MultiTrackTimeline({
             title="Load pre-choreographed cinematic storyboards for showcase tracks"
           >
             <option value="">🎬 Load Storyboard Choreography...</option>
-            <option value="sb:pl_excavating_neverland">🛸 Excavating Neverland (45 clips · Vegas UFO 5-Act)</option>
+            <option value="sb:pl_excavating_neverland">🛸 Excavating Neverland (119 cuts · Vegas UFO Timed-FX)</option>
             <option value="sb:pl_wait_till_you_see_it">👁 Wait Till You SEE It (78 clips · Dark Perchance)</option>
             <option value="sb:pl_high_roller">🎰 High Roller (55 clips · Neon Grindhouse)</option>
           </select>

@@ -430,15 +430,46 @@ export default function App() {
   });
 
   // ── FX / era state ──
-  const [selectedEra,   setSelectedEra]   = useState('1902_melies');
+  const [selectedEra,   setSelectedEra]   = useState('default');
   const [isEraLocked,   setIsEraLocked]   = useState(false);
   const [eraChangeCooldown, setEraChangeCooldown] = useState(8000); // 8000ms default
   const lastEraChangeTimeRef = useRef(0);
-  const [selectedStyle, setSelectedStyle] = useState('lsd_acid_melt');
-  const [selectedRube,  setSelectedRube]  = useState('strangelet_event');
-  const [chaosLevel,    setChaosLevel]    = useState(0.10);
+  const [selectedStyle, setSelectedStyle] = useState('timeline');
+  const [selectedRube,  setSelectedRube]  = useState('none');
+  const [chaosLevel,    setChaosLevel]    = useState(0);
   const [rubeDecay,     setRubeDecay]     = useState(800);
   const [trackTitle,    setTrackTitle]    = useState('Excavating Neverland by The Magic Static Society');
+
+  const basePresetRef = useRef({
+    era: 'default',
+    rube: 'none',
+    style: 'timeline',
+  });
+
+  const handleUserSetRube = useCallback((rube) => {
+    basePresetRef.current.rube = rube;
+    setSelectedRube(rube);
+  }, []);
+
+  const applyPreset = useCallback((preset) => {
+    if (!preset) return;
+    if (preset.selectedStyle !== undefined) setSelectedStyle(preset.selectedStyle);
+    if (preset.selectedEra   !== undefined) setSelectedEra(preset.selectedEra);
+    if (preset.selectedRube  !== undefined) setSelectedRube(preset.selectedRube);
+    if (preset.chaosLevel    !== undefined) setChaosLevel(preset.chaosLevel);
+    if (preset.chaosEnabled  !== undefined) setChaosEnabled(preset.chaosEnabled);
+    if (preset.sensitivity   !== undefined) setSensitivity(preset.sensitivity);
+    if (preset.bpm           !== undefined) setBpm(preset.bpm);
+    if (preset.reverbWet     !== undefined) setReverbWet(preset.reverbWet);
+    if (preset.autoDJEnabled !== undefined) setAutoDJEnabled(preset.autoDJEnabled);
+    if (preset.autoDJMode    !== undefined) setAutoDJMode(preset.autoDJMode);
+    if (preset.autoDJInterval !== undefined) setAutoDJInterval(preset.autoDJInterval);
+    basePresetRef.current = {
+      era: preset.selectedEra || 'default',
+      rube: preset.selectedRube || 'none',
+      style: preset.selectedStyle || 'timeline',
+    };
+  }, [setReverbWet]);
 
   // ── Auto DJ ──
   const [autoDJEnabled,  setAutoDJEnabled]  = useState(false);
@@ -658,6 +689,20 @@ export default function App() {
   } = useTimelineState(assets, duration || 60, bpm, setBpm);
 
   // Consolidated editing operations bundle passed down to timeline and toolbar
+  const handleLoadStoryboard = useCallback((storyboardId) => {
+    const ok = loadStoryboard(storyboardId);
+    const sb = STORYBOARD_PRESETS[storyboardId];
+    if (sb) {
+      if (Array.isArray(sb.fxMarkers)) {
+        setFxMarkers(sb.fxMarkers);
+      }
+      if (sb.preset) {
+        applyPreset(sb.preset);
+      }
+    }
+    return ok;
+  }, [loadStoryboard, applyPreset]);
+
   const timelineEdit = useMemo(() => ({
     beginClipEdit,
     updateClip,
@@ -676,7 +721,7 @@ export default function App() {
     generateAutoMvCut,
     exportCutTemplate,
     loadCutTemplate,
-    loadStoryboard,
+    loadStoryboard: handleLoadStoryboard,
     splitAtTime,
     splitClipAtTime,
     undo,
@@ -701,7 +746,7 @@ export default function App() {
     generateAutoMvCut,
     exportCutTemplate,
     loadCutTemplate,
-    loadStoryboard,
+    handleLoadStoryboard,
     splitAtTime,
     splitClipAtTime,
     undo,
@@ -718,21 +763,13 @@ export default function App() {
     loadAudioTrack(entry.file || entry.url);
     // Apply the entry's saved preset
     if (entry.preset) {
-      if (entry.preset.selectedStyle !== undefined) setSelectedStyle(entry.preset.selectedStyle);
-      if (entry.preset.selectedEra   !== undefined) setSelectedEra(entry.preset.selectedEra);
-      if (entry.preset.selectedRube  !== undefined) setSelectedRube(entry.preset.selectedRube);
-      if (entry.preset.chaosLevel    !== undefined) setChaosLevel(entry.preset.chaosLevel);
-      if (entry.preset.chaosEnabled  !== undefined) setChaosEnabled(entry.preset.chaosEnabled);
-      if (entry.preset.sensitivity   !== undefined) setSensitivity(entry.preset.sensitivity);
-      if (entry.preset.bpm           !== undefined) setBpm(entry.preset.bpm);
-      if (entry.preset.reverbWet     !== undefined) setReverbWet(entry.preset.reverbWet);
-      if (entry.preset.autoDJEnabled !== undefined) setAutoDJEnabled(entry.preset.autoDJEnabled);
-      if (entry.preset.autoDJMode    !== undefined) setAutoDJMode(entry.preset.autoDJMode);
-      if (entry.preset.autoDJInterval !== undefined) setAutoDJInterval(entry.preset.autoDJInterval);
+      applyPreset(entry.preset);
     }
     // Auto-load storyboard choreography if defined for this track
     if (entry.storyboardId && STORYBOARD_PRESETS[entry.storyboardId]) {
-      loadStoryboard(entry.storyboardId);
+      handleLoadStoryboard(entry.storyboardId);
+    } else {
+      setFxMarkers([]);
     }
     setLyricSegments([]);
     if (entry.lrcUrl) {
@@ -830,17 +867,7 @@ export default function App() {
       lastAudioFileRef.current = DEFAULT_TRACK_URL;
       const p = DEFAULT_PLAYLIST[0]?.preset;
       if (p) {
-        if (p.selectedStyle) setSelectedStyle(p.selectedStyle);
-        if (p.selectedEra) setSelectedEra(p.selectedEra);
-        if (p.selectedRube) setSelectedRube(p.selectedRube);
-        if (p.bpm) setBpm(p.bpm);
-        if (p.chaosLevel !== undefined) setChaosLevel(p.chaosLevel);
-        if (p.chaosEnabled !== undefined) setChaosEnabled(p.chaosEnabled);
-        if (p.sensitivity) setSensitivity(p.sensitivity);
-        if (p.reverbWet !== undefined) setReverbWet(p.reverbWet);
-        if (p.autoDJEnabled !== undefined) setAutoDJEnabled(p.autoDJEnabled);
-        if (p.autoDJMode !== undefined) setAutoDJMode(p.autoDJMode);
-        if (p.autoDJInterval !== undefined) setAutoDJInterval(p.autoDJInterval);
+        applyPreset(p);
       }
     } catch (err) {
       console.warn('[App] Default audio track init warning:', err);
@@ -861,9 +888,9 @@ export default function App() {
         .catch((err) => console.warn('[App] Default LRC lyrics load info:', err));
     }
     if (DEFAULT_PLAYLIST[0]?.storyboardId && STORYBOARD_PRESETS[DEFAULT_PLAYLIST[0].storyboardId]) {
-      loadStoryboard(DEFAULT_PLAYLIST[0].storyboardId);
+      handleLoadStoryboard(DEFAULT_PLAYLIST[0].storyboardId);
     }
-  }, [loadAudioTrack, loadStoryboard]);
+  }, [loadAudioTrack, handleLoadStoryboard, applyPreset]);
 
   // ── Modular CSS Automation Effect ──
   const [selectedCssEffect, setSelectedCssEffect] = useState('solarize_invert');
@@ -1039,13 +1066,22 @@ export default function App() {
     lastEraChangeTimeRef.current = currentTime;
   }, [currentTime]);
 
-  // ── Section Marker Binding (Auto-Mode) ──
-  // Ensure manual selection of an era or explicit timeline section marker triggers
-  // (e.g., Intro, Bridge, Outro) can override the cooldown period while respecting the user's manual choice.
+  // ── Section Marker Binding (Auto-Mode & Timed FX/Rube Triggers) ──
+  // Timed FX markers allow Rube Goldberg machines and era effects to turn ON during specific
+  // moments (drops, guitar solo, chorus, climax) and cleanly turn OFF when the marker ends.
   const lastSectionMarkerIdRef = useRef(null);
+  const isInTimedFxRef = useRef(false);
+
   useEffect(() => {
     if (!effectiveIsPlaying) {
-      lastSectionMarkerIdRef.current = null;
+      if (lastSectionMarkerIdRef.current !== null || isInTimedFxRef.current) {
+        lastSectionMarkerIdRef.current = null;
+        isInTimedFxRef.current = false;
+        setSelectedRube(basePresetRef.current.rube || 'none');
+        if (!isEraLocked) {
+          setSelectedEra(basePresetRef.current.era || 'default');
+        }
+      }
       return;
     }
 
@@ -1054,19 +1090,58 @@ export default function App() {
       return effectiveCurrentTime >= m.time && effectiveCurrentTime < end;
     });
 
-    if (activeMarker && activeMarker.id !== lastSectionMarkerIdRef.current) {
-      lastSectionMarkerIdRef.current = activeMarker.id;
-      if (!isEraLocked) {
-        const markerEraMap = {
-          'INTRO': '1902_melies',
-          'CUT-UP': 'lynchian_interzone',
-          'BRIDGE': '1927_metropolis',
-          'DROP': '2020_cyber',
-          'OUTRO': '1970_grindhouse',
-        };
-        const eraForMarker = markerEraMap[activeMarker.label];
-        if (eraForMarker) {
-          handleEraMutate(eraForMarker, true); // true overrides cooldown
+    if (activeMarker) {
+      if (activeMarker.id !== lastSectionMarkerIdRef.current) {
+        lastSectionMarkerIdRef.current = activeMarker.id;
+        isInTimedFxRef.current = true;
+
+        // 1. Timed Rube trigger
+        if (activeMarker.rube) {
+          setSelectedRube(activeMarker.rube);
+        } else if (activeMarker.label?.includes('RUBE')) {
+          const match = activeMarker.label.match(/RUBE:\s*([A-Za-z0-9_]+)/i);
+          const rubeKey = match ? match[1].toLowerCase() : 'cathode_burn';
+          const rubeMap = {
+            'burst': 'cathode_burn',
+            'prism': 'chromatic_prism',
+            'pulse': 'neon_pulse',
+            'strangelet': 'strangelet_event',
+            'horizon': 'strangelet_event',
+            'cathode_burn': 'cathode_burn',
+            'chromatic_prism': 'chromatic_prism',
+            'neon_pulse': 'neon_pulse',
+            'strangelet_event': 'strangelet_event',
+          };
+          setSelectedRube(rubeMap[rubeKey] || 'cathode_burn');
+        } else if (activeMarker.label === 'DROP') {
+          setSelectedRube('cathode_burn');
+        }
+
+        // 2. Timed Era trigger
+        if (activeMarker.era) {
+          setSelectedEra(activeMarker.era);
+        } else if (!isEraLocked) {
+          const markerEraMap = {
+            'INTRO': '1902_melies',
+            'CUT-UP': 'lynchian_interzone',
+            'BRIDGE': '1927_metropolis',
+            'DROP': '2020_cyber',
+            'OUTRO': '1970_grindhouse',
+          };
+          const eraForMarker = markerEraMap[activeMarker.label];
+          if (eraForMarker) {
+            handleEraMutate(eraForMarker, true); // true overrides cooldown
+          }
+        }
+      }
+    } else {
+      // Exited any active marker — cleanly turn off Rube and return to base preset!
+      if (lastSectionMarkerIdRef.current !== null || isInTimedFxRef.current) {
+        lastSectionMarkerIdRef.current = null;
+        isInTimedFxRef.current = false;
+        setSelectedRube(basePresetRef.current.rube || 'none');
+        if (!isEraLocked) {
+          setSelectedEra(basePresetRef.current.era || 'default');
         }
       }
     }
@@ -1254,7 +1329,7 @@ export default function App() {
       selectedStyle={selectedStyle}
       setSelectedStyle={setSelectedStyle}
       selectedRube={selectedRube}
-      setSelectedRube={setSelectedRube}
+      setSelectedRube={handleUserSetRube}
       assets={assets}
     >
       <div style={{
@@ -1356,6 +1431,16 @@ export default function App() {
               loopEnd={loopEnd}
               onUpdateLoop={setLoopPoints}
               fxMarkers={fxMarkers}
+              onSetFxMarkers={setFxMarkers}
+              currentPreset={{
+                selectedStyle,
+                selectedEra,
+                selectedRube: basePresetRef.current.rube,
+                bpm,
+                chaosLevel,
+                chaosEnabled,
+              }}
+              onApplyPreset={applyPreset}
               onAddFxMarker={handleAddFxMarker}
               onRemoveFxMarker={handleRemoveFxMarker}
               onUpdateFxMarker={handleUpdateFxMarker}
@@ -1480,7 +1565,7 @@ export default function App() {
           selectedStyle={selectedStyle}
           setSelectedStyle={setSelectedStyle}
           selectedRube={selectedRube}
-          setSelectedRube={setSelectedRube}
+          setSelectedRube={handleUserSetRube}
           sensitivity={sensitivity}
           setSensitivity={setSensitivity}
           chaosLevel={chaosLevel}

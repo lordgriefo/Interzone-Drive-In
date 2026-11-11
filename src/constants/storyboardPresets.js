@@ -9,6 +9,65 @@ export const STORYBOARD_PRESETS = {
     "bpm": 120,
     "duration": 310,
     "description": "Upgraded rapid-switching kinetic cut (119 cuts) alternating striking vintage surreal stills and recurring hero video climaxes (Sands UFO explosion, Chevy Malibu vortex flight, Classroom manifest).",
+    "preset": {
+      "selectedStyle": "timeline",
+      "selectedEra": "default",
+      "selectedRube": "none",
+      "bpm": 120,
+      "chaosLevel": 0,
+      "chaosEnabled": false,
+      "autoDJEnabled": false
+    },
+    "fxMarkers": [
+      {
+        "id": "fx-m-1",
+        "time": 16.0,
+        "duration": 6.0,
+        "label": "DROP (RUBE: BURST)",
+        "rube": "cathode_burn",
+        "intensity": 1.2
+      },
+      {
+        "id": "fx-m-2",
+        "time": 62.0,
+        "duration": 8.0,
+        "label": "CHORUS (RUBE: PRISM)",
+        "rube": "chromatic_prism",
+        "intensity": 1.1
+      },
+      {
+        "id": "fx-m-3",
+        "time": 126.0,
+        "duration": 8.0,
+        "label": "DROP (RUBE: PULSE)",
+        "rube": "neon_pulse",
+        "intensity": 1.2
+      },
+      {
+        "id": "fx-m-4",
+        "time": 158.0,
+        "duration": 16.0,
+        "label": "SOLO (RUBE: STRANGELET)",
+        "rube": "strangelet_event",
+        "intensity": 1.4
+      },
+      {
+        "id": "fx-m-5",
+        "time": 268.0,
+        "duration": 8.0,
+        "label": "BRIDGE (RUBE: BURST)",
+        "rube": "cathode_burn",
+        "intensity": 1.2
+      },
+      {
+        "id": "fx-m-6",
+        "time": 284.0,
+        "duration": 14.0,
+        "label": "CLIMAX (RUBE: HORIZON)",
+        "rube": "strangelet_event",
+        "intensity": 1.5
+      }
+    ],
     "clips": [
       {
         "id": "ex-clip-0",

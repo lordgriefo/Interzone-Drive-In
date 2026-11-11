@@ -532,27 +532,33 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
     }, true);
   }, [assets, applyClips]);
 
-  // Export current cut sequence as a JSON template
-  const exportCutTemplate = useCallback(() => {
+  // Export current cut sequence as a JSON template (including timed FX and presets)
+  const exportCutTemplate = useCallback((extraData = {}) => {
     return {
-      version: 1,
+      version: 2,
       createdAt: new Date().toISOString(),
       bpm,
       duration,
+      preset: extraData.preset || null,
+      fxMarkers: extraData.fxMarkers || [],
+      automationKeyframes: extraData.automationKeyframes || automationKeyframes || [],
       clips: clipsRef.current.map((c) => {
         const asset = assets.find((a) => a.id === c.assetId);
         return {
+          id: c.id,
           startTime: c.startTime,
           duration: c.duration,
           inPoint: c.inPoint || 0,
           reversed: Boolean(c.reversed),
           mirrored: Boolean(c.mirrored),
-          assetIndex: assets.findIndex((a) => a.id === c.assetId),
-          assetName: asset?.name || 'clip',
+          assetId: c.assetId,
+          assetUrl: c.assetUrl || asset?.url,
+          assetName: c.assetName || asset?.name || 'clip',
+          mediaType: c.mediaType || asset?.mediaType || (asset?.url?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
         };
       }),
     };
-  }, [bpm, duration, assets]);
+  }, [bpm, duration, assets, automationKeyframes]);
 
   // Load a cut sequence from a JSON template
   const loadCutTemplate = useCallback((templateData) => {
