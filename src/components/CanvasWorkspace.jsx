@@ -81,11 +81,7 @@ function TimelineClipMedia({
 
   const flip = clip.mirrored || (clip.reversed && !isVideo);
 
-  // ── LIVING STILL & DYNAMIC VIDEO ENGINE: Organic Ken Burns & Beat-Reactive Punch ──
-  const bass = Number(audioSignals?.bass) || 0;
-  const isTransient = Boolean(audioSignals?.isTransient);
-  const beatPulse = isTransient ? 0.12 : bass * 0.07;
-
+  // ── LIVING STILL & VIDEO ENGINE: Clean, High-Clarity Showcase ──
   let finalMediaStyle = {
     ...mediaStyle,
     objectFit: 'cover',
@@ -96,35 +92,25 @@ function TimelineClipMedia({
     const hash = (clip.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
     const zoomDir = hash % 2 === 0 ? 1 : -1;
     const panXDir = hash % 3 === 0 ? 1 : -1;
-    const panYDir = hash % 4 === 0 ? 1 : -1;
 
-    // Parallax Ken Burns drift that breathes with the bass and transients
-    const baseScale = zoomDir > 0 ? 1.05 + progress * 0.16 : 1.22 - progress * 0.14;
-    const scale = Number((baseScale + beatPulse).toFixed(3));
-    const panX = (Math.sin(progress * Math.PI) * 4.2 * panXDir).toFixed(2);
-    const panY = (Math.sin(progress * Math.PI) * 2.8 * panYDir).toFixed(2);
-    const rot = (Math.sin(localTime * 1.5) * (0.6 + bass * 0.4) * (zoomDir > 0 ? 1 : -1)).toFixed(2);
+    // Smooth, gentle Ken Burns rostrum zoom & subtle pan (preserves 100% crystal clear detail)
+    const baseScale = zoomDir > 0 ? 1.02 + progress * 0.05 : 1.07 - progress * 0.05;
+    const panX = (Math.sin(progress * Math.PI) * 1.8 * panXDir).toFixed(2);
 
     finalMediaStyle = {
       ...mediaStyle,
       objectFit: 'cover',
-      transform: `${mediaStyle.transform || ''} translate3d(${panX}%, ${panY}%, 0) scale(${scale}) rotate(${rot}deg)`.trim(),
+      transform: `${mediaStyle.transform || ''} translate3d(${panX}%, 0, 0) scale(${baseScale.toFixed(4)})`.trim(),
       transformOrigin: 'center center',
-      transition: isTransient ? 'none' : 'transform 0.08s ease-out, filter 0.12s ease-out',
-      filter: `${mediaStyle.filter || ''} brightness(${1 + (isTransient ? 0.25 : 0) + bass * 0.12}) saturate(${1 + (isTransient ? 0.20 : 0) + bass * 0.10})`.trim(),
-      willChange: 'transform, filter',
+      transition: 'transform 0.1s linear',
+      filter: mediaStyle.filter || 'none',
+      willChange: 'transform',
     };
   } else {
-    // Dynamic kinetic scale pop and transient brightness flash on video clips
-    const vidScale = 1.0 + beatPulse * 0.55;
     finalMediaStyle = {
       ...mediaStyle,
       objectFit: 'cover',
-      transform: `${mediaStyle.transform || ''} scale(${vidScale.toFixed(3)})`.trim(),
-      transformOrigin: 'center center',
-      filter: `${mediaStyle.filter || ''} brightness(${1 + (isTransient ? 0.22 : 0) + bass * 0.10})`.trim(),
-      transition: isTransient ? 'none' : 'transform 0.08s ease-out, filter 0.1s ease-out',
-      willChange: 'transform, filter',
+      filter: mediaStyle.filter || 'none',
     };
   }
 
@@ -681,20 +667,16 @@ export function CanvasWorkspace({
 
     switch (selectedStyle) {
 
-      // ── TIMELINE: Beat-reactive kinetic pulse with audio-driven zoom pops & transient flares ──
+      // ── TIMELINE: Clean showcase cut — 100% visible, true colors, subtle musical downbeat pulse ──
       case 'timeline': {
         const beatFrac = (currentTime * (bpm / 60)) % 1;
         const beatSnap = Math.exp(-beatFrac * 6);
-        const bassKick = (bass > 0.35 || audioSignals?.isTransient) ? (bass * 0.16 + (audioSignals?.isTransient ? 0.09 : 0)) : 0;
-        const scaleVal = 1.0 + beatSnap * (0.05 + bassKick);
-        const brightVal = 1.0 + (audioSignals?.isTransient ? 0.35 : 0) + bass * 0.18 + (rms * 0.12);
-        const satVal = 1.0 + (audioSignals?.isTransient ? 0.30 : 0) + (mid * 0.22);
-        const jX = audioSignals?.isTransient ? (Math.random() - 0.5) * 12 * bass : 0;
-        const jY = audioSignals?.isTransient ? (Math.random() - 0.5) * 8 * bass : 0;
+        const bassKick = (bass > 0.4) ? bass * 0.03 : 0;
+        const scaleVal = 1.0 + beatSnap * (0.015 + bassKick);
         return {
-          transform: `scale(${scaleVal.toFixed(4)}) translate(${jX.toFixed(1)}px, ${jY.toFixed(1)}px)`,
-          filter: `brightness(${brightVal.toFixed(3)}) saturate(${satVal.toFixed(3)})`,
-          transition: audioSignals?.isTransient ? 'none' : 'transform 0.08s cubic-bezier(0.2, 0.9, 0.3, 1.2), filter 0.1s ease-out',
+          transform: `scale(${scaleVal.toFixed(4)})`,
+          filter: 'none',
+          transition: 'transform 0.08s ease-out',
         };
       }
 
