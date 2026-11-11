@@ -81,11 +81,16 @@ function TimelineClipMedia({
 
   const flip = clip.mirrored || (clip.reversed && !isVideo);
 
-  // ── LIVING STILL IMAGE ENGINE: Organic Ken Burns & Audio-Reactive Motion ──
+  // ── LIVING STILL & DYNAMIC VIDEO ENGINE: Organic Ken Burns & Beat-Reactive Punch ──
+  const bass = Number(audioSignals?.bass) || 0;
+  const isTransient = Boolean(audioSignals?.isTransient);
+  const beatPulse = isTransient ? 0.12 : bass * 0.07;
+
   let finalMediaStyle = {
     ...mediaStyle,
     objectFit: 'cover',
   };
+
   if (!isVideo) {
     const progress = clip.duration > 0 ? Math.max(0, Math.min(1, localTime / clip.duration)) : 0;
     const hash = (clip.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
@@ -93,24 +98,32 @@ function TimelineClipMedia({
     const panXDir = hash % 3 === 0 ? 1 : -1;
     const panYDir = hash % 4 === 0 ? 1 : -1;
 
-    const bass = Number(audioSignals?.bass) || 0;
-    const isTransient = Boolean(audioSignals?.isTransient);
-    const beatPulse = isTransient ? 0.045 : bass * 0.025;
-
-    // Smooth sinusoidal parallax drift across the clip's duration
-    const baseScale = zoomDir > 0 ? 1.06 + progress * 0.14 : 1.20 - progress * 0.12;
+    // Parallax Ken Burns drift that breathes with the bass and transients
+    const baseScale = zoomDir > 0 ? 1.05 + progress * 0.16 : 1.22 - progress * 0.14;
     const scale = Number((baseScale + beatPulse).toFixed(3));
-    const panX = (Math.sin(progress * Math.PI) * 3.5 * panXDir).toFixed(2);
-    const panY = (Math.sin(progress * Math.PI) * 2.2 * panYDir).toFixed(2);
-    const rot = (Math.sin(localTime * 1.4) * (0.5 + bass * 0.35) * (zoomDir > 0 ? 1 : -1)).toFixed(2);
+    const panX = (Math.sin(progress * Math.PI) * 4.2 * panXDir).toFixed(2);
+    const panY = (Math.sin(progress * Math.PI) * 2.8 * panYDir).toFixed(2);
+    const rot = (Math.sin(localTime * 1.5) * (0.6 + bass * 0.4) * (zoomDir > 0 ? 1 : -1)).toFixed(2);
 
     finalMediaStyle = {
       ...mediaStyle,
       objectFit: 'cover',
       transform: `${mediaStyle.transform || ''} translate3d(${panX}%, ${panY}%, 0) scale(${scale}) rotate(${rot}deg)`.trim(),
       transformOrigin: 'center center',
-      transition: 'transform 0.08s ease-out, filter 0.12s ease-out',
-      filter: `${mediaStyle.filter || ''} brightness(${1 + (isTransient ? 0.14 : 0) + bass * 0.06})`.trim(),
+      transition: isTransient ? 'none' : 'transform 0.08s ease-out, filter 0.12s ease-out',
+      filter: `${mediaStyle.filter || ''} brightness(${1 + (isTransient ? 0.25 : 0) + bass * 0.12}) saturate(${1 + (isTransient ? 0.20 : 0) + bass * 0.10})`.trim(),
+      willChange: 'transform, filter',
+    };
+  } else {
+    // Dynamic kinetic scale pop and transient brightness flash on video clips
+    const vidScale = 1.0 + beatPulse * 0.55;
+    finalMediaStyle = {
+      ...mediaStyle,
+      objectFit: 'cover',
+      transform: `${mediaStyle.transform || ''} scale(${vidScale.toFixed(3)})`.trim(),
+      transformOrigin: 'center center',
+      filter: `${mediaStyle.filter || ''} brightness(${1 + (isTransient ? 0.22 : 0) + bass * 0.10})`.trim(),
+      transition: isTransient ? 'none' : 'transform 0.08s ease-out, filter 0.1s ease-out',
       willChange: 'transform, filter',
     };
   }
@@ -667,6 +680,23 @@ export function CanvasWorkspace({
     const rms  = Number(audioSignals?.rms) || 0;
 
     switch (selectedStyle) {
+
+      // ── TIMELINE: Beat-reactive kinetic pulse with audio-driven zoom pops & transient flares ──
+      case 'timeline': {
+        const beatFrac = (currentTime * (bpm / 60)) % 1;
+        const beatSnap = Math.exp(-beatFrac * 6);
+        const bassKick = (bass > 0.35 || audioSignals?.isTransient) ? (bass * 0.16 + (audioSignals?.isTransient ? 0.09 : 0)) : 0;
+        const scaleVal = 1.0 + beatSnap * (0.05 + bassKick);
+        const brightVal = 1.0 + (audioSignals?.isTransient ? 0.35 : 0) + bass * 0.18 + (rms * 0.12);
+        const satVal = 1.0 + (audioSignals?.isTransient ? 0.30 : 0) + (mid * 0.22);
+        const jX = audioSignals?.isTransient ? (Math.random() - 0.5) * 12 * bass : 0;
+        const jY = audioSignals?.isTransient ? (Math.random() - 0.5) * 8 * bass : 0;
+        return {
+          transform: `scale(${scaleVal.toFixed(4)}) translate(${jX.toFixed(1)}px, ${jY.toFixed(1)}px)`,
+          filter: `brightness(${brightVal.toFixed(3)}) saturate(${satVal.toFixed(3)})`,
+          transition: audioSignals?.isTransient ? 'none' : 'transform 0.08s cubic-bezier(0.2, 0.9, 0.3, 1.2), filter 0.1s ease-out',
+        };
+      }
 
       // ── STAN BRAKHAGE: Celluloid gate hops + dye-shift from spectral flux ──
       case 'brakhage_emulsion': {

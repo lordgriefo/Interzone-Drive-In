@@ -37,12 +37,15 @@ export const DEFAULT_PLAYLIST = [
     preset: {
       selectedStyle: 'timeline',
       selectedEra: '1902_melies',
-      selectedRube: 'strangelet_event',
+      selectedRube: 'cathode_burn',
       bpm: 120,
-      chaosLevel: 0.10,
+      chaosLevel: 0.16,
       chaosEnabled: true,
-      sensitivity: 1.3,
+      sensitivity: 1.5,
       reverbWet: 0.32,
+      autoDJEnabled: true,
+      autoDJMode: 'mood_drift',
+      autoDJInterval: 8,
     },
   },
   {
@@ -725,6 +728,9 @@ export default function App() {
       if (entry.preset.sensitivity   !== undefined) setSensitivity(entry.preset.sensitivity);
       if (entry.preset.bpm           !== undefined) setBpm(entry.preset.bpm);
       if (entry.preset.reverbWet     !== undefined) setReverbWet(entry.preset.reverbWet);
+      if (entry.preset.autoDJEnabled !== undefined) setAutoDJEnabled(entry.preset.autoDJEnabled);
+      if (entry.preset.autoDJMode    !== undefined) setAutoDJMode(entry.preset.autoDJMode);
+      if (entry.preset.autoDJInterval !== undefined) setAutoDJInterval(entry.preset.autoDJInterval);
     }
     // Auto-load storyboard choreography if defined for this track
     if (entry.storyboardId && STORYBOARD_PRESETS[entry.storyboardId]) {
@@ -834,6 +840,9 @@ export default function App() {
         if (p.chaosEnabled !== undefined) setChaosEnabled(p.chaosEnabled);
         if (p.sensitivity) setSensitivity(p.sensitivity);
         if (p.reverbWet !== undefined) setReverbWet(p.reverbWet);
+        if (p.autoDJEnabled !== undefined) setAutoDJEnabled(p.autoDJEnabled);
+        if (p.autoDJMode !== undefined) setAutoDJMode(p.autoDJMode);
+        if (p.autoDJInterval !== undefined) setAutoDJInterval(p.autoDJInterval);
       }
     } catch (err) {
       console.warn('[App] Default audio track init warning:', err);
