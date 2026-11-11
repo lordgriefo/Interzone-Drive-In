@@ -283,16 +283,17 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // ── Deep-linkable Tab Router (URL search param ?tab=studio or hash #studio) ──
-  // Default to 'studio' (KenetiCut) so user lands directly into the working editor!
+  // Default to 'editor' (KenetiCut) so user lands directly into the working editor!
+  // 'studio' switches to the AI Choreography & Flipbook Studio.
   const [activeTab, setActiveTab] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
-        if (tab === 'studio' || tab === 'drivein') return tab;
+        if (tab === 'studio' || tab === 'drivein' || tab === 'editor') return tab;
       }
     } catch (_) {}
-    return 'studio';
+    return 'editor';
   });
 
   const handleTabChange = useCallback((nextTab) => {
@@ -311,7 +312,7 @@ export default function App() {
       try {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
-        if (tab === 'studio' || tab === 'drivein') {
+        if (tab === 'studio' || tab === 'drivein' || tab === 'editor') {
           setActiveTab(tab);
         }
       } catch (_) {}
@@ -1161,6 +1162,41 @@ export default function App() {
 
   const handleAddAssets = (newAssets) => setAssets((prev) => [...prev, ...newAssets]);
 
+  // ── Perchance AI Studio & External PostMessage Bridge ──
+  useEffect(() => {
+    const handleMessage = (e) => {
+      if (!e.data || typeof e.data !== 'object') return;
+      const { type, url, name, mediaType, cueStart, cueEnd } = e.data;
+
+      if (type === 'ADD_ASSET' && url) {
+        const assetId = `studio-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        const newAsset = {
+          id: assetId,
+          name: name || `AI Asset ${Date.now()}`,
+          url: url,
+          mediaType: mediaType || (url.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
+        };
+
+        setAssets((prev) => [...prev, newAsset]);
+      } else if (type === 'TOGGLE_PLAY') {
+        togglePlay();
+      } else if (type === 'SEEK_TO' && typeof e.data.time === 'number') {
+        seekTo(e.data.time);
+      } else if (type === 'TRIGGER_CHOP') {
+        window.dispatchEvent(new CustomEvent('keneticut:manual-chop'));
+      } else if (type === 'SET_SUBLIMINAL' && e.data.text) {
+        window.dispatchEvent(new CustomEvent('keneticut:subliminal', {
+          detail: { text: e.data.text, duration: e.data.duration || 600 }
+        }));
+      } else if (type === 'SET_STYLE' && e.data.style) {
+        setSelectedStyle(e.data.style);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [togglePlay, seekTo, setSelectedStyle]);
+
   const handleRemoveAsset = (id) => {
     setAssets((prev) => {
       // Clear any puppet slot that was pointing to this asset
@@ -1341,9 +1377,101 @@ export default function App() {
         position: 'relative',
       }}>
 
-        {activeTab === 'drivein' ? (
+        {activeTab === 'studio' ? (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 100,
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#09090c',
+          }}>
+            {/* Top Navigation Bar back to KenetiCut */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 18px',
+              backgroundColor: '#121218',
+              borderBottom: '1px solid #242432',
+              flexShrink: 0,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('editor')}
+                  style={{
+                    background: 'linear-gradient(90deg, #ff6b00, #ff8800)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '6px 16px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontWeight: 800,
+                    fontSize: 10,
+                    letterSpacing: 1.5,
+                    cursor: 'pointer',
+                    boxShadow: '0 0 12px rgba(255,107,0,0.5)',
+                  }}
+                >
+                  ← BACK TO KENETICUT
+                </button>
+                <span style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: 22,
+                  letterSpacing: 2,
+                  color: '#00ffcc',
+                  textShadow: '0 0 8px rgba(0,255,204,0.4)',
+                }}>
+                  AI CHOREOGRAPHY & FLIPBOOK STUDIO
+                </span>
+                <span style={{
+                  fontSize: 10,
+                  color: '#84849a',
+                  fontFamily: 'monospace',
+                }}>
+                  Generated flipbooks & reels stream live into KenetiCut's Media Bin!
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <a
+                  href="./perchance-generator.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: '#00e5ff',
+                    fontSize: 10,
+                    fontFamily: 'monospace',
+                    textDecoration: 'none',
+                    border: '1px solid rgba(0,229,255,0.4)',
+                    padding: '5px 12px',
+                    borderRadius: 4,
+                    background: 'rgba(0, 229, 255, 0.08)',
+                  }}
+                  title="Open AI Studio in a separate browser tab"
+                >
+                  OPEN IN NEW WINDOW ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Embedded AI Choreography & Flipbook Studio */}
+            <iframe
+              src="./perchance-generator.html"
+              title="Strangelet KenetiCut AI Choreography & Flipbook Studio"
+              style={{
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+              allow="autoplay; clipboard-write; display-capture"
+            />
+          </div>
+        ) : activeTab === 'drivein' ? (
           <InterzoneDriveInTheater
-            onSwitchToStudio={() => handleTabChange('studio')}
+            onSwitchToStudio={() => handleTabChange('editor')}
             currentTrackTitle={trackTitle}
             isPlaying={isPlaying}
             onTogglePlay={togglePlay}
@@ -1360,8 +1488,9 @@ export default function App() {
           <>
         {!cinemaMode && (
           <AssetBin
-          assets={assets}
-          onAddAssets={handleAddAssets}
+            assets={assets}
+            onOpenStudio={() => handleTabChange('studio')}
+            onAddAssets={handleAddAssets}
           onRemoveAsset={handleRemoveAsset}
           onClearAll={handleClearAllAssets}
           selectedAssetIndex={selectedAssetIndex}

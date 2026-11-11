@@ -271,6 +271,53 @@
       flex-shrink: 0;
       animation: popIn 0.25s ease-out;
     }
+    .video-loop-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #14141e;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 4px 10px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px var(--accent-glow);
+      animation: popIn 0.3s ease-out;
+    }
+    .video-loop-card video {
+      width: 84px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 3px;
+      background: #000;
+      border: 1px solid #333;
+    }
+    .video-loop-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .loop-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .btn-download-video {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      background: var(--accent);
+      color: #000;
+      text-decoration: none;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.15s;
+    }
+    .btn-download-video:hover {
+      opacity: 0.85;
+    }
     @keyframes popIn {
       from { transform: scale(0.6); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
@@ -359,6 +406,24 @@
       </select>
     </div>
 
+    <div class="input-group">
+      <span>Output:</span>
+      <select id="output-mode" onchange="toggleMotionControls()">
+        <option value="webm_loop" selected>🎥 WebM Video Loop</option>
+        <option value="flipbook_stills">🎞️ Flipbook Stills</option>
+      </select>
+    </div>
+
+    <div class="input-group" id="motion-mode-wrap">
+      <span>Motion:</span>
+      <select id="motion-style">
+        <option value="cinematic_cut" selected>⚡ Rapid Cinema (12fps)</option>
+        <option value="smooth_drift">🌊 Ken Burns Drift & Zoom</option>
+        <option value="pulse_strobe">💥 Strobe / Pulse</option>
+        <option value="hyper_speed">🚀 Hyper Speed (24fps)</option>
+      </select>
+    </div>
+
     <button id="gen-btn" class="btn-primary" onclick="generateChoreographedReel()">
       <span>🎬</span> Choreograph Reel
     </button>
@@ -435,6 +500,19 @@
     const timeDisplay = document.getElementById('timecode-display');
     const durDisplay = document.getElementById('duration-display');
 
+    // Multi-target broadcaster: reaches iframe child, parent window (when embedded), and opener window (when popup)
+    function postToKenetiCut(msg) {
+      if (frame && frame.contentWindow) {
+        try { frame.contentWindow.postMessage(msg, '*'); } catch (_) {}
+      }
+      if (window.parent && window.parent !== window) {
+        try { window.parent.postMessage(msg, '*'); } catch (_) {}
+      }
+      if (window.opener) {
+        try { window.opener.postMessage(msg, '*'); } catch (_) {}
+      }
+    }
+
     let currentSongTime = 0;
     let songDuration = 32;
     let activeCues = [];
@@ -497,7 +575,7 @@
       if (!p) return;
       document.getElementById('prompt-input').value = p.prompt;
       if (p.style) {
-        frame.contentWindow?.postMessage({ type: 'SET_STYLE', style: p.style }, '*');
+        postToKenetiCut({ type: 'SET_STYLE', style: p.style });
       }
     }
 
@@ -694,7 +772,7 @@
 
         // If in Stills mode, stream each frame immediately into KenetiCut
         if (outputMode === 'flipbook_stills') {
-          frame.contentWindow?.postMessage({
+          postToKenetiCut({
             type: 'ADD_ASSET',
             url: imgUrl,
             name: `${reelName}_#${i + 1}`,
@@ -702,7 +780,7 @@
             cueStart: cueInSec,
             cueEnd: cueEndSec,
             reelName: reelName
-          }, '*');
+          });
         }
 
         await new Promise((r) => setTimeout(r, 350));
@@ -721,7 +799,7 @@
           const videoFileName = `${safeReelName}_loop.webm`;
 
           // Stream compiled video loop into KenetiCut as native video!
-          frame.contentWindow?.postMessage({
+          postToKenetiCut({
             type: 'ADD_ASSET',
             url: videoBlobUrl,
             name: videoFileName,
@@ -729,7 +807,7 @@
             cueStart: cueInSec,
             cueEnd: cueEndSec,
             reelName: reelName
-          }, '*');
+          });
 
           // Add playable video preview card to the bottom strip
           const card = document.createElement('div');
@@ -779,20 +857,20 @@
     }
 
     function seekSong(time) {
-      frame.contentWindow?.postMessage({ type: 'SEEK_TO', time: parseFloat(time) }, '*');
+      postToKenetiCut({ type: 'SEEK_TO', time: parseFloat(time) });
     }
 
     function flashSubliminal() {
       const line = BURROUGHS_LINES[Math.floor(Math.random() * BURROUGHS_LINES.length)];
-      frame.contentWindow?.postMessage({ type: 'SET_SUBLIMINAL', text: line, duration: 600 }, '*');
+      postToKenetiCut({ type: 'SET_SUBLIMINAL', text: line, duration: 600 });
     }
 
     function triggerChop() {
-      frame.contentWindow?.postMessage({ type: 'TRIGGER_CHOP' }, '*');
+      postToKenetiCut({ type: 'TRIGGER_CHOP' });
     }
 
     function togglePlay() {
-      frame.contentWindow?.postMessage({ type: 'TOGGLE_PLAY' }, '*');
+      postToKenetiCut({ type: 'TOGGLE_PLAY' });
     }
   </script>
 </body>

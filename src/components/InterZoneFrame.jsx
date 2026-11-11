@@ -270,7 +270,7 @@ export function InterzoneFrame({
         </a>
       )}
 
-      {/* ── INTERZONE DRIVE-IN BANNER ── */}
+      {/* ── HEADER BANNER ── */}
       {!cinemaMode && (
         <div style={{
           position: 'relative',
@@ -278,145 +278,130 @@ export function InterzoneFrame({
           width: '100%',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 5,
+          justifyContent: 'space-between',
+          marginBottom: 6,
           flexShrink: 0,
-          padding: '4px 0 6px',
-          borderBottom: '1px solid var(--border-dim)',
-          gap: 14,
+          padding: '6px 16px',
+          borderBottom: '1px solid rgba(0, 229, 255, 0.2)',
+          background: 'linear-gradient(180deg, rgba(12, 12, 22, 0.85) 0%, rgba(6, 6, 14, 0.5) 100%)',
         }}>
-          {/* Left logo image */}
-          <img
-            src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
-            alt="Interzone Drive-In"
-            style={{
-              height: 42,
-              width: 'auto',
-              objectFit: 'contain',
-              borderRadius: 3,
-              opacity: 0.88,
-              boxShadow: '0 0 10px var(--accent-blue-glow), 0 0 2px rgba(0,229,255,0.4)',
-              border: '1px solid rgba(0,229,255,0.25)',
-            }}
-          />
+          {/* Left: Vintage Strangelet Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 160 }}>
+            <img
+              src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
+              alt="The Strangelet"
+              style={{
+                height: 38,
+                width: 'auto',
+                objectFit: 'contain',
+                borderRadius: 3,
+                opacity: 0.92,
+                boxShadow: '0 0 10px rgba(0, 229, 255, 0.45)',
+                border: '1px solid rgba(0, 229, 255, 0.3)',
+              }}
+            />
+          </div>
 
-          {/* Main banner & Suite Tab Switcher */}
+          {/* Center: Title in Bebas Neue font */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             lineHeight: 1,
+            pointerEvents: 'none',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <button
-                onClick={() => onTabChange && onTabChange('studio')}
-                style={{
-                  background: activeTab === 'studio' ? 'linear-gradient(90deg, #00e5ff, #00b0ff)' : 'rgba(20, 20, 35, 0.75)',
-                  color: activeTab === 'studio' ? '#000' : '#00e5ff',
-                  border: '1px solid #00e5ff',
-                  borderRadius: 4,
-                  padding: '4px 14px',
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontWeight: 800,
-                  fontSize: 9.5,
-                  letterSpacing: 2,
-                  cursor: 'pointer',
-                  boxShadow: activeTab === 'studio' ? '0 0 14px rgba(0,229,255,0.8)' : 'none',
-                  transition: 'all 0.15s',
-                }}
-              >
-                🎬 KENETICUT STUDIO
-              </button>
-
-              <button
-                onClick={() => onTabChange && onTabChange('drivein')}
-                style={{
-                  background: activeTab === 'drivein' ? 'linear-gradient(90deg, #ff6b00, #ff8800)' : 'rgba(20, 20, 35, 0.75)',
-                  color: activeTab === 'drivein' ? '#000' : '#ff6b00',
-                  border: '1px solid #ff6b00',
-                  borderRadius: 4,
-                  padding: '4px 14px',
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontWeight: 800,
-                  fontSize: 9.5,
-                  letterSpacing: 2,
-                  cursor: 'pointer',
-                  boxShadow: activeTab === 'drivein' ? '0 0 14px rgba(255,107,0,0.8)' : 'none',
-                  transition: 'all 0.15s',
-                }}
-              >
-                🛸 INTERZONE DRIVE-IN
-              </button>
-
-              {/* Master Global Sound / Video Controls in Header */}
-              <button
-                onClick={onToggleMute}
-                title={isMuted ? "Sound MUTED (Click or press 'M' to unmute)" : "Sound ACTIVE (Click or press 'M' to mute)"}
-                style={{
-                  background: isMuted ? 'rgba(244, 63, 94, 0.22)' : 'rgba(255, 107, 0, 0.15)',
-                  color: isMuted ? '#f43f5e' : 'var(--accent-orange, #ff6b00)',
-                  border: `1px solid ${isMuted ? '#f43f5e' : 'rgba(255, 107, 0, 0.6)'}`,
-                  borderRadius: 4,
-                  padding: '4px 10px',
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontWeight: 800,
-                  fontSize: 9,
-                  letterSpacing: 1.5,
-                  cursor: 'pointer',
-                  marginLeft: 8,
-                  transition: 'all 0.15s',
-                }}
-              >
-                {isMuted ? '🔇 MUTED' : '🔊 SOUND'}
-              </button>
-
-              <button
-                onClick={onToggleVideo}
-                title={videoEnabled ? "Video loops RUNNING (Click or press 'V' to pause)" : "Video loops PAUSED (Click or press 'V' to resume)"}
-                style={{
-                  background: videoEnabled ? 'rgba(0, 229, 255, 0.18)' : 'rgba(30, 41, 59, 0.7)',
-                  color: videoEnabled ? '#00e5ff' : '#94a3b8',
-                  border: `1px solid ${videoEnabled ? '#00e5ff' : 'rgba(148, 163, 184, 0.4)'}`,
-                  borderRadius: 4,
-                  padding: '4px 10px',
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontWeight: 800,
-                  fontSize: 9,
-                  letterSpacing: 1.5,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {videoEnabled ? '🎬 VIDEO: ON' : '⏸ VIDEO: OFF'}
-              </button>
+            <div style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 'clamp(22px, 2.6vw, 32px)',
+              letterSpacing: '4px',
+              color: '#ffffff',
+              textShadow: '0 0 12px rgba(0, 229, 255, 0.85), 0 0 24px rgba(0, 229, 255, 0.45)',
+              fontWeight: 400,
+            }}>
+              STRANGELET · KENETICUT
             </div>
             <div style={{
-              fontFamily: "'Syncopate', var(--font-mono)",
-              fontSize: 'clamp(0.40rem, 0.85vw, 0.50rem)',
-              letterSpacing: '5px',
-              color: 'var(--accent-orange)',
-              opacity: 0.85,
+              fontFamily: "'Syncopate', sans-serif",
+              fontSize: '7.5px',
+              letterSpacing: '3.5px',
+              color: 'var(--accent-orange, #ff6b00)',
+              opacity: 0.95,
               fontWeight: 700,
+              marginTop: 2,
             }}>
-              THE STRANGELET · KenetiCut Suite
+              AI AUDIO-REACTIVE CHOP ENGINE & VJ CUT-UP LAB
             </div>
           </div>
 
-          {/* Right logo image */}
-          <img
-            src="./assets-bg/iz-midnight/iz-drv-in_midnight-010.jpg"
-            alt="Interzone Drive-In"
-            style={{
-              height: 42,
-              width: 'auto',
-              objectFit: 'contain',
-              borderRadius: 3,
-              opacity: 0.88,
-              boxShadow: '0 0 10px var(--accent-blue-glow), 0 0 2px rgba(0,229,255,0.4)',
-              border: '1px solid rgba(0,229,255,0.25)',
-              transform: 'scaleX(-1)',
-            }}
-          />
+          {/* Right: Studio Tab Switcher & Master Audio/Video Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 160, justifyContent: 'flex-end' }}>
+            {/* Link / Tab to Choreography Studio */}
+            <button
+              onClick={() => onTabChange && onTabChange('studio')}
+              title="Open the AI Choreography & Flipbook Studio to create custom flipbooks, living reels, and prompts"
+              style={{
+                background: 'linear-gradient(90deg, #00e5ff, #00b0ff)',
+                color: '#000',
+                border: '1px solid #00e5ff',
+                borderRadius: 4,
+                padding: '5px 12px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontWeight: 800,
+                fontSize: 9,
+                letterSpacing: 1.5,
+                cursor: 'pointer',
+                boxShadow: '0 0 12px rgba(0, 229, 255, 0.75)',
+                transition: 'all 0.15s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              🎞️ AI FLIPBOOK STUDIO
+            </button>
+
+            {/* Sound Toggle */}
+            <button
+              onClick={onToggleMute}
+              title={isMuted ? "Sound MUTED (Click to unmute)" : "Sound ACTIVE (Click to mute)"}
+              style={{
+                background: isMuted ? 'rgba(244, 63, 94, 0.22)' : 'rgba(255, 107, 0, 0.15)',
+                color: isMuted ? '#f43f5e' : 'var(--accent-orange, #ff6b00)',
+                border: `1px solid ${isMuted ? '#f43f5e' : 'rgba(255, 107, 0, 0.6)'}`,
+                borderRadius: 4,
+                padding: '5px 10px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontWeight: 800,
+                fontSize: 8.5,
+                letterSpacing: 1,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {isMuted ? '🔇 MUTED' : '🔊 SOUND'}
+            </button>
+
+            {/* Video Toggle */}
+            <button
+              onClick={onToggleVideo}
+              title={videoEnabled ? "Video loops RUNNING" : "Video loops PAUSED"}
+              style={{
+                background: videoEnabled ? 'rgba(0, 229, 255, 0.18)' : 'rgba(30, 41, 59, 0.7)',
+                color: videoEnabled ? '#00e5ff' : '#94a3b8',
+                border: `1px solid ${videoEnabled ? '#00e5ff' : 'rgba(148, 163, 184, 0.4)'}`,
+                borderRadius: 4,
+                padding: '5px 10px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontWeight: 800,
+                fontSize: 8.5,
+                letterSpacing: 1,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {videoEnabled ? '🎬 VIDEO: ON' : '⏸ VIDEO: OFF'}
+            </button>
+          </div>
         </div>
       )}
 

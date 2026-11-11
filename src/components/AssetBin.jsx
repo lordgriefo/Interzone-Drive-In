@@ -82,6 +82,7 @@ function LazyAssetThumbnail({ asset, isVideo }) {
 
 export function AssetBin({
   assets = [],
+  onOpenStudio = null,
   onAddAssets = () => {},
   onRemoveAsset = () => {},
   onClearAll = () => {},
@@ -286,6 +287,35 @@ export function AssetBin({
           style={{ display: 'none' }}
         />
       </label>
+
+      {/* ── AI FLIPBOOK STUDIO BUTTON ── */}
+      {onOpenStudio && (
+        <button
+          type="button"
+          onClick={onOpenStudio}
+          style={{
+            backgroundColor: 'rgba(0, 229, 255, 0.08)',
+            border: '1px solid rgba(0, 229, 255, 0.45)',
+            color: '#00e5ff',
+            padding: '7px 8px',
+            borderRadius: 4,
+            fontWeight: 700,
+            fontSize: 9.5,
+            letterSpacing: 0.5,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 5,
+            fontFamily: "'Syncopate', sans-serif",
+            transition: 'all 0.15s',
+            boxShadow: '0 0 10px rgba(0, 229, 255, 0.15)',
+          }}
+          title="Open AI Choreography & Flipbook Studio to generate new living reels, flipbooks, and prompts"
+        >
+          🎞️ LAUNCH FLIPBOOK STUDIO →
+        </button>
+      )}
 
       {/* ── CLEAR ALL ── */}
       <button
