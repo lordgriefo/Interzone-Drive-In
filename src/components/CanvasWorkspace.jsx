@@ -1943,11 +1943,17 @@ export function CanvasWorkspace({
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         {active.map(({ clip, opacity }) => {
-          const asset = assets.find((a) => a.id === clip.assetId);
-          if (!asset?.url) return null;
+          const asset = assets.find((a) => a.id === clip.assetId || (clip.assetUrl && a.url === clip.assetUrl)) || {
+            id: clip.assetId,
+            name: clip.assetName || clip.id,
+            url: clip.assetUrl || clip.url,
+            mediaType: clip.mediaType || (clip.assetUrl?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
+          };
+          const resolvedUrl = asset?.url || clip.assetUrl || clip.url;
+          if (!resolvedUrl) return null;
           const styleExtras = getStyleExtras();
-          const isVideo = asset.mediaType === 'video';
-          const clipUrl = failedUrls[asset.url] ? SMPTE_FALLBACK_URL : asset.url;
+          const isVideo = (asset?.mediaType === 'video') || (clip.mediaType === 'video') || Boolean(resolvedUrl.match(/\.(mp4|webm|mov)$/i));
+          const clipUrl = failedUrls[resolvedUrl] ? SMPTE_FALLBACK_URL : resolvedUrl;
           const imgFilter = getImageFilter();
           const composedClipFilter = [styleExtras.filter, imgFilter !== 'none' ? imgFilter : ''].filter(Boolean).join(' ').trim() || 'none';
 
@@ -1970,7 +1976,7 @@ export function CanvasWorkspace({
             <TimelineClipMedia
               key={clip.id}
               url={clipUrl}
-              name={asset.name}
+              name={asset.name || clip.assetName || clip.id}
               clip={clip}
               localTime={currentTime - clip.startTime}
               isPlaying={isPlaying}

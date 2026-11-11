@@ -573,12 +573,18 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
         if (!matchedAsset && c.assetIndex !== undefined && assets[c.assetIndex]) {
           matchedAsset = assets[c.assetIndex];
         }
-        if (!matchedAsset) {
-          matchedAsset = assets[i % Math.max(assets.length, 1)];
-        }
+        // Never discard clip asset information if provided by the storyboard template
+        const finalAssetId = matchedAsset?.id || c.assetId || (assets[i % Math.max(assets.length, 1)]?.id || `asset-${i}`);
+        const finalAssetUrl = matchedAsset?.url || c.assetUrl || assets[i % Math.max(assets.length, 1)]?.url;
+        const finalAssetName = matchedAsset?.name || c.assetName || assets[i % Math.max(assets.length, 1)]?.name || `Clip ${i + 1}`;
+        const finalMediaType = matchedAsset?.mediaType || c.mediaType || (finalAssetUrl && finalAssetUrl.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image');
+
         return {
           id: c.id || uid('imported-clip'),
-          assetId: matchedAsset ? matchedAsset.id : `asset-${i}`,
+          assetId: finalAssetId,
+          assetUrl: finalAssetUrl,
+          assetName: finalAssetName,
+          mediaType: finalMediaType,
           startTime: Number(c.startTime) || 0,
           duration: Math.max(MIN_CLIP_DURATION, Number(c.duration) || DEFAULT_CLIP_DURATION),
           inPoint: Number(c.inPoint) || 0,

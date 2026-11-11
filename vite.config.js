@@ -43,10 +43,15 @@ function mediaScannerPlugin() {
       }
     };
 
-    // 1. Scan public/assets-bg/iz-extras & public/assets-bg/iz-webms
+    // 1. Scan public/assets-bg folders
+    scanDirectory(path.resolve(root, 'public/assets-bg/excavating'), './assets-bg/excavating');
+    scanDirectory(path.resolve(root, 'public/assets-bg/wait-till-you-see-it'), './assets-bg/wait-till-you-see-it');
+    scanDirectory(path.resolve(root, 'public/assets-bg/puppet-man'), './assets-bg/puppet-man');
+    scanDirectory(path.resolve(root, 'public/assets-bg/drive-in'), './assets-bg/drive-in');
     scanDirectory(path.resolve(root, 'public/assets-bg/iz-extras'), './assets-bg/iz-extras');
     scanDirectory(path.resolve(root, 'public/assets-bg/iz-webms'), './assets-bg/iz-webms');
     scanDirectory(path.resolve(root, 'public/assets-bg/iz-webm'), './assets-bg/iz-webm');
+    scanDirectory(path.resolve(root, 'public/assets-bg/extra-images'), './assets-bg/extra-images');
 
     // 2. Scan public/iz-extras & public/iz-webms
     scanDirectory(path.resolve(root, 'public/iz-extras'), './iz-extras');

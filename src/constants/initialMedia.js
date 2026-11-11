@@ -140,19 +140,34 @@ const baseMediaItems = [
 ];
 
 import discoveredAssets from './discoveredAssets.json';
+import { STORYBOARD_PRESETS } from './storyboardPresets';
 
 // Track all existing URLs and filenames so nothing doubles
 const seenFilenames = new Set();
 const seenIds = new Set();
 
-baseMediaItems.forEach((item) => {
-  if (item.id) seenIds.add(item.id.toLowerCase());
-  if (item.url) {
-    const fn = item.url.split('/').pop().toLowerCase();
+// 1. Primary Priority: All unique assets defined across the 7 choreographed song storyboards
+const storyboardMediaItems = [];
+Object.values(STORYBOARD_PRESETS || {}).forEach((preset) => {
+  (preset?.clips || []).forEach((c) => {
+    if (!c.assetUrl) return;
+    const fn = c.assetUrl.split('/').pop().toLowerCase();
+    if (seenFilenames.has(fn)) return;
     seenFilenames.add(fn);
-  }
+
+    const assetId = c.assetId || `sb-${fn.replace(/[^a-z0-9_-]/g, '_')}`;
+    seenIds.add(assetId.toLowerCase());
+
+    storyboardMediaItems.push({
+      id: assetId,
+      name: c.assetName || fn.replace(/[-_]/g, ' ').replace(/\b\w/g, (ch) => ch.toUpperCase()),
+      url: c.assetUrl,
+      mediaType: c.mediaType || (c.assetUrl.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'),
+    });
+  });
 });
 
+// 2. Secondary Priority: Discovered assets from scanner
 const extraMediaItems = [];
 (discoveredAssets || []).forEach((item) => {
   if (!item?.url) return;
@@ -165,4 +180,15 @@ const extraMediaItems = [];
   extraMediaItems.push(item);
 });
 
-export const DEFAULT_MEDIA_ITEMS = [...baseMediaItems, ...extraMediaItems];
+// 3. Fallback / Auxiliary: Base Interzone Drive-In marquee backgrounds
+const filteredBaseItems = [];
+baseMediaItems.forEach((item) => {
+  if (item.url) {
+    const fn = item.url.split('/').pop().toLowerCase();
+    if (seenFilenames.has(fn)) return;
+    seenFilenames.add(fn);
+  }
+  filteredBaseItems.push(item);
+});
+
+export const DEFAULT_MEDIA_ITEMS = [...storyboardMediaItems, ...extraMediaItems, ...filteredBaseItems];
