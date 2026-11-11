@@ -78,8 +78,8 @@ export function InterzoneDriveInTheater({
   playlist = [],
   onSelectTrack,
 }) {
-  // 'gate' (box office / entry) or 'lot' (parked in the desert watching screen)
-  const [driveInView, setDriveInView] = useState('gate');
+  // 'lot' (parked in the desert watching screen) or 'gate' (roadside box office)
+  const [driveInView, setDriveInView] = useState('lot');
   // 'feature' | 'ufo_broll' | 'hey_books' | 'community_reel'
   const [screenChannel, setScreenChannel] = useState('feature');
   const [malibuFlying, setMalibuFlying] = useState(false);

@@ -278,6 +278,7 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // ── Deep-linkable Tab Router (URL search param ?tab=studio or hash #studio) ──
+  // Default to 'studio' (KenetiCut) so user lands directly into the working editor!
   const [activeTab, setActiveTab] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -286,7 +287,7 @@ export default function App() {
         if (tab === 'studio' || tab === 'drivein') return tab;
       }
     } catch (_) {}
-    return 'drivein';
+    return 'studio';
   });
 
   const handleTabChange = useCallback((nextTab) => {

@@ -309,13 +309,33 @@ export function InterzoneFrame({
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <button
+                onClick={() => onTabChange && onTabChange('studio')}
+                style={{
+                  background: activeTab === 'studio' ? 'linear-gradient(90deg, #00e5ff, #00b0ff)' : 'rgba(20, 20, 35, 0.75)',
+                  color: activeTab === 'studio' ? '#000' : '#00e5ff',
+                  border: '1px solid #00e5ff',
+                  borderRadius: 4,
+                  padding: '4px 14px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 9.5,
+                  letterSpacing: 2,
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'studio' ? '0 0 14px rgba(0,229,255,0.8)' : 'none',
+                  transition: 'all 0.15s',
+                }}
+              >
+                🎬 KENETICUT STUDIO
+              </button>
+
+              <button
                 onClick={() => onTabChange && onTabChange('drivein')}
                 style={{
                   background: activeTab === 'drivein' ? 'linear-gradient(90deg, #ff6b00, #ff8800)' : 'rgba(20, 20, 35, 0.75)',
                   color: activeTab === 'drivein' ? '#000' : '#ff6b00',
                   border: '1px solid #ff6b00',
                   borderRadius: 4,
-                  padding: '4px 12px',
+                  padding: '4px 14px',
                   fontFamily: "'Syncopate', sans-serif",
                   fontWeight: 800,
                   fontSize: 9.5,
@@ -326,26 +346,6 @@ export function InterzoneFrame({
                 }}
               >
                 🛸 INTERZONE DRIVE-IN
-              </button>
-
-              <button
-                onClick={() => onTabChange && onTabChange('studio')}
-                style={{
-                  background: activeTab === 'studio' ? 'linear-gradient(90deg, #00e5ff, #00b0ff)' : 'rgba(20, 20, 35, 0.75)',
-                  color: activeTab === 'studio' ? '#000' : '#00e5ff',
-                  border: '1px solid #00e5ff',
-                  borderRadius: 4,
-                  padding: '4px 12px',
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontWeight: 800,
-                  fontSize: 9.5,
-                  letterSpacing: 2,
-                  cursor: 'pointer',
-                  boxShadow: activeTab === 'studio' ? '0 0 14px rgba(0,229,255,0.8)' : 'none',
-                  transition: 'all 0.15s',
-                }}
-              >
-                🎬 CHOREOGRAPHY STUDIO
               </button>
 
               {/* Master Global Sound / Video Controls in Header */}
