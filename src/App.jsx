@@ -28,23 +28,6 @@ import { STORYBOARD_PRESETS } from './constants/storyboardPresets';
 
 export const DEFAULT_PLAYLIST = [
   {
-    id: 'pl_high_roller',
-    title: "High Roller — MonoAtomiX",
-    url: './assets-bg/high-roller.mp3',
-    duration: 210,
-    storyboardId: 'pl_high_roller',
-    preset: {
-      selectedStyle: 'timeline',
-      selectedEra: '1970_grindhouse',
-      selectedRube: 'cathode_burn',
-      bpm: 124,
-      chaosLevel: 0.12,
-      chaosEnabled: true,
-      sensitivity: 1.25,
-      reverbWet: 0.28,
-    },
-  },
-  {
     id: 'pl_excavating_neverland',
     title: "Excavating Neverland — The Magic Static Society",
     url: './assets-bg/excavating-neverland.mp3',
@@ -77,6 +60,23 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.2,
       reverbWet: 0.30,
+    },
+  },
+  {
+    id: 'pl_high_roller',
+    title: "High Roller — MonoAtomiX",
+    url: './assets-bg/high-roller.mp3',
+    duration: 210,
+    storyboardId: 'pl_high_roller',
+    preset: {
+      selectedStyle: 'timeline',
+      selectedEra: '1970_grindhouse',
+      selectedRube: 'cathode_burn',
+      bpm: 124,
+      chaosLevel: 0.12,
+      chaosEnabled: true,
+      sensitivity: 1.25,
+      reverbWet: 0.28,
     },
   },
   {
@@ -276,7 +276,47 @@ export default function App() {
 
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('drivein');
+
+  // ── Deep-linkable Tab Router (URL search param ?tab=studio or hash #studio) ──
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
+        if (tab === 'studio' || tab === 'drivein') return tab;
+      }
+    } catch (_) {}
+    return 'drivein';
+  });
+
+  const handleTabChange = useCallback((nextTab) => {
+    setActiveTab(nextTab);
+    try {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', nextTab);
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch (_) {}
+  }, []);
+
+  useEffect(() => {
+    const handleUrlSync = () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
+        if (tab === 'studio' || tab === 'drivein') {
+          setActiveTab(tab);
+        }
+      } catch (_) {}
+    };
+    window.addEventListener('popstate', handleUrlSync);
+    window.addEventListener('hashchange', handleUrlSync);
+    return () => {
+      window.removeEventListener('popstate', handleUrlSync);
+      window.removeEventListener('hashchange', handleUrlSync);
+    };
+  }, []);
 
   // ── Global Video Motion State (Pause / Play background screen video loops) ──
   const [videoEnabled, setVideoEnabled] = useState(true);
@@ -1216,7 +1256,7 @@ export default function App() {
 
         {activeTab === 'drivein' ? (
           <InterzoneDriveInTheater
-            onSwitchToStudio={() => setActiveTab('studio')}
+            onSwitchToStudio={() => handleTabChange('studio')}
             currentTrackTitle={trackTitle}
             isPlaying={isPlaying}
             onTogglePlay={togglePlay}
@@ -1261,7 +1301,7 @@ export default function App() {
 
         <InterzoneFrame
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           onResetProject={handleResetProject}
           cinemaMode={cinemaMode}
           onToggleCinema={handleToggleCinema}
