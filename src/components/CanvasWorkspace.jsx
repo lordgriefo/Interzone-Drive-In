@@ -81,36 +81,81 @@ function TimelineClipMedia({
 
   const flip = clip.mirrored || (clip.reversed && !isVideo);
 
-  // ── LIVING STILL & VIDEO ENGINE: Clean, High-Clarity Showcase ──
+  // ── LIVING STILL & VIDEO ENGINE: Active Motion & Audio-Reactive Rhythm ──
   let finalMediaStyle = {
     ...mediaStyle,
     objectFit: 'cover',
   };
 
+  const bass = Number(audioSignals?.bass) || 0;
+  const mid  = Number(audioSignals?.mid)  || 0;
+  const isTransient = Boolean(audioSignals?.isTransient);
+  const beatFrac = isPlaying ? ((localTime * 2) % 1) : 0;
+  const beatSnap = Math.exp(-beatFrac * 5);
+
   if (!isVideo) {
     const progress = clip.duration > 0 ? Math.max(0, Math.min(1, localTime / clip.duration)) : 0;
     const hash = (clip.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    const zoomDir = hash % 2 === 0 ? 1 : -1;
-    const panXDir = hash % 3 === 0 ? 1 : -1;
+    const mode = Math.abs(hash) % 4;
 
-    // Smooth, gentle Ken Burns rostrum zoom & subtle pan (preserves 100% crystal clear detail)
-    const baseScale = zoomDir > 0 ? 1.02 + progress * 0.05 : 1.07 - progress * 0.05;
-    const panX = (Math.sin(progress * Math.PI) * 1.8 * panXDir).toFixed(2);
+    // Cinematic Ken Burns ranges (zoom between 1.05 and 1.20)
+    let baseScale = 1.08;
+    let panX = 0;
+    let panY = 0;
+    let rot = 0;
+
+    if (mode === 0) {
+      // Push-in + Slow pan right
+      baseScale = 1.05 + progress * 0.15;
+      panX = -3.5 + progress * 7.0;
+      panY = Math.sin(progress * Math.PI) * 2.0;
+    } else if (mode === 1) {
+      // Pull-out + Slow pan left
+      baseScale = 1.20 - progress * 0.14;
+      panX = 3.5 - progress * 7.0;
+      panY = -Math.sin(progress * Math.PI) * 2.0;
+    } else if (mode === 2) {
+      // Diagonal rostrum drift + subtle roll
+      baseScale = 1.07 + progress * 0.12;
+      panX = Math.sin(progress * Math.PI * 0.8) * 4.5;
+      panY = -2.5 + progress * 5.0;
+      rot = (progress - 0.5) * 1.5;
+    } else {
+      // Wide cinematic sweep + push
+      baseScale = 1.06 + Math.sin(progress * Math.PI) * 0.14;
+      panX = (progress - 0.5) * 8.0;
+      panY = Math.cos(progress * Math.PI) * 2.5;
+    }
+
+    // Audio-reactive punch & rhythm drift
+    const bassPulse = isPlaying ? (bass * 0.08 + (isTransient ? 0.045 : 0) + beatSnap * 0.02) : 0;
+    const totalScale = (baseScale + bassPulse).toFixed(4);
+    const audioDriftX = isPlaying ? (Math.sin(localTime * 1.8) * 1.2 * mid) : 0;
+    const audioDriftY = isPlaying ? (Math.cos(localTime * 1.4) * 0.8 * bass) : 0;
+    const totalPanX = (panX + audioDriftX).toFixed(2);
+    const totalPanY = (panY + audioDriftY).toFixed(2);
 
     finalMediaStyle = {
       ...mediaStyle,
       objectFit: 'cover',
-      transform: `${mediaStyle.transform || ''} translate3d(${panX}%, 0, 0) scale(${baseScale.toFixed(4)})`.trim(),
+      transform: `${mediaStyle.transform || ''} translate3d(${totalPanX}%, ${totalPanY}%, 0) scale(${totalScale}) rotate(${rot.toFixed(2)}deg)`.trim(),
       transformOrigin: 'center center',
-      transition: 'transform 0.1s linear',
-      filter: mediaStyle.filter || 'none',
-      willChange: 'transform',
+      transition: !isPlaying ? 'none' : 'transform 0.08s ease-out, filter 0.12s ease-out',
+      filter: `${mediaStyle.filter || 'none'} ${isTransient ? 'brightness(1.12)' : (bass > 0.5 ? 'brightness(1.06)' : '')}`.trim() || 'none',
+      willChange: 'transform, filter',
     };
   } else {
+    // Videos: subtle beat pulse on strong bass transients
+    const bassPulse = isPlaying && bass > 0.35 ? (bass - 0.35) * 0.06 : 0;
+    const vidScale = 1.0 + bassPulse + (isTransient ? 0.025 : 0);
+
     finalMediaStyle = {
       ...mediaStyle,
       objectFit: 'cover',
+      transform: vidScale > 1.005 ? `${mediaStyle.transform || ''} scale(${vidScale.toFixed(4)})`.trim() : (mediaStyle.transform || 'none'),
       filter: mediaStyle.filter || 'none',
+      transition: !isPlaying ? 'none' : 'transform 0.08s ease-out',
+      willChange: 'transform',
     };
   }
 
@@ -717,12 +762,13 @@ export function CanvasWorkspace({
 
     switch (selectedStyle) {
 
-      // ── TIMELINE: Clean showcase cut — 100% visible, true colors, subtle musical downbeat pulse ──
+      // ── TIMELINE: Audio-reactive cut — punchy musical downbeat pop & transient snap ──
       case 'timeline': {
         const beatFrac = (currentTime * (bpm / 60)) % 1;
         const beatSnap = Math.exp(-beatFrac * 6);
-        const bassKick = (bass > 0.4) ? bass * 0.03 : 0;
-        const scaleVal = 1.0 + beatSnap * (0.015 + bassKick);
+        const bassKick = (bass > 0.3) ? (bass - 0.3) * 0.08 : 0;
+        const transientPop = audioSignals?.isTransient ? 0.035 : 0;
+        const scaleVal = 1.0 + beatSnap * 0.025 + bassKick + transientPop;
         return {
           transform: `scale(${scaleVal.toFixed(4)})`,
           filter: 'none',
