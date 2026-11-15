@@ -47,6 +47,7 @@ function mediaScannerPlugin() {
     scanDirectory(path.resolve(root, 'public/assets-bg/excavating'), './assets-bg/excavating');
     scanDirectory(path.resolve(root, 'public/assets-bg/wait-till-you-see-it'), './assets-bg/wait-till-you-see-it');
     scanDirectory(path.resolve(root, 'public/assets-bg/puppet-man'), './assets-bg/puppet-man');
+    scanDirectory(path.resolve(root, 'public/assets-bg/synchro-vox'), './assets-bg/synchro-vox');
     scanDirectory(path.resolve(root, 'public/assets-bg/drive-in'), './assets-bg/drive-in');
     scanDirectory(path.resolve(root, 'public/assets-bg/iz-extras'), './assets-bg/iz-extras');
     scanDirectory(path.resolve(root, 'public/assets-bg/iz-webms'), './assets-bg/iz-webms');

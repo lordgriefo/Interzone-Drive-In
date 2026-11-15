@@ -114,20 +114,22 @@ export function AssetBin({
   const [searchQuery, setSearchQuery] = useState('');
 
   const counts = useMemo(() => {
-    let excavating = 0, waitSee = 0, videos = 0, stills = 0, driveIn = 0;
+    let excavating = 0, waitSee = 0, synchroVox = 0, videos = 0, stills = 0, driveIn = 0;
     assets.forEach((a) => {
       const isVid = a.mediaType === 'video' || a.type === 'video' || a.url?.endsWith('.webm') || a.url?.endsWith('.mp4');
       if (a.url?.includes('excavating')) excavating++;
       if (a.url?.includes('wait-till-you-see-it')) waitSee++;
+      if (a.url?.includes('synchro-vox') || a.url?.includes('puppet') || a.name?.toLowerCase().includes('mouth') || a.name?.toLowerCase().includes('character_') || a.name?.toLowerCase().includes('transform_')) synchroVox++;
       if (isVid) videos++; else stills++;
       if (a.url?.includes('iz-') || a.url?.includes('drive-in')) driveIn++;
     });
-    return { all: assets.length, excavating, waitSee, videos, stills, driveIn };
+    return { all: assets.length, excavating, waitSee, synchroVox, videos, stills, driveIn };
   }, [assets]);
 
   const filteredItems = useMemo(() => {
     return assets.map((a, origIndex) => ({ ...a, origIndex })).filter((asset) => {
       const isVid = asset.mediaType === 'video' || asset.type === 'video' || asset.url?.endsWith('.webm') || asset.url?.endsWith('.mp4');
+      if (activeCategory === 'SYNCHRO_VOX' && !asset.url?.includes('synchro-vox') && !asset.url?.includes('puppet') && !asset.name?.toLowerCase().includes('mouth') && !asset.name?.toLowerCase().includes('character_') && !asset.name?.toLowerCase().includes('transform_')) return false;
       if (activeCategory === 'EXCAVATING' && !asset.url?.includes('excavating')) return false;
       if (activeCategory === 'WAIT_SEE' && !asset.url?.includes('wait-till-you-see-it')) return false;
       if (activeCategory === 'VIDEOS' && !isVid) return false;
@@ -216,6 +218,48 @@ export function AssetBin({
     onAddAssets(newAssets);
     e.target.value = '';
   };
+
+  // Auto-assign phoneme slots from Synchro-Vox faces folder
+  const handleAutoAssignVisemes = useCallback(() => {
+    const synchroAssets = assets.filter((a) =>
+      a.url?.includes('synchro-vox') ||
+      a.url?.includes('puppet') ||
+      a.name?.toLowerCase().includes('mouth') ||
+      a.name?.toLowerCase().includes('speaking') ||
+      a.name?.toLowerCase().includes('talking') ||
+      a.name?.toLowerCase().includes('character_')
+    );
+    if (!synchroAssets.length) return;
+
+    const findMatch = (terms) => {
+      for (const t of terms) {
+        const found = synchroAssets.find((a) => (a.name || a.url || '').toLowerCase().includes(t.toLowerCase()));
+        if (found) return found.id;
+      }
+      return null;
+    };
+
+    const restId    = findMatch(['speaking_in_1960s', 'speaking_in_las', 'talking_in_las', 'speaking_with_las', 'rest', 'speaking']) || synchroAssets[0]?.id;
+    const openId    = findMatch(['mouth_open_talking', 'opening_mouth_wide_20261009000343.jpg', 'open_mouth_pose', 'open']) || synchroAssets[1]?.id;
+    const narrowId  = findMatch(['intense_mou', 'talking_pose_with_open', 'narrow']) || synchroAssets[2]?.id;
+    const wideId    = findMatch(['mouth_wide_open', 'screaming', 'wide']) || synchroAssets[3]?.id;
+    const teethId   = findMatch(['intense_vocaliz', 'teeth', 'posing_with_open']) || synchroAssets[4]?.id;
+    const puckerId  = findMatch(['mouth_pose', 'to_speak', 'pucker']) || synchroAssets[5]?.id;
+    const midOpenId = findMatch(['open_mouth_pose_2', 'opening_mouth_widely', 'mid']) || synchroAssets[6]?.id;
+    const snapId    = findMatch(['talking_pose_mouth_open', 'speaking_with_mouth', 'snap']) || synchroAssets[7]?.id;
+
+    setPuppetSlots({
+      rest: restId,
+      open: openId,
+      narrow: narrowId,
+      wide: wideId,
+      teeth: teethId,
+      pucker: puckerId,
+      midOpen: midOpenId,
+      snap: snapId,
+    });
+    setPuppetEnabled?.(true);
+  }, [assets, setPuppetSlots, setPuppetEnabled]);
 
   const visibleSlots = getSlotsForMode(puppetMode);
 
@@ -810,6 +854,7 @@ export function AssetBin({
         <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {[
             { id: 'ALL', label: `ALL (${counts.all})` },
+            { id: 'SYNCHRO_VOX', label: `👄 SYNCHRO-VOX (${counts.synchroVox})` },
             { id: 'EXCAVATING', label: `🛸 EXCAVATING (${counts.excavating})` },
             { id: 'WAIT_SEE', label: `👁 WAIT SEE (${counts.waitSee})` },
             { id: 'VIDEOS', label: `🎬 VID (${counts.videos})` },
@@ -1117,6 +1162,26 @@ export function AssetBin({
                 {m}
               </button>
             ))}
+
+            {/* Quick Auto-Assign Visemes Button */}
+            <button
+              type="button"
+              onClick={handleAutoAssignVisemes}
+              style={{
+                padding: '2px 5px',
+                borderRadius: 3,
+                border: '1px solid var(--accent-orange, #ff6b00)',
+                backgroundColor: 'rgba(255,107,0,0.18)',
+                color: 'var(--accent-orange, #ff6b00)',
+                fontSize: 8,
+                fontWeight: 800,
+                cursor: 'pointer',
+                fontFamily: 'var(--font-mono)',
+              }}
+              title="Auto-tag REST, OPEN, NARROW, WIDE phonemes from Synchro-Vox face collection"
+            >
+              ⚡ AUTO-TAG
+            </button>
           </div>
         </div>
 

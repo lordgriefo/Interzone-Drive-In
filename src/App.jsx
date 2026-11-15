@@ -406,9 +406,40 @@ export default function App() {
 
   // ── Synchro-Vox puppet lip-sync ──
   const [puppetMode, setPuppetMode] = useState('2'); // '2' | '4' | '8'
-  const [puppetSlots, setPuppetSlots] = useState({
-    rest: null, open: null, narrow: null, wide: null,
-    teeth: null, pucker: null, midOpen: null, snap: null,
+  const [puppetSlots, setPuppetSlots] = useState(() => {
+    try {
+      const synchroAssets = (DEFAULT_MEDIA_ITEMS || []).filter((a) =>
+        a.url?.includes('synchro-vox') ||
+        a.url?.includes('puppet') ||
+        a.name?.toLowerCase().includes('mouth') ||
+        a.name?.toLowerCase().includes('speaking') ||
+        a.name?.toLowerCase().includes('talking') ||
+        a.name?.toLowerCase().includes('character_')
+      );
+      if (synchroAssets.length >= 2) {
+        const findMatch = (terms) => {
+          for (const t of terms) {
+            const found = synchroAssets.find((a) => (a.name || a.url || '').toLowerCase().includes(t.toLowerCase()));
+            if (found) return found.id;
+          }
+          return null;
+        };
+        return {
+          rest: findMatch(['speaking_in_1960s', 'speaking_in_las', 'talking_in_las', 'speaking_with_las', 'rest', 'speaking']) || synchroAssets[0]?.id,
+          open: findMatch(['mouth_open_talking', 'opening_mouth_wide_20261009000343.jpg', 'open_mouth_pose', 'open']) || synchroAssets[1]?.id,
+          narrow: findMatch(['intense_mou', 'talking_pose_with_open', 'narrow']) || synchroAssets[2]?.id,
+          wide: findMatch(['mouth_wide_open', 'screaming', 'wide']) || synchroAssets[3]?.id,
+          teeth: findMatch(['intense_vocaliz', 'teeth', 'posing_with_open']) || synchroAssets[4]?.id,
+          pucker: findMatch(['mouth_pose', 'to_speak', 'pucker']) || synchroAssets[5]?.id,
+          midOpen: findMatch(['open_mouth_pose_2', 'opening_mouth_widely', 'mid']) || synchroAssets[6]?.id,
+          snap: findMatch(['talking_pose_mouth_open', 'speaking_with_mouth', 'snap']) || synchroAssets[7]?.id,
+        };
+      }
+    } catch (_) {}
+    return {
+      rest: null, open: null, narrow: null, wide: null,
+      teeth: null, pucker: null, midOpen: null, snap: null,
+    };
   });
   const [puppetEnabled, setPuppetEnabled] = useState(true);
   const [puppetDisplayMode, setPuppetDisplayMode] = useState('overlay'); // 'overlay' | 'swap'
