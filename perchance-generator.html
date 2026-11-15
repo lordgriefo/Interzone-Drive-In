@@ -957,8 +957,12 @@
     const durDisplay = document.getElementById('duration-display');
 
     // ── Multi-Target Broadcaster ──
-    // Reaches parent window (when embedded inside KenetiCut tab), opener window (when popup), or iframe
+    // Reaches embedded KenetiCut iframe (on Perchance), parent window, or opener popup
     function postToKenetiCut(msg) {
+      const frame = document.getElementById('keneticut-embedded-iframe');
+      if (frame && frame.contentWindow) {
+        try { frame.contentWindow.postMessage(msg, '*'); } catch (_) {}
+      }
       if (window.parent && window.parent !== window) {
         try { window.parent.postMessage(msg, '*'); } catch (_) {}
       }
@@ -968,23 +972,46 @@
     }
 
     function returnToKenetiCut() {
-      const isPerchanceSite = window.location.hostname.includes('perchance.org') || window.location.href.includes('null');
+      // 1. If running embedded inside KenetiCut app itself, tell parent to switch tab
+      const isEmbeddedInKenetiCut = window.parent && window.parent !== window &&
+        !window.location.hostname.includes('perchance.org') &&
+        !window.location.href.includes('null');
+
+      if (isEmbeddedInKenetiCut) {
+        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
+        return;
+      }
+
+      // 2. If running as popup from KenetiCut, notify opener
       if (window.opener) {
         try { window.opener.postMessage({ type: 'SWITCH_TAB', tab: 'editor' }, '*'); } catch (_) {}
-        try { window.close(); } catch (_) {}
-      } else if (!isPerchanceSite && window.parent && window.parent !== window) {
-        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
-      } else {
-        const targetUrl = isPerchanceSite
-          ? 'https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html'
-          : './index.html?tab=editor';
-        if (isPerchanceSite) {
-          window.open(targetUrl, '_blank');
-        } else {
-          window.location.href = targetUrl;
-        }
+        try { window.close(); return; } catch (_) {}
+      }
+
+      // 3. Running directly on Perchance or standalone: open embedded KenetiCut right here on the same page!
+      const container = document.getElementById('keneticut-embedded-container');
+      if (container) {
+        container.style.display = 'flex';
+        return;
+      }
+
+      // Fallback
+      window.location.href = './index.html?tab=editor';
+    }
+
+    function switchToFlipbookView() {
+      const container = document.getElementById('keneticut-embedded-container');
+      if (container) {
+        container.style.display = 'none';
       }
     }
+
+    // Listen for tab switch requests from embedded KenetiCut
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SWITCH_TAB' && (event.data.tab === 'studio' || event.data.tab === 'flipbook')) {
+        switchToFlipbookView();
+      }
+    });
 
     let currentSongTime = 0;
     let songDuration = 32;
@@ -1637,5 +1664,33 @@
       postToKenetiCut({ type: 'TOGGLE_PLAY' });
     }
   </script>
+
+  <!-- Embedded KenetiCut Studio Tab View (Allows running 100% on Perchance without leaving!) -->
+  <div id="keneticut-embedded-container" style="display:none; position:fixed; inset:0; z-index:999999; background:#000; flex-direction:column;">
+    <div style="background:#121218; border-bottom:1px solid #242432; padding:6px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="btn-return-keneticut" onclick="switchToFlipbookView()" style="background:#00e5ff; border-color:#00e5ff; color:#000; font-weight:800; padding:4px 12px; border-radius:4px; cursor:pointer;">
+          ← BACK TO AI FLIPBOOK STUDIO
+        </button>
+        <span style="font-family:'Bebas Neue',sans-serif; color:#ff6b00; font-size:18px; letter-spacing:1.5px;">
+          STRANGELET KENETICUT — TIMELINE & MEDIA BIN
+        </span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:10px; color:#00ffcc; font-family:monospace;">
+          ⚡ Active on Perchance
+        </span>
+        <button onclick="switchToFlipbookView()" style="background:transparent; border:1px solid #444; color:#aaa; font-size:10px; padding:2px 8px; border-radius:3px; cursor:pointer;">
+          ✕ CLOSE
+        </button>
+      </div>
+    </div>
+    <iframe
+      id="keneticut-embedded-iframe"
+      src="https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=editor"
+      style="flex:1; width:100%; height:100%; border:none;"
+      allow="autoplay; clipboard-write; display-capture"
+    ></iframe>
+  </div>
 </body>
 </html>
