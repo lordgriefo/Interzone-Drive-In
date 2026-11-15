@@ -1285,6 +1285,7 @@ export default function App() {
     lastAudioFileRef.current = null;
     setLyricSegments([]);
     setPlaylistIndex(-1);
+    setPlaylist([]);
 
     // 2. Clear timeline cuts & assets
     clearVideoClips();
@@ -1473,6 +1474,9 @@ export default function App() {
         {!cinemaMode && (
           <AssetBin
             assets={assets}
+            currentTrack={playlist[playlistIndex]}
+            currentTrackTitle={trackTitle}
+            playlist={playlist}
             onOpenStudio={() => handleTabChange('studio')}
             onAddAssets={handleAddAssets}
           onRemoveAsset={handleRemoveAsset}

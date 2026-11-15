@@ -82,6 +82,9 @@ function LazyAssetThumbnail({ asset, isVideo }) {
 
 export function AssetBin({
   assets = [],
+  currentTrack = null,
+  currentTrackTitle = '',
+  playlist = [],
   onOpenStudio = null,
   onAddAssets = () => {},
   onRemoveAsset = () => {},
@@ -116,49 +119,85 @@ export function AssetBin({
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const currentKeyword = useMemo(() => {
+    if (!currentTrack && !currentTrackTitle) return null;
+    const id = (currentTrack?.id || '').toLowerCase();
+    const url = (currentTrack?.url || '').toLowerCase();
+    const t = (currentTrackTitle || currentTrack?.title || '').toLowerCase();
+    if (id.includes('radiator') || url.includes('radiator') || t.includes('radiator')) return 'radiator';
+    if (id.includes('thelema') || url.includes('thelema') || t.includes('thelema')) return 'thelema-mountain';
+    if (id.includes('eighth_sphere') || url.includes('eighth-sphere') || t.includes('eighth') || t.includes('8th')) return 'eighth-sphere';
+    if (id.includes('high_roller') || url.includes('high-roller') || t.includes('high roller')) return 'high-roller';
+    if (id.includes('the_breach') || url.includes('the-breach') || t.includes('breach')) return 'the-breach';
+    if (id.includes('babalon') || url.includes('babalon') || t.includes('babalon')) return 'babalon';
+    if (id.includes('excavating') || url.includes('excavating') || t.includes('excavating')) return 'excavating';
+    if (id.includes('wait_till') || url.includes('wait-till') || t.includes('wait till')) return 'wait-till-you-see-it';
+    const clean = t.replace(/\.[a-z0-9]+$/i, '').trim();
+    return clean.length >= 3 ? clean : null;
+  }, [currentTrack, currentTrackTitle]);
+
   const counts = useMemo(() => {
+    let currentTrackCount = 0;
     let excavating = 0, waitSee = 0, synchroVox = 0, radiator = 0, thelema = 0, eighthSphere = 0, highRoller = 0, theBreach = 0, babalon = 0, videos = 0, stills = 0, driveIn = 0;
     assets.forEach((a) => {
       const isVid = a.mediaType === 'video' || a.type === 'video' || a.url?.endsWith('.webm') || a.url?.endsWith('.mp4');
-      if (a.url?.includes('excavating')) excavating++;
-      if (a.url?.includes('wait-till-you-see-it')) waitSee++;
-      if (a.url?.includes('radiator')) radiator++;
-      if (a.url?.includes('thelema-mountain')) thelema++;
-      if (a.url?.includes('eighth-sphere')) eighthSphere++;
-      if (a.url?.includes('high-roller')) highRoller++;
-      if (a.url?.includes('the-breach')) theBreach++;
-      if (a.url?.includes('babalon')) babalon++;
-      if (a.url?.includes('synchro-vox') || a.url?.includes('puppet') || a.name?.toLowerCase().includes('mouth') || a.name?.toLowerCase().includes('character_') || a.name?.toLowerCase().includes('transform_')) synchroVox++;
+      const urlLower = (a.url || '').toLowerCase();
+      const nameLower = (a.name || '').toLowerCase();
+
+      if (currentKeyword && (urlLower.includes(currentKeyword) || nameLower.includes(currentKeyword))) {
+        currentTrackCount++;
+      } else if (a.songId && currentTrack?.id && a.songId === currentTrack.id) {
+        currentTrackCount++;
+      }
+
+      if (urlLower.includes('excavating')) excavating++;
+      if (urlLower.includes('wait-till-you-see-it')) waitSee++;
+      if (urlLower.includes('radiator')) radiator++;
+      if (urlLower.includes('thelema-mountain')) thelema++;
+      if (urlLower.includes('eighth-sphere')) eighthSphere++;
+      if (urlLower.includes('high-roller')) highRoller++;
+      if (urlLower.includes('the-breach')) theBreach++;
+      if (urlLower.includes('babalon')) babalon++;
+      if (urlLower.includes('synchro-vox') || urlLower.includes('puppet') || nameLower.includes('mouth') || nameLower.includes('character_') || nameLower.includes('transform_')) synchroVox++;
       if (isVid) videos++; else stills++;
-      if (a.url?.includes('iz-') || a.url?.includes('drive-in')) driveIn++;
+      if (urlLower.includes('iz-') || urlLower.includes('drive-in')) driveIn++;
     });
-    return { all: assets.length, excavating, waitSee, synchroVox, radiator, thelema, eighthSphere, highRoller, theBreach, babalon, videos, stills, driveIn };
-  }, [assets]);
+    return { all: assets.length, currentTrack: currentTrackCount, excavating, waitSee, synchroVox, radiator, thelema, eighthSphere, highRoller, theBreach, babalon, videos, stills, driveIn };
+  }, [assets, currentKeyword, currentTrack]);
 
   const filteredItems = useMemo(() => {
     return assets.map((a, origIndex) => ({ ...a, origIndex })).filter((asset) => {
       const isVid = asset.mediaType === 'video' || asset.type === 'video' || asset.url?.endsWith('.webm') || asset.url?.endsWith('.mp4');
-      if (activeCategory === 'SYNCHRO_VOX' && !asset.url?.includes('synchro-vox') && !asset.url?.includes('puppet') && !asset.name?.toLowerCase().includes('mouth') && !asset.name?.toLowerCase().includes('character_') && !asset.name?.toLowerCase().includes('transform_')) return false;
-      if (activeCategory === 'EXCAVATING' && !asset.url?.includes('excavating')) return false;
-      if (activeCategory === 'WAIT_SEE' && !asset.url?.includes('wait-till-you-see-it')) return false;
-      if (activeCategory === 'RADIATOR' && !asset.url?.includes('radiator')) return false;
-      if (activeCategory === 'THELEMA' && !asset.url?.includes('thelema-mountain')) return false;
-      if (activeCategory === 'EIGHTH_SPHERE' && !asset.url?.includes('eighth-sphere')) return false;
-      if (activeCategory === 'HIGH_ROLLER' && !asset.url?.includes('high-roller')) return false;
-      if (activeCategory === 'THE_BREACH' && !asset.url?.includes('the-breach')) return false;
-      if (activeCategory === 'BABALON' && !asset.url?.includes('babalon')) return false;
+      const urlLower = (asset.url || '').toLowerCase();
+      const nameLower = (asset.name || '').toLowerCase();
+
+      if (activeCategory === 'CURRENT_TRACK') {
+        if (currentKeyword && (urlLower.includes(currentKeyword) || nameLower.includes(currentKeyword))) return true;
+        if (asset.songId && currentTrack?.id && asset.songId === currentTrack.id) return true;
+        return false;
+      }
+
+      if (activeCategory === 'SYNCHRO_VOX' && !urlLower.includes('synchro-vox') && !urlLower.includes('puppet') && !nameLower.includes('mouth') && !nameLower.includes('character_') && !nameLower.includes('transform_')) return false;
+      if (activeCategory === 'EXCAVATING' && !urlLower.includes('excavating')) return false;
+      if (activeCategory === 'WAIT_SEE' && !urlLower.includes('wait-till-you-see-it')) return false;
+      if (activeCategory === 'RADIATOR' && !urlLower.includes('radiator')) return false;
+      if (activeCategory === 'THELEMA' && !urlLower.includes('thelema-mountain')) return false;
+      if (activeCategory === 'EIGHTH_SPHERE' && !urlLower.includes('eighth-sphere')) return false;
+      if (activeCategory === 'HIGH_ROLLER' && !urlLower.includes('high-roller')) return false;
+      if (activeCategory === 'THE_BREACH' && !urlLower.includes('the-breach')) return false;
+      if (activeCategory === 'BABALON' && !urlLower.includes('babalon')) return false;
       if (activeCategory === 'VIDEOS' && !isVid) return false;
       if (activeCategory === 'STILLS' && isVid) return false;
-      if (activeCategory === 'DRIVE_IN' && !asset.url?.includes('iz-') && !asset.url?.includes('drive-in')) return false;
+      if (activeCategory === 'DRIVE_IN' && !urlLower.includes('iz-') && !urlLower.includes('drive-in')) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchName = (asset.name || '').toLowerCase().includes(q);
-        const matchUrl = (asset.url || '').toLowerCase().includes(q);
+        const matchName = nameLower.includes(q);
+        const matchUrl = urlLower.includes(q);
         if (!matchName && !matchUrl) return false;
       }
       return true;
     });
-  }, [assets, activeCategory, searchQuery]);
+  }, [assets, activeCategory, searchQuery, currentKeyword, currentTrack]);
 
   const selectedAsset = assets[selectedAssetIndex] || null;
   const selectedIsVideo = selectedAsset?.mediaType === 'video' || selectedAsset?.type === 'video' || selectedAsset?.url?.endsWith('.webm') || selectedAsset?.url?.endsWith('.mp4');
@@ -869,6 +908,11 @@ export function AssetBin({
         <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {[
             { id: 'ALL', label: `ALL (${counts.all})` },
+            ...(currentTrack || currentTrackTitle ? [{
+              id: 'CURRENT_TRACK',
+              label: `🎵 CURRENT TRACK (${counts.currentTrack})`,
+              isCurrentTrack: true,
+            }] : []),
             { id: 'RADIATOR', label: `🔥 RADIATOR (${counts.radiator})` },
             { id: 'THELEMA', label: `🏔 THELEMA (${counts.thelema})` },
             { id: 'EIGHTH_SPHERE', label: `🌑 8TH SPHERE (${counts.eighthSphere})` },
@@ -881,7 +925,7 @@ export function AssetBin({
             { id: 'VIDEOS', label: `🎬 VID (${counts.videos})` },
             { id: 'STILLS', label: `🖼 STILLS (${counts.stills})` },
             { id: 'DRIVE_IN', label: `📼 DRIVE-IN (${counts.driveIn})` },
-          ].map(({ id, label }) => {
+          ].map(({ id, label, isCurrentTrack }) => {
             const active = activeCategory === id;
             return (
               <button
@@ -889,17 +933,26 @@ export function AssetBin({
                 type="button"
                 onClick={() => setActiveCategory(id)}
                 style={{
-                  background: active ? 'var(--accent-orange)' : 'var(--bg-secondary)',
-                  color: active ? '#000' : 'var(--text-dim)',
-                  border: `1px solid ${active ? 'var(--accent-orange)' : 'var(--border-dim)'}`,
+                  background: active
+                    ? (isCurrentTrack ? '#06b6d4' : 'var(--accent-orange)')
+                    : (isCurrentTrack ? 'rgba(6, 182, 212, 0.12)' : 'var(--bg-secondary)'),
+                  color: active
+                    ? '#000'
+                    : (isCurrentTrack ? '#22d3ee' : 'var(--text-dim)'),
+                  border: `1px solid ${
+                    active
+                      ? (isCurrentTrack ? '#22d3ee' : 'var(--accent-orange)')
+                      : (isCurrentTrack ? 'rgba(34, 211, 238, 0.45)' : 'var(--border-dim)')
+                  }`,
                   borderRadius: 2,
                   padding: '2px 5px',
                   fontSize: 8,
-                  fontWeight: active ? 800 : 600,
+                  fontWeight: active ? 800 : (isCurrentTrack ? 700 : 600),
                   cursor: 'pointer',
                   fontFamily: 'var(--font-mono, monospace)',
                   letterSpacing: 0.2,
                   whiteSpace: 'nowrap',
+                  boxShadow: isCurrentTrack ? '0 0 4px rgba(6, 182, 212, 0.2)' : 'none',
                 }}
               >
                 {label}
