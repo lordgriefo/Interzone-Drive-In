@@ -48,6 +48,11 @@ function mediaScannerPlugin() {
     scanDirectory(path.resolve(root, 'public/assets-bg/wait-till-you-see-it'), './assets-bg/wait-till-you-see-it');
     scanDirectory(path.resolve(root, 'public/assets-bg/puppet-man'), './assets-bg/puppet-man');
     scanDirectory(path.resolve(root, 'public/assets-bg/radiator-hum'), './assets-bg/radiator-hum');
+    scanDirectory(path.resolve(root, 'public/assets-bg/thelema-mountain'), './assets-bg/thelema-mountain');
+    scanDirectory(path.resolve(root, 'public/assets-bg/eighth-sphere'), './assets-bg/eighth-sphere');
+    scanDirectory(path.resolve(root, 'public/assets-bg/high-roller'), './assets-bg/high-roller');
+    scanDirectory(path.resolve(root, 'public/assets-bg/the-breach'), './assets-bg/the-breach');
+    scanDirectory(path.resolve(root, 'public/assets-bg/babalon'), './assets-bg/babalon');
     scanDirectory(path.resolve(root, 'public/assets-bg/synchro-vox'), './assets-bg/synchro-vox');
     scanDirectory(path.resolve(root, 'public/assets-bg/drive-in'), './assets-bg/drive-in');
     scanDirectory(path.resolve(root, 'public/assets-bg/iz-extras'), './assets-bg/iz-extras');

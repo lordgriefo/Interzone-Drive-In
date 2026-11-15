@@ -117,17 +117,22 @@ export function AssetBin({
   const [searchQuery, setSearchQuery] = useState('');
 
   const counts = useMemo(() => {
-    let excavating = 0, waitSee = 0, synchroVox = 0, radiator = 0, videos = 0, stills = 0, driveIn = 0;
+    let excavating = 0, waitSee = 0, synchroVox = 0, radiator = 0, thelema = 0, eighthSphere = 0, highRoller = 0, theBreach = 0, babalon = 0, videos = 0, stills = 0, driveIn = 0;
     assets.forEach((a) => {
       const isVid = a.mediaType === 'video' || a.type === 'video' || a.url?.endsWith('.webm') || a.url?.endsWith('.mp4');
       if (a.url?.includes('excavating')) excavating++;
       if (a.url?.includes('wait-till-you-see-it')) waitSee++;
       if (a.url?.includes('radiator')) radiator++;
+      if (a.url?.includes('thelema-mountain')) thelema++;
+      if (a.url?.includes('eighth-sphere')) eighthSphere++;
+      if (a.url?.includes('high-roller')) highRoller++;
+      if (a.url?.includes('the-breach')) theBreach++;
+      if (a.url?.includes('babalon')) babalon++;
       if (a.url?.includes('synchro-vox') || a.url?.includes('puppet') || a.name?.toLowerCase().includes('mouth') || a.name?.toLowerCase().includes('character_') || a.name?.toLowerCase().includes('transform_')) synchroVox++;
       if (isVid) videos++; else stills++;
       if (a.url?.includes('iz-') || a.url?.includes('drive-in')) driveIn++;
     });
-    return { all: assets.length, excavating, waitSee, synchroVox, radiator, videos, stills, driveIn };
+    return { all: assets.length, excavating, waitSee, synchroVox, radiator, thelema, eighthSphere, highRoller, theBreach, babalon, videos, stills, driveIn };
   }, [assets]);
 
   const filteredItems = useMemo(() => {
@@ -137,6 +142,11 @@ export function AssetBin({
       if (activeCategory === 'EXCAVATING' && !asset.url?.includes('excavating')) return false;
       if (activeCategory === 'WAIT_SEE' && !asset.url?.includes('wait-till-you-see-it')) return false;
       if (activeCategory === 'RADIATOR' && !asset.url?.includes('radiator')) return false;
+      if (activeCategory === 'THELEMA' && !asset.url?.includes('thelema-mountain')) return false;
+      if (activeCategory === 'EIGHTH_SPHERE' && !asset.url?.includes('eighth-sphere')) return false;
+      if (activeCategory === 'HIGH_ROLLER' && !asset.url?.includes('high-roller')) return false;
+      if (activeCategory === 'THE_BREACH' && !asset.url?.includes('the-breach')) return false;
+      if (activeCategory === 'BABALON' && !asset.url?.includes('babalon')) return false;
       if (activeCategory === 'VIDEOS' && !isVid) return false;
       if (activeCategory === 'STILLS' && isVid) return false;
       if (activeCategory === 'DRIVE_IN' && !asset.url?.includes('iz-') && !asset.url?.includes('drive-in')) return false;
@@ -859,10 +869,15 @@ export function AssetBin({
         <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {[
             { id: 'ALL', label: `ALL (${counts.all})` },
-            { id: 'SYNCHRO_VOX', label: `👄 SYNCHRO-VOX (${counts.synchroVox})` },
-            { id: 'RADIATOR', label: `🔥 RADIATOR HUM (${counts.radiator})` },
+            { id: 'RADIATOR', label: `🔥 RADIATOR (${counts.radiator})` },
+            { id: 'THELEMA', label: `🏔 THELEMA (${counts.thelema})` },
+            { id: 'EIGHTH_SPHERE', label: `🌑 8TH SPHERE (${counts.eighthSphere})` },
+            { id: 'HIGH_ROLLER', label: `🎲 HIGH ROLLER (${counts.highRoller})` },
+            { id: 'THE_BREACH', label: `⚡ THE BREACH (${counts.theBreach})` },
+            { id: 'BABALON', label: `🏛 BABALON (${counts.babalon})` },
             { id: 'EXCAVATING', label: `🛸 EXCAVATING (${counts.excavating})` },
             { id: 'WAIT_SEE', label: `👁 WAIT SEE (${counts.waitSee})` },
+            { id: 'SYNCHRO_VOX', label: `👄 SYNCHRO-VOX (${counts.synchroVox})` },
             { id: 'VIDEOS', label: `🎬 VID (${counts.videos})` },
             { id: 'STILLS', label: `🖼 STILLS (${counts.stills})` },
             { id: 'DRIVE_IN', label: `📼 DRIVE-IN (${counts.driveIn})` },

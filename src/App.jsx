@@ -151,6 +151,7 @@ export const DEFAULT_PLAYLIST = [
     url: './assets-bg/the-breach.mp3',
     lrcUrl: './assets-bg/the-breach.lrc',
     duration: 338,
+    storyboardId: 'pl_the_breach',
     preset: {
       selectedStyle: 'third_mind',
       selectedEra: '1902_melies',
