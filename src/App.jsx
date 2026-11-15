@@ -443,6 +443,18 @@ export default function App() {
   });
   const [puppetEnabled, setPuppetEnabled] = useState(true);
   const [puppetDisplayMode, setPuppetDisplayMode] = useState('overlay'); // 'overlay' | 'swap'
+  const [puppetMask, setPuppetMask] = useState({
+    posX: 50,         // % horizontal position on face (0 - 100, 50 = center)
+    posY: 22,         // % vertical position from bottom (0 - 100, 22 = mouth position)
+    scale: 1.0,       // size multiplier (0.3 to 2.5)
+    width: 34,        // container width % (15 to 75)
+    height: 22,       // container height % (10 to 50)
+    shape: 'ellipse', // 'ellipse' | 'feather_box' | 'circle' | 'none'
+    feather: 22,      // feather softness % (0 to 50)
+    cropZoom: 2.2,    // zoom inside source face to extract just the lips (1.0 to 4.0)
+    cropY: 62,        // vertical focus point on source face (0 to 100, 62 = lips)
+    showGuides: false,// on-canvas guide reticle & drag handles
+  });
 
   // Offline deterministic export state (Mode B)
   const [isOfflineRendering, setIsOfflineRendering] = useState(false);
@@ -1549,6 +1561,8 @@ export default function App() {
           setPuppetEnabled={setPuppetEnabled}
           puppetDisplayMode={puppetDisplayMode}
           setPuppetDisplayMode={setPuppetDisplayMode}
+          puppetMask={puppetMask}
+          setPuppetMask={setPuppetMask}
           activeSlot={puppetActiveSlot}
           isPlaying={isPlaying}
           onReorderAssets={handleReorderAssets}
@@ -1694,6 +1708,8 @@ export default function App() {
               puppetEnabled={puppetEnabled}
               puppetDisplayMode={puppetDisplayMode}
               puppetActiveUrl={puppetActiveUrl}
+              puppetMask={puppetMask}
+              setPuppetMask={setPuppetMask}
               onEraMutate={handleEraMutate}
               onRubeStageChange={handleRubeStageChange}
               bpm={bpm}

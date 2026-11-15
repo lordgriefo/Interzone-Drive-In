@@ -11,6 +11,7 @@ vite.config.js.timestamp-*
 # Archives / backups
 *.rar
 *.zip
+assets-vault/
 
 # Logs
 npm-debug.log*

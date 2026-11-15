@@ -705,8 +705,8 @@
   <!-- Top Header Bar -->
   <header>
     <div class="brand">
-      <button class="btn-return-keneticut" onclick="returnToKenetiCut()" title="Return to Strangelet KenetiCut Timeline Editor">
-        ← KENETICUT
+      <button class="btn-return-keneticut" onclick="returnToKenetiCut()" title="Return to Strangelet KenetiCut Timeline & Media Bin">
+        ← BACK TO KENETICUT (MEDIA BIN)
       </button>
       <div id="beat-dot" class="beat-dot"></div>
       <h1>AI Choreography & Living Reel Studio</h1>
@@ -968,7 +968,14 @@
     }
 
     function returnToKenetiCut() {
-      postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
+      if (window.parent && window.parent !== window) {
+        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
+      } else if (window.opener) {
+        try { window.opener.postMessage({ type: 'SWITCH_TAB', tab: 'editor' }, '*'); } catch (_) {}
+        try { window.close(); } catch (_) {}
+      } else {
+        window.location.href = './index.html?tab=editor';
+      }
     }
 
     let currentSongTime = 0;

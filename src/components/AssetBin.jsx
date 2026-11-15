@@ -96,6 +96,8 @@ export function AssetBin({
   setPuppetEnabled = () => {},
   puppetDisplayMode = 'overlay',
   setPuppetDisplayMode = () => {},
+  puppetMask = {},
+  setPuppetMask = () => {},
   activeSlot,
   isPlaying = false,
   onReorderAssets = () => {},
@@ -108,6 +110,7 @@ export function AssetBin({
   const [renameText, setRenameText] = useState('');
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [isMaskPanelOpen, setIsMaskPanelOpen] = useState(false);
 
   // Category filter and live search
   const [activeCategory, setActiveCategory] = useState('ALL');
@@ -886,11 +889,30 @@ export function AssetBin({
             );
           })}
         </div>
+
+        {activeCategory === 'SYNCHRO_VOX' && (
+          <div style={{
+            fontSize: 8,
+            color: '#00e5ff',
+            backgroundColor: 'rgba(0, 229, 255, 0.08)',
+            border: '1px solid rgba(0, 229, 255, 0.3)',
+            padding: '5px 7px',
+            borderRadius: 3,
+            lineHeight: 1.35,
+          }}>
+            👄 <strong>8 Curated Visemes for Video</strong>: REST, OPEN, NARROW, WIDE, TEETH, PUCKER, MID, SNAP.
+            <div style={{ color: 'var(--text-dim)', fontSize: 7, marginTop: 2 }}>
+              141 extra faces safely vaulted in <code>assets-vault/faces-yo/</code> for upcoming video projects.
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── ASSET GRID (Drag & drop reorder + quick shift buttons) ── */}
       <div style={{
         flexGrow: 1,
+        minHeight: 180,
+        maxHeight: 380,
         overflowY: 'auto',
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
@@ -1139,6 +1161,26 @@ export function AssetBin({
               {puppetDisplayMode === 'overlay' ? '🎭 OVERLAY' : '🔀 SWAP'}
             </button>
 
+            {/* Mask & Placement Settings Button */}
+            <button
+              type="button"
+              onClick={() => setIsMaskPanelOpen((v) => !v)}
+              style={{
+                padding: '2px 6px',
+                borderRadius: 3,
+                border: isMaskPanelOpen ? '1px solid #00e5ff' : '1px solid var(--border-dim)',
+                backgroundColor: isMaskPanelOpen ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                color: isMaskPanelOpen ? '#00e5ff' : 'var(--text-primary)',
+                fontSize: 8,
+                fontWeight: 800,
+                cursor: 'pointer',
+                fontFamily: 'var(--font-mono)',
+              }}
+              title="Open Mouth Mask, Lip Zoom & Alignment Controls"
+            >
+              🎭 MASK {isMaskPanelOpen ? '▲' : '▼'}
+            </button>
+
             {/* 2 / 4 / 8 sprite mode */}
             {['2', '4', '8'].map((m) => (
               <button
@@ -1184,6 +1226,279 @@ export function AssetBin({
             </button>
           </div>
         </div>
+
+        {/* ── MOUTH MASK & ALIGNMENT CONTROLS ── */}
+        {isMaskPanelOpen && (
+          <div style={{
+            backgroundColor: 'rgba(0, 229, 255, 0.05)',
+            border: '1px solid rgba(0, 229, 255, 0.35)',
+            borderRadius: 5,
+            padding: '8px 10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 7,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: '#00e5ff', fontFamily: 'var(--font-mono)' }}>
+                👄 MASK SHAPE & ALIGNMENT
+              </span>
+              <button
+                type="button"
+                onClick={() => setPuppetMask?.((prev) => ({ ...prev, showGuides: !prev.showGuides }))}
+                style={{
+                  background: puppetMask?.showGuides ? '#00e5ff' : 'rgba(0,0,0,0.5)',
+                  color: puppetMask?.showGuides ? '#000' : '#00e5ff',
+                  border: '1px solid #00e5ff',
+                  borderRadius: 3,
+                  padding: '2px 6px',
+                  fontSize: 7.5,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-mono)',
+                }}
+                title="Toggle on-screen drag guide reticle on canvas"
+              >
+                {puppetMask?.showGuides ? '🎯 GUIDES: ON' : '🎯 GUIDES: OFF'}
+              </button>
+            </div>
+
+            {/* Mask Shape Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 8, color: 'var(--text-dim)', width: 45 }}>SHAPE:</span>
+              {[
+                { id: 'ellipse', label: '( ) ELLIPSE' },
+                { id: 'feather_box', label: '[ ] BOX' },
+                { id: 'circle', label: '◯ CIRCLE' },
+                { id: 'none', label: 'FULL' },
+              ].map(({ id, label }) => {
+                const active = (puppetMask?.shape || 'ellipse') === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setPuppetMask?.((prev) => ({ ...prev, shape: id }))}
+                    style={{
+                      flex: 1,
+                      background: active ? '#00e5ff' : 'rgba(0,0,0,0.4)',
+                      color: active ? '#000' : 'var(--text-dim)',
+                      border: `1px solid ${active ? '#00e5ff' : 'var(--border-dim)'}`,
+                      borderRadius: 2,
+                      padding: '2px 4px',
+                      fontSize: 7.5,
+                      fontWeight: active ? 800 : 600,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-mono)',
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Sliders */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {/* Position X */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 8 }}>
+                <span style={{ width: 62, color: 'var(--text-dim)' }}>↔ HORIZ (X):</span>
+                <input
+                  type="range"
+                  min="5"
+                  max="95"
+                  value={puppetMask?.posX ?? 50}
+                  onChange={(e) => setPuppetMask?.((prev) => ({ ...prev, posX: Number(e.target.value) }))}
+                  style={{ flex: 1, accentColor: '#00e5ff' }}
+                />
+                <span style={{ width: 28, textAlign: 'right', fontFamily: 'monospace' }}>
+                  {puppetMask?.posX ?? 50}%
+                </span>
+              </div>
+
+              {/* Position Y */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 8 }}>
+                <span style={{ width: 62, color: 'var(--text-dim)' }}>↕ VERT (Y):</span>
+                <input
+                  type="range"
+                  min="5"
+                  max="95"
+                  value={puppetMask?.posY ?? 22}
+                  onChange={(e) => setPuppetMask?.((prev) => ({ ...prev, posY: Number(e.target.value) }))}
+                  style={{ flex: 1, accentColor: '#00e5ff' }}
+                />
+                <span style={{ width: 28, textAlign: 'right', fontFamily: 'monospace' }}>
+                  {puppetMask?.posY ?? 22}%
+                </span>
+              </div>
+
+              {/* Scale / Size */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 8 }}>
+                <span style={{ width: 62, color: 'var(--text-dim)' }}>🔍 SCALE:</span>
+                <input
+                  type="range"
+                  min="0.4"
+                  max="2.5"
+                  step="0.05"
+                  value={puppetMask?.scale ?? 1.0}
+                  onChange={(e) => setPuppetMask?.((prev) => ({ ...prev, scale: Number(e.target.value) }))}
+                  style={{ flex: 1, accentColor: '#00e5ff' }}
+                />
+                <span style={{ width: 28, textAlign: 'right', fontFamily: 'monospace' }}>
+                  {(puppetMask?.scale ?? 1.0).toFixed(2)}x
+                </span>
+              </div>
+
+              {/* Lip Crop Zoom (zooms into source mouth) */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 8 }}>
+                <span style={{ width: 62, color: 'var(--text-dim)' }}>💋 LIP ZOOM:</span>
+                <input
+                  type="range"
+                  min="1.0"
+                  max="3.5"
+                  step="0.1"
+                  value={puppetMask?.cropZoom ?? 2.2}
+                  onChange={(e) => setPuppetMask?.((prev) => ({ ...prev, cropZoom: Number(e.target.value) }))}
+                  style={{ flex: 1, accentColor: '#ff6b00' }}
+                />
+                <span style={{ width: 28, textAlign: 'right', fontFamily: 'monospace' }}>
+                  {(puppetMask?.cropZoom ?? 2.2).toFixed(1)}x
+                </span>
+              </div>
+
+              {/* Soft Edge Feather */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 8 }}>
+                <span style={{ width: 62, color: 'var(--text-dim)' }}>🫧 FEATHER:</span>
+                <input
+                  type="range"
+                  min="5"
+                  max="45"
+                  value={puppetMask?.feather ?? 22}
+                  onChange={(e) => setPuppetMask?.((prev) => ({ ...prev, feather: Number(e.target.value) }))}
+                  style={{ flex: 1, accentColor: '#00e5ff' }}
+                />
+                <span style={{ width: 28, textAlign: 'right', fontFamily: 'monospace' }}>
+                  {puppetMask?.feather ?? 22}%
+                </span>
+              </div>
+            </div>
+
+            {/* Presets */}
+            <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginTop: 2 }}>
+              <button
+                type="button"
+                onClick={() => setPuppetMask?.((prev) => ({
+                  ...prev,
+                  posX: 50,
+                  posY: 22,
+                  scale: 1.0,
+                  width: 34,
+                  height: 22,
+                  shape: 'ellipse',
+                  feather: 22,
+                  cropZoom: 2.2,
+                  cropY: 62,
+                }))}
+                style={{
+                  background: 'rgba(255,107,0,0.18)',
+                  border: '1px solid #ff6b00',
+                  color: '#ff6b00',
+                  borderRadius: 2,
+                  padding: '2px 5px',
+                  fontSize: 7.5,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                }}
+              >
+                👄 SYNCHRO-VOX
+              </button>
+              <button
+                type="button"
+                onClick={() => setPuppetMask?.((prev) => ({
+                  ...prev,
+                  posX: 50,
+                  posY: 20,
+                  scale: 0.9,
+                  width: 30,
+                  height: 20,
+                  shape: 'ellipse',
+                  feather: 8,
+                  cropZoom: 2.0,
+                  cropY: 60,
+                }))}
+                style={{
+                  background: 'rgba(0, 229, 255, 0.15)',
+                  border: '1px solid #00e5ff',
+                  color: '#00e5ff',
+                  borderRadius: 2,
+                  padding: '2px 5px',
+                  fontSize: 7.5,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                }}
+              >
+                📺 CLUTCH CARGO
+              </button>
+              <button
+                type="button"
+                onClick={() => setPuppetMask?.((prev) => ({
+                  ...prev,
+                  posX: 50,
+                  posY: 24,
+                  scale: 1.15,
+                  width: 42,
+                  height: 24,
+                  shape: 'ellipse',
+                  feather: 28,
+                  cropZoom: 2.4,
+                  cropY: 62,
+                }))}
+                style={{
+                  background: 'rgba(168, 85, 247, 0.18)',
+                  border: '1px solid #a855f7',
+                  color: '#c084fc',
+                  borderRadius: 2,
+                  padding: '2px 5px',
+                  fontSize: 7.5,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                }}
+              >
+                🐶 CONAN HEAD
+              </button>
+              <button
+                type="button"
+                onClick={() => setPuppetMask?.((prev) => ({
+                  ...prev,
+                  posX: 50,
+                  posY: 22,
+                  scale: 1.0,
+                  width: 34,
+                  height: 22,
+                  shape: 'ellipse',
+                  feather: 22,
+                  cropZoom: 2.2,
+                  cropY: 62,
+                  showGuides: false,
+                }))}
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid var(--border-dim)',
+                  color: 'var(--text-dim)',
+                  borderRadius: 2,
+                  padding: '2px 5px',
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                }}
+              >
+                ↺ RESET
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Mouth phoneme thumbnail grid */}
         <div style={{

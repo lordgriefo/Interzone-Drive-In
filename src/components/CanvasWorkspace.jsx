@@ -275,6 +275,8 @@ export function CanvasWorkspace({
   puppetEnabled = true,
   puppetDisplayMode = 'overlay',
   puppetActiveUrl: propsPuppetActiveUrl,
+  puppetMask,
+  setPuppetMask,
   onEraMutate,
   onRubeStageChange,
   // Phase 1: master BPM — live-bound to all beat-synced FX
@@ -346,6 +348,54 @@ export function CanvasWorkspace({
   const beatFlashRafRef = useRef(null);
   // Per-style minimum hold time between slide advances (ms). Chill styles use a long hold.
   const lastSlideAdvanceRef = useRef(0);
+
+  // Drag handler for Synchro-Vox Mouth Mask positioning directly on canvas
+  const isDraggingMouthRef = useRef(false);
+  const dragStartPosRef = useRef({ clientX: 0, clientY: 0, initialPosX: 50, initialPosY: 22 });
+
+  const handleMouthDragStart = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!containerRef.current || !setPuppetMask) return;
+    isDraggingMouthRef.current = true;
+    dragStartPosRef.current = {
+      clientX: e.clientX,
+      clientY: e.clientY,
+      initialPosX: puppetMask?.posX ?? 50,
+      initialPosY: puppetMask?.posY ?? 22,
+    };
+
+    const onMouseMove = (ev) => {
+      if (!isDraggingMouthRef.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const deltaX = ev.clientX - dragStartPosRef.current.clientX;
+      const deltaY = ev.clientY - dragStartPosRef.current.clientY;
+
+      const deltaPercentX = (deltaX / rect.width) * 100;
+      // Note: posY is measured from the bottom, so moving mouse down (positive deltaY) decreases posY
+      const deltaPercentY = (deltaY / rect.height) * 100;
+
+      const newPosX = Math.max(5, Math.min(95, Math.round(dragStartPosRef.current.initialPosX + deltaPercentX)));
+      const newPosY = Math.max(5, Math.min(95, Math.round(dragStartPosRef.current.initialPosY - deltaPercentY)));
+
+      setPuppetMask((prev) => ({
+        ...prev,
+        posX: newPosX,
+        posY: newPosY,
+      }));
+    };
+
+    const onMouseUp = () => {
+      isDraggingMouthRef.current = false;
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }, [containerRef, puppetMask?.posX, puppetMask?.posY, setPuppetMask]);
   const lastTransientCountRef = useRef(-1);
   const currentTimeRef = useRef(currentTime);
   useEffect(() => { currentTimeRef.current = currentTime; }, [currentTime]);
@@ -1835,37 +1885,138 @@ export function CanvasWorkspace({
           />
         )}
 
-        {/* ── Synchro-Vox Mouth Overlay (Classic Clutch Cargo / Character Lip-Sync) ── */}
-        {puppetEnabled && hasPuppetAssignment && puppetActiveUrl && puppetDisplayMode === 'overlay' && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '18%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '32%',
-              maxHeight: '28%',
-              zIndex: 6,
-              pointerEvents: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <img
-              key={`synchro-vox-${puppetActiveUrl}`}
-              src={puppetActiveUrl}
-              alt="Synchro-Vox Lip-Sync"
+        {/* ── Synchro-Vox Mouth Overlay (Classic Clutch Cargo / Character Lip-Sync with Masking) ── */}
+        {puppetEnabled && hasPuppetAssignment && puppetActiveUrl && puppetDisplayMode === 'overlay' && (() => {
+          const mask = puppetMask || {
+            posX: 50,
+            posY: 22,
+            scale: 1.0,
+            width: 34,
+            height: 22,
+            shape: 'ellipse',
+            feather: 22,
+            cropZoom: 2.2,
+            cropY: 62,
+            showGuides: false,
+          };
+
+          const maskCss = mask.shape === 'ellipse'
+            ? `radial-gradient(ellipse at 50% 50%, black ${Math.max(10, 100 - mask.feather * 2)}%, transparent 100%)`
+            : mask.shape === 'circle'
+              ? `radial-gradient(circle at 50% 50%, black ${Math.max(10, 100 - mask.feather * 2)}%, transparent 100%)`
+              : mask.shape === 'feather_box'
+                ? `linear-gradient(to right, transparent, black ${mask.feather}%, black ${100 - mask.feather}%, transparent), linear-gradient(to bottom, transparent, black ${mask.feather}%, black ${100 - mask.feather}%, transparent)`
+                : 'none';
+
+          const maskComposite = mask.shape === 'feather_box' ? 'destination-in' : undefined;
+          const containerW = mask.width * (mask.scale || 1.0);
+          const containerH = mask.height * (mask.scale || 1.0);
+
+          return (
+            <div
               style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                objectFit: 'contain',
-                filter: composedFilter,
-                opacity: rubeVisuals.opacityBleed,
+                position: 'absolute',
+                bottom: `${mask.posY}%`,
+                left: `${mask.posX}%`,
+                transform: 'translateX(-50%) translateY(50%)',
+                width: `${containerW}%`,
+                height: `${containerH}%`,
+                zIndex: 6,
+                pointerEvents: mask.showGuides ? 'auto' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
-          </div>
-        )}
+            >
+              {/* Masked Mouth Area with source lip zoom & feathering */}
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  WebkitMaskImage: maskCss !== 'none' ? maskCss : undefined,
+                  maskImage: maskCss !== 'none' ? maskCss : undefined,
+                  WebkitMaskComposite: maskComposite,
+                  maskComposite: maskComposite,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <img
+                  key={`synchro-vox-${puppetActiveUrl}`}
+                  src={puppetActiveUrl}
+                  alt="Synchro-Vox Lip-Sync"
+                  style={{
+                    position: 'absolute',
+                    top: `${50 - ((mask.cropY || 62) - 50) * (mask.cropZoom || 2.2)}%`,
+                    left: '50%',
+                    transform: `translate(-50%, -50%) scale(${mask.cropZoom || 2.2})`,
+                    maxWidth: 'none',
+                    maxHeight: 'none',
+                    width: '100%',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    filter: composedFilter,
+                    opacity: rubeVisuals.opacityBleed,
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
+
+              {/* Interactive Visual Alignment Guide (when showGuides is active) */}
+              {mask.showGuides && (
+                <div
+                  onMouseDown={handleMouthDragStart}
+                  style={{
+                    position: 'absolute',
+                    inset: -4,
+                    border: '2px dashed #00e5ff',
+                    borderRadius: mask.shape === 'ellipse' || mask.shape === 'circle' ? '50%' : 4,
+                    boxShadow: '0 0 10px rgba(0, 229, 255, 0.6), inset 0 0 8px rgba(0, 229, 255, 0.3)',
+                    cursor: 'move',
+                    pointerEvents: 'auto',
+                    zIndex: 10,
+                  }}
+                  title="Drag to position mouth on face"
+                >
+                  {/* Center Reticle */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    border: '1.5px solid #ff6b00',
+                    background: 'rgba(255, 107, 0, 0.4)',
+                    pointerEvents: 'none',
+                  }} />
+                  {/* Label */}
+                  <span style={{
+                    position: 'absolute',
+                    bottom: -18,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'rgba(0,0,0,0.85)',
+                    color: '#00e5ff',
+                    fontSize: 8,
+                    fontWeight: 800,
+                    padding: '1px 5px',
+                    borderRadius: 2,
+                    whiteSpace: 'nowrap',
+                    fontFamily: 'monospace',
+                    pointerEvents: 'none',
+                  }}>
+                    👄 MASK GUIDE: DRAG TO MOVE
+                  </span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     );
   };
