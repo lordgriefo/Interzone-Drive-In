@@ -309,55 +309,66 @@ export function InterzoneFrame({
             alignItems: 'center',
             lineHeight: 1,
             pointerEvents: 'none',
+            flex: 1,
+            minWidth: 0,
+            textAlign: 'center',
+            padding: '0 8px',
           }}>
             <div style={{
               fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: 'clamp(22px, 2.6vw, 32px)',
+              fontSize: 'clamp(22px, 2.8vw, 34px)',
               letterSpacing: '4px',
               color: '#ffffff',
               textShadow: '0 0 12px rgba(0, 229, 255, 0.85), 0 0 24px rgba(0, 229, 255, 0.45)',
               fontWeight: 400,
+              whiteSpace: 'nowrap',
             }}>
               STRANGELET · KENETICUT
             </div>
             <div style={{
               fontFamily: "'Syncopate', sans-serif",
-              fontSize: '7.5px',
-              letterSpacing: '3.5px',
+              fontSize: 'clamp(6.5px, 0.8vw, 8px)',
+              letterSpacing: '3px',
               color: 'var(--accent-orange, #ff6b00)',
               opacity: 0.95,
               fontWeight: 700,
               marginTop: 2,
+              whiteSpace: 'nowrap',
             }}>
               AI AUDIO-REACTIVE CHOP ENGINE & VJ CUT-UP LAB
             </div>
           </div>
 
           {/* Right: Studio Tab Switcher & Master Audio/Video Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 160, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, justifyContent: 'flex-end' }}>
             {/* Link / Tab to Choreography Studio */}
             <button
-              onClick={() => onTabChange && onTabChange('studio')}
-              title="Open the AI Choreography & Flipbook Studio to create custom flipbooks, living reels, and prompts"
+              onClick={() => onTabChange && onTabChange(activeTab === 'studio' ? 'editor' : 'studio')}
+              title={activeTab === 'studio' ? "Return to KenetiCut Editor" : "Open the AI Choreography & Flipbook Studio"}
               style={{
-                background: 'linear-gradient(90deg, #00e5ff, #00b0ff)',
+                background: activeTab === 'studio'
+                  ? 'linear-gradient(90deg, #ff6b00, #ff8c00)'
+                  : 'linear-gradient(90deg, #00e5ff, #00b0ff)',
                 color: '#000',
-                border: '1px solid #00e5ff',
+                border: activeTab === 'studio' ? '1px solid #ff6b00' : '1px solid #00e5ff',
                 borderRadius: 4,
-                padding: '5px 12px',
+                padding: '3px 7px',
                 fontFamily: "'Syncopate', sans-serif",
                 fontWeight: 800,
-                fontSize: 9,
-                letterSpacing: 1.5,
+                fontSize: 7.5,
+                letterSpacing: 0.8,
                 cursor: 'pointer',
-                boxShadow: '0 0 12px rgba(0, 229, 255, 0.75)',
+                boxShadow: activeTab === 'studio'
+                  ? '0 0 8px rgba(255, 107, 0, 0.4)'
+                  : '0 0 8px rgba(0, 229, 255, 0.4)',
                 transition: 'all 0.15s',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 5,
+                gap: 3,
+                flexShrink: 0,
               }}
             >
-              🎞️ AI FLIPBOOK STUDIO
+              {activeTab === 'studio' ? '🎬 KENETICUT' : '🎞️ FLIPBOOK'}
             </button>
 
             {/* Sound Toggle */}
@@ -369,13 +380,14 @@ export function InterzoneFrame({
                 color: isMuted ? '#f43f5e' : 'var(--accent-orange, #ff6b00)',
                 border: `1px solid ${isMuted ? '#f43f5e' : 'rgba(255, 107, 0, 0.6)'}`,
                 borderRadius: 4,
-                padding: '5px 10px',
+                padding: '3px 7px',
                 fontFamily: "'Syncopate', sans-serif",
                 fontWeight: 800,
-                fontSize: 8.5,
-                letterSpacing: 1,
+                fontSize: 7.5,
+                letterSpacing: 0.8,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
+                flexShrink: 0,
               }}
             >
               {isMuted ? '🔇 MUTED' : '🔊 SOUND'}
@@ -390,16 +402,17 @@ export function InterzoneFrame({
                 color: videoEnabled ? '#00e5ff' : '#94a3b8',
                 border: `1px solid ${videoEnabled ? '#00e5ff' : 'rgba(148, 163, 184, 0.4)'}`,
                 borderRadius: 4,
-                padding: '5px 10px',
+                padding: '3px 7px',
                 fontFamily: "'Syncopate', sans-serif",
                 fontWeight: 800,
-                fontSize: 8.5,
-                letterSpacing: 1,
+                fontSize: 7.5,
+                letterSpacing: 0.8,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
+                flexShrink: 0,
               }}
             >
-              {videoEnabled ? '🎬 VIDEO: ON' : '⏸ VIDEO: OFF'}
+              {videoEnabled ? '▶ VIDEO' : '⏸ VIDEO'}
             </button>
           </div>
         </div>

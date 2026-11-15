@@ -281,6 +281,7 @@ export default function App() {
 
   // ── Dual-Pipeline Export Modal State ──
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const studioIframeRef = useRef(null);
 
   // ── Deep-linkable Tab Router (URL search param ?tab=studio or hash #studio) ──
   // Default to 'editor' (KenetiCut) so user lands directly into the working editor!
@@ -627,25 +628,36 @@ export default function App() {
     return () => window.removeEventListener('message', onMessage);
   }, [isPlaying, togglePlay]);
 
-  // Broadcast beat pulses and real-time timecode back to Perchance parent window
+  // Broadcast beat pulses and real-time timecode back to Perchance parent window AND embedded studio iframe
   useEffect(() => {
+    const stateMsg = {
+      type: 'KENETICUT_STATE',
+      currentTime,
+      duration,
+      isPlaying,
+      bpm,
+      era: selectedEra,
+      style: selectedStyle,
+    };
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'KENETICUT_STATE',
-        currentTime,
-        duration,
-        isPlaying,
+      try { window.parent.postMessage(stateMsg, '*'); } catch (_) {}
+    }
+    if (studioIframeRef.current?.contentWindow) {
+      try { studioIframeRef.current.contentWindow.postMessage(stateMsg, '*'); } catch (_) {}
+    }
+
+    if (isPlaying && audioSignals?.isTransient) {
+      const beatMsg = {
+        type: 'KENETICUT_BEAT',
+        transientCount: audioSignals.transientCount,
         bpm,
-        era: selectedEra,
-        style: selectedStyle,
-      }, '*');
-      if (isPlaying && audioSignals?.isTransient) {
-        window.parent.postMessage({
-          type: 'KENETICUT_BEAT',
-          transientCount: audioSignals.transientCount,
-          bpm,
-          currentTime,
-        }, '*');
+        currentTime,
+      };
+      if (window.parent && window.parent !== window) {
+        try { window.parent.postMessage(beatMsg, '*'); } catch (_) {}
+      }
+      if (studioIframeRef.current?.contentWindow) {
+        try { studioIframeRef.current.contentWindow.postMessage(beatMsg, '*'); } catch (_) {}
       }
     }
   }, [audioSignals?.transientCount, isPlaying, bpm, currentTime, duration, selectedEra, selectedStyle]);
@@ -1190,12 +1202,14 @@ export default function App() {
         }));
       } else if (type === 'SET_STYLE' && e.data.style) {
         setSelectedStyle(e.data.style);
+      } else if (type === 'SWITCH_TAB' && e.data.tab) {
+        handleTabChange(e.data.tab);
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [togglePlay, seekTo, setSelectedStyle]);
+  }, [togglePlay, seekTo, setSelectedStyle, handleTabChange]);
 
   const handleRemoveAsset = (id) => {
     setAssets((prev) => {
@@ -1458,6 +1472,7 @@ export default function App() {
 
             {/* Embedded AI Choreography & Flipbook Studio */}
             <iframe
+              ref={studioIframeRef}
               src="./perchance-generator.html"
               title="Strangelet KenetiCut AI Choreography & Flipbook Studio"
               style={{
