@@ -968,13 +968,21 @@
     }
 
     function returnToKenetiCut() {
-      if (window.parent && window.parent !== window) {
-        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
-      } else if (window.opener) {
+      const isPerchanceSite = window.location.hostname.includes('perchance.org') || window.location.href.includes('null');
+      if (window.opener) {
         try { window.opener.postMessage({ type: 'SWITCH_TAB', tab: 'editor' }, '*'); } catch (_) {}
         try { window.close(); } catch (_) {}
+      } else if (!isPerchanceSite && window.parent && window.parent !== window) {
+        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
       } else {
-        window.location.href = './index.html?tab=editor';
+        const targetUrl = isPerchanceSite
+          ? 'https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html'
+          : './index.html?tab=editor';
+        if (isPerchanceSite) {
+          window.open(targetUrl, '_blank');
+        } else {
+          window.location.href = targetUrl;
+        }
       }
     }
 
