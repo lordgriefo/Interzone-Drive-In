@@ -117,16 +117,17 @@ export function AssetBin({
   const [searchQuery, setSearchQuery] = useState('');
 
   const counts = useMemo(() => {
-    let excavating = 0, waitSee = 0, synchroVox = 0, videos = 0, stills = 0, driveIn = 0;
+    let excavating = 0, waitSee = 0, synchroVox = 0, radiator = 0, videos = 0, stills = 0, driveIn = 0;
     assets.forEach((a) => {
       const isVid = a.mediaType === 'video' || a.type === 'video' || a.url?.endsWith('.webm') || a.url?.endsWith('.mp4');
       if (a.url?.includes('excavating')) excavating++;
       if (a.url?.includes('wait-till-you-see-it')) waitSee++;
+      if (a.url?.includes('radiator')) radiator++;
       if (a.url?.includes('synchro-vox') || a.url?.includes('puppet') || a.name?.toLowerCase().includes('mouth') || a.name?.toLowerCase().includes('character_') || a.name?.toLowerCase().includes('transform_')) synchroVox++;
       if (isVid) videos++; else stills++;
       if (a.url?.includes('iz-') || a.url?.includes('drive-in')) driveIn++;
     });
-    return { all: assets.length, excavating, waitSee, synchroVox, videos, stills, driveIn };
+    return { all: assets.length, excavating, waitSee, synchroVox, radiator, videos, stills, driveIn };
   }, [assets]);
 
   const filteredItems = useMemo(() => {
@@ -135,6 +136,7 @@ export function AssetBin({
       if (activeCategory === 'SYNCHRO_VOX' && !asset.url?.includes('synchro-vox') && !asset.url?.includes('puppet') && !asset.name?.toLowerCase().includes('mouth') && !asset.name?.toLowerCase().includes('character_') && !asset.name?.toLowerCase().includes('transform_')) return false;
       if (activeCategory === 'EXCAVATING' && !asset.url?.includes('excavating')) return false;
       if (activeCategory === 'WAIT_SEE' && !asset.url?.includes('wait-till-you-see-it')) return false;
+      if (activeCategory === 'RADIATOR' && !asset.url?.includes('radiator')) return false;
       if (activeCategory === 'VIDEOS' && !isVid) return false;
       if (activeCategory === 'STILLS' && isVid) return false;
       if (activeCategory === 'DRIVE_IN' && !asset.url?.includes('iz-') && !asset.url?.includes('drive-in')) return false;
@@ -858,6 +860,7 @@ export function AssetBin({
           {[
             { id: 'ALL', label: `ALL (${counts.all})` },
             { id: 'SYNCHRO_VOX', label: `👄 SYNCHRO-VOX (${counts.synchroVox})` },
+            { id: 'RADIATOR', label: `🔥 RADIATOR HUM (${counts.radiator})` },
             { id: 'EXCAVATING', label: `🛸 EXCAVATING (${counts.excavating})` },
             { id: 'WAIT_SEE', label: `👁 WAIT SEE (${counts.waitSee})` },
             { id: 'VIDEOS', label: `🎬 VID (${counts.videos})` },
