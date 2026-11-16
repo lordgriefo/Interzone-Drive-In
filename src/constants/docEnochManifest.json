@@ -1,0 +1,912 @@
+[
+  {
+    "id": "enoch_station_id_01",
+    "type": "station_id",
+    "track_number": "",
+    "track_title": "W-OCCULT Station ID",
+    "script": "Doc Enoch here on W-OCCULT 99.3 FM... that's Magick with a K, travelers. Broadcasting from a rusted trailer between the Mojave dunes and Universe B. Keep your dials locked right here.",
+    "duration": 14.22,
+    "wav_file": "enoch_station_id_01.wav",
+    "mp3_file": "enoch_station_id_01.mp3"
+  },
+  {
+    "id": "enoch_station_id_02",
+    "type": "station_id",
+    "track_number": "",
+    "track_title": "W-OCCULT Neon Frequency",
+    "script": "You're riding with Doc Enoch through the midnight stretch. If the neon on the interstate is vibrating with a slight violet aura tonight, don't adjust the knobs. That's just the natural resonance of the ether.",
+    "duration": 13.35,
+    "wav_file": "enoch_station_id_02.wav",
+    "mp3_file": "enoch_station_id_02.mp3"
+  },
+  {
+    "id": "enoch_weather_01",
+    "type": "weather",
+    "track_number": "",
+    "track_title": "Mojave Desert Weather",
+    "script": "Checking the late-night Mojave weather: 71 degrees, calm winds out of the southwest, a forty percent chance of localized temporal anomalies, and a steady 3.8 roentgens coming off the Malibu in the back row.",
+    "duration": 14.45,
+    "wav_file": "enoch_weather_01.wav",
+    "mp3_file": "enoch_weather_01.mp3"
+  },
+  {
+    "id": "enoch_bumper_01",
+    "type": "bumper",
+    "track_number": "",
+    "track_title": "As Above So Below Bumper",
+    "script": "Remember the primary directive of the High Mojave: As above, so below... but buy the ticket, take the ride, and keep the pedal buried until you hit the Nevada border.",
+    "duration": 11.28,
+    "wav_file": "enoch_bumper_01.wav",
+    "mp3_file": "enoch_bumper_01.mp3"
+  },
+  {
+    "id": "enoch_01_intro",
+    "type": "track_intro",
+    "track_number": "01",
+    "track_title": "Babalon Working Blues",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 01, Babalon Working Blues. A rocket scientist, a scribe, and an invocation in the desert. The paperwork is still arriving. Let's drop the needle.",
+    "duration": 15.55,
+    "wav_file": "enoch_01_intro.wav",
+    "mp3_file": "enoch_01_intro.mp3"
+  },
+  {
+    "id": "enoch_01_fact",
+    "type": "fact_tangent",
+    "track_number": "01",
+    "track_title": "Babalon Working Blues",
+    "script": "Doc Enoch with a transmission note on Babalon Working Blues. John Whiteside 'Jack' Parsons was a self-taught chemist who co-founded the Caltech-linked rocket group (GALCIT) that led to the Jet Propulsion Laboratory, and he co-founded Aerojet. He led the Agape Lodge of the Ordo Templi Orientis in Pasadena and was a devoted follower of Aleister Crowley\u2019s Thelema. Remember travelers, that's Magick with a K.",
+    "duration": 23.8,
+    "wav_file": "enoch_01_fact.wav",
+    "mp3_file": "enoch_01_fact.mp3"
+  },
+  {
+    "id": "enoch_01_error",
+    "type": "transmission_error",
+    "track_number": "01",
+    "track_title": "Babalon Working Blues",
+    "script": "Wait a second... Babylon working shoes. No. Babalon Working Blues. Correction noted. Yeah. Let's keep it rolling.",
+    "duration": 7.65,
+    "wav_file": "enoch_01_error.wav",
+    "mp3_file": "enoch_01_error.mp3"
+  },
+  {
+    "id": "enoch_02_intro",
+    "type": "track_intro",
+    "track_number": "02",
+    "track_title": "Do What Thou Wilt (Hillbilly Hadit)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 02, Do What Thou Wilt (Hillbilly Hadit). Three days in a Cairo hotel room, and a phrase that launched a thousand paperback books. Let's drop the needle.",
+    "duration": 15.9,
+    "wav_file": "enoch_02_intro.wav",
+    "mp3_file": "enoch_02_intro.mp3"
+  },
+  {
+    "id": "enoch_02_fact",
+    "type": "fact_tangent",
+    "track_number": "02",
+    "track_title": "Do What Thou Wilt (Hillbilly Hadit)",
+    "script": "Doc Enoch with a transmission note on Do What Thou Wilt (Hillbilly Hadit). In Cairo in April 1904, Aleister Crowley and his new wife Rose said a voice dictated a text over three days. He called the voice Aiwass; the text was Liber AL vel Legis, The Book of the Law. Remember travelers, that's Magick with a K.",
+    "duration": 18.65,
+    "wav_file": "enoch_02_fact.wav",
+    "mp3_file": "enoch_02_fact.mp3"
+  },
+  {
+    "id": "enoch_02_error",
+    "type": "transmission_error",
+    "track_number": "02",
+    "track_title": "Do What Thou Wilt (Hillbilly Hadit)",
+    "script": "Wait a second... Do what you will. No. Do what thou wilt. The grammar is specific. Yeah. Let's keep it rolling.",
+    "duration": 6.9,
+    "wav_file": "enoch_02_error.wav",
+    "mp3_file": "enoch_02_error.mp3"
+  },
+  {
+    "id": "enoch_03_intro",
+    "type": "track_intro",
+    "track_number": "03",
+    "track_title": "The Lam & the Grey",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 03, The Lam & the Grey. A portrait drawn in 1918 that looks remarkably like what everyone started seeing in 1947. Let's drop the needle.",
+    "duration": 16.38,
+    "wav_file": "enoch_03_intro.wav",
+    "mp3_file": "enoch_03_intro.mp3"
+  },
+  {
+    "id": "enoch_03_fact",
+    "type": "fact_tangent",
+    "track_number": "03",
+    "track_title": "The Lam & the Grey",
+    "script": "Doc Enoch with a transmission note on The Lam & the Grey. In 1918 Crowley drew a portrait of an entity he called Lam during his stay in New York. The portrait depicts an entity with a large domed head, small mouth, and narrow eyes. Remember travelers, that's Magick with a K.",
+    "duration": 17.23,
+    "wav_file": "enoch_03_fact.wav",
+    "mp3_file": "enoch_03_fact.mp3"
+  },
+  {
+    "id": "enoch_03_error",
+    "type": "transmission_error",
+    "track_number": "03",
+    "track_title": "The Lam & the Grey",
+    "script": "Wait a second... Little lamb. No. Lam. With one m. Yeah. Let's keep it rolling.",
+    "duration": 5.03,
+    "wav_file": "enoch_03_error.wav",
+    "mp3_file": "enoch_03_error.mp3"
+  },
+  {
+    "id": "enoch_04_intro",
+    "type": "track_intro",
+    "track_number": "04",
+    "track_title": "Thelema Mountain",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 04, Thelema Mountain. Old-time shape-note singing from a choir that only uses the number ninety-three. Let's drop the needle.",
+    "duration": 14.28,
+    "wav_file": "enoch_04_intro.wav",
+    "mp3_file": "enoch_04_intro.mp3"
+  },
+  {
+    "id": "enoch_04_fact",
+    "type": "fact_tangent",
+    "track_number": "04",
+    "track_title": "Thelema Mountain",
+    "script": "Doc Enoch with a transmission note on Thelema Mountain. Nuit, Hadit, and Ra-Hoor-Khuit are the three central deities of The Book of the Law. The number 93 is the common greeting and closing in Thelema because the Greek words for Will (Thelema) and Love (Agape) both enumerate to 93 in isopsephy. Remember travelers, that's Magick with a K.",
+    "duration": 20.07,
+    "wav_file": "enoch_04_fact.wav",
+    "mp3_file": "enoch_04_fact.mp3"
+  },
+  {
+    "id": "enoch_04_error",
+    "type": "transmission_error",
+    "track_number": "04",
+    "track_title": "Thelema Mountain",
+    "script": "Wait a second... Ninety-four. No. Ninety-three. Yeah. Let's keep it rolling.",
+    "duration": 4.65,
+    "wav_file": "enoch_04_error.wav",
+    "mp3_file": "enoch_04_error.mp3"
+  },
+  {
+    "id": "enoch_05_intro",
+    "type": "track_intro",
+    "track_number": "05",
+    "track_title": "The Con Man Sails Away (L. Ron's Excellent Adventure)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 05, The Con Man Sails Away (L. Ron's Excellent Adventure). A yacht purchase in Florida that went sideways, documented in court filings and frantic telegrams. Let's drop the needle.",
+    "duration": 18.2,
+    "wav_file": "enoch_05_intro.wav",
+    "mp3_file": "enoch_05_intro.mp3"
+  },
+  {
+    "id": "enoch_05_fact",
+    "type": "fact_tangent",
+    "track_number": "05",
+    "track_title": "The Con Man Sails Away (L. Ron's Excellent Adventure)",
+    "script": "Doc Enoch with a transmission note on The Con Man Sails Away (L. Ron's Excellent Adventure). L. Ron Hubbard joined Parsons' Pasadena household in 1945 and participated in the Babalon Working as scribe. Parsons, Hubbard, and Sara Northrup formed an investment partnership called Allied Enterprises to purchase yachts in Florida. Remember travelers, that's Magick with a K.",
+    "duration": 22.9,
+    "wav_file": "enoch_05_fact.wav",
+    "mp3_file": "enoch_05_fact.mp3"
+  },
+  {
+    "id": "enoch_05_error",
+    "type": "transmission_error",
+    "track_number": "05",
+    "track_title": "The Con Man Sails Away (L. Ron's Excellent Adventure)",
+    "script": "Wait a second... Sail away on a cloud. No. On a boat. A forty-six-foot schooner. Yeah. Let's keep it rolling.",
+    "duration": 7.33,
+    "wav_file": "enoch_05_error.wav",
+    "mp3_file": "enoch_05_error.mp3"
+  },
+  {
+    "id": "enoch_06_intro",
+    "type": "track_intro",
+    "track_number": "06",
+    "track_title": "Cameron (The Scarlet Woman of Pasadena)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 06, Cameron (The Scarlet Woman of Pasadena). She walked through the door of 1003 South Orange Grove with fiery red hair and became the living avatar of Babalon. Let's drop the needle.",
+    "duration": 18.2,
+    "wav_file": "enoch_06_intro.wav",
+    "mp3_file": "enoch_06_intro.mp3"
+  },
+  {
+    "id": "enoch_06_fact",
+    "type": "fact_tangent",
+    "track_number": "06",
+    "track_title": "Cameron (The Scarlet Woman of Pasadena)",
+    "script": "Doc Enoch with a transmission note on Cameron (The Scarlet Woman of Pasadena). Marjorie Cameron arrived at the Parsonage at 1003 South Orange Grove in early 1946 with vibrant red hair, immediately fulfilling Parsons' astral vision of the Scarlet Woman. Cameron was a formidable fine artist and occult practitioner in her own right, starring in Kenneth Anger's 1954 avant-garde film Inauguration of the Pleasure Dome as the Scarlet Woman and Kali. Remember travelers, that's Magick with a K.",
+    "duration": 29.18,
+    "wav_file": "enoch_06_fact.wav",
+    "mp3_file": "enoch_06_fact.mp3"
+  },
+  {
+    "id": "enoch_06_error",
+    "type": "transmission_error",
+    "track_number": "06",
+    "track_title": "Cameron (The Scarlet Woman of Pasadena)",
+    "script": "Wait a second... Wait, check the death certificate. 1952? No, Jack died in '52. Cameron was in Venice Beach until 1995. Forty-three years later. Yeah. Let's keep it rolling.",
+    "duration": 13.72,
+    "wav_file": "enoch_06_error.wav",
+    "mp3_file": "enoch_06_error.mp3"
+  },
+  {
+    "id": "enoch_07_intro",
+    "type": "track_intro",
+    "track_number": "07",
+    "track_title": "Kenneth Grant & the Typhonian Transmission",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 07, Kenneth Grant & the Typhonian Transmission. Banjo breaks in the Mauve Zone. The tuning is deliberately slightly off. Let's drop the needle.",
+    "duration": 15.88,
+    "wav_file": "enoch_07_intro.wav",
+    "mp3_file": "enoch_07_intro.mp3"
+  },
+  {
+    "id": "enoch_07_fact",
+    "type": "fact_tangent",
+    "track_number": "07",
+    "track_title": "Kenneth Grant & the Typhonian Transmission",
+    "script": "Doc Enoch with a transmission note on Kenneth Grant & the Typhonian Transmission. Kenneth Grant was Aleister Crowley's personal secretary in the 1940s at Netherwood. He founded the New Isis Lodge in 1952 and later led the Typhonian O.T.O. Remember travelers, that's Magick with a K.",
+    "duration": 19.35,
+    "wav_file": "enoch_07_fact.wav",
+    "mp3_file": "enoch_07_fact.mp3"
+  },
+  {
+    "id": "enoch_07_error",
+    "type": "transmission_error",
+    "track_number": "07",
+    "track_title": "Kenneth Grant & the Typhonian Transmission",
+    "script": "Wait a second... The mauve phone. No. The Mauve Zone. Yeah. Let's keep it rolling.",
+    "duration": 5.1,
+    "wav_file": "enoch_07_error.wav",
+    "mp3_file": "enoch_07_error.mp3"
+  },
+  {
+    "id": "enoch_08_intro",
+    "type": "track_intro",
+    "track_number": "08",
+    "track_title": "Six Months in the Desert (Abramelin Boogie)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 08, Six Months in the Desert (Abramelin Boogie). Eighteen months of fasting, praying, and demon-binding, interrupted by order politics. Let's drop the needle.",
+    "duration": 16.12,
+    "wav_file": "enoch_08_intro.wav",
+    "mp3_file": "enoch_08_intro.mp3"
+  },
+  {
+    "id": "enoch_08_fact",
+    "type": "fact_tangent",
+    "track_number": "08",
+    "track_title": "Six Months in the Desert (Abramelin Boogie)",
+    "script": "Doc Enoch with a transmission note on Six Months in the Desert (Abramelin Boogie). The Book of the Sacred Magic of Abramelin the Mage was translated into English by S.L. MacGregor Mathers in 1898. It describes an elaborate retreat designed to achieve the Knowledge and Conversation of the Holy Guardian Angel. Remember travelers, that's Magick with a K.",
+    "duration": 21.6,
+    "wav_file": "enoch_08_fact.wav",
+    "mp3_file": "enoch_08_fact.mp3"
+  },
+  {
+    "id": "enoch_08_error",
+    "type": "transmission_error",
+    "track_number": "08",
+    "track_title": "Six Months in the Desert (Abramelin Boogie)",
+    "script": "Wait a second... Abramelin cookie. No. Abramelin Boogie. Yeah. Let's keep it rolling.",
+    "duration": 5.78,
+    "wav_file": "enoch_08_error.wav",
+    "mp3_file": "enoch_08_error.mp3"
+  },
+  {
+    "id": "enoch_09_intro",
+    "type": "track_intro",
+    "track_number": "09",
+    "track_title": "The Beast in His Boarding House",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 09, The Beast in His Boarding House. The wickedest man in the world spent his last winter by the sea, writing letters and playing chess. Let's drop the needle.",
+    "duration": 15.82,
+    "wav_file": "enoch_09_intro.wav",
+    "mp3_file": "enoch_09_intro.mp3"
+  },
+  {
+    "id": "enoch_09_fact",
+    "type": "fact_tangent",
+    "track_number": "09",
+    "track_title": "The Beast in His Boarding House",
+    "script": "Doc Enoch with a transmission note on The Beast in His Boarding House. Aleister Crowley died on December 1, 1947, at Netherwood boarding house in Hastings at age 72. His final major works were The Book of Thoth and the accompanying Thoth tarot deck, painted by Lady Frieda Harris. Remember travelers, that's Magick with a K.",
+    "duration": 20.32,
+    "wav_file": "enoch_09_fact.wav",
+    "mp3_file": "enoch_09_fact.mp3"
+  },
+  {
+    "id": "enoch_09_error",
+    "type": "transmission_error",
+    "track_number": "09",
+    "track_title": "The Beast in His Boarding House",
+    "script": "Wait a second... Netherworld. No. Netherwood. A guest house in Hastings. Yeah. Let's keep it rolling.",
+    "duration": 6.15,
+    "wav_file": "enoch_09_error.wav",
+    "mp3_file": "enoch_09_error.mp3"
+  },
+  {
+    "id": "enoch_10_intro",
+    "type": "track_intro",
+    "track_number": "10",
+    "track_title": "Doctor Dee & the Angel Table",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 10, Doctor Dee & the Angel Table. A mathematician to the Queen, an Aztec black mirror, and an angel that gave questionable domestic advice. Let's drop the needle.",
+    "duration": 17.18,
+    "wav_file": "enoch_10_intro.wav",
+    "mp3_file": "enoch_10_intro.mp3"
+  },
+  {
+    "id": "enoch_10_fact",
+    "type": "fact_tangent",
+    "track_number": "10",
+    "track_title": "Doctor Dee & the Angel Table",
+    "script": "Doc Enoch with a transmission note on Doctor Dee & the Angel Table. John Dee was a mathematician, geographer, and advisor to Queen Elizabeth I. From 1582 to 1589 he conducted scrying sessions with medium Edward Kelley, recording an angelic language now called Enochian. Remember travelers, that's Magick with a K.",
+    "duration": 20.35,
+    "wav_file": "enoch_10_fact.wav",
+    "mp3_file": "enoch_10_fact.mp3"
+  },
+  {
+    "id": "enoch_10_error",
+    "type": "transmission_error",
+    "track_number": "10",
+    "track_title": "Doctor Dee & the Angel Table",
+    "script": "Wait a second... Edward Kelly. Kelley with an e before the y. Yeah. Let's keep it rolling.",
+    "duration": 5.75,
+    "wav_file": "enoch_10_error.wav",
+    "mp3_file": "enoch_10_error.mp3"
+  },
+  {
+    "id": "enoch_11_intro",
+    "type": "track_intro",
+    "track_number": "11",
+    "track_title": "Zos Kia (Austin Osman Spare's Alphabet of Desire)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 11, Zos Kia (Austin Osman Spare's Alphabet of Desire). Royal Academy prodigy at seventeen, South London pub portraitist at sixty, and father of the modern sigil. Let's drop the needle.",
+    "duration": 18.65,
+    "wav_file": "enoch_11_intro.wav",
+    "mp3_file": "enoch_11_intro.mp3"
+  },
+  {
+    "id": "enoch_11_fact",
+    "type": "fact_tangent",
+    "track_number": "11",
+    "track_title": "Zos Kia (Austin Osman Spare's Alphabet of Desire)",
+    "script": "Doc Enoch with a transmission note on Zos Kia (Austin Osman Spare's Alphabet of Desire). Austin Osman Spare was a visual prodigy who exhibited at the Royal Academy at age seventeen. He developed a personal occult philosophy called the Zos Kia Cultus, based on the Alphabet of Desire and sigilization. Remember travelers, that's Magick with a K.",
+    "duration": 22.25,
+    "wav_file": "enoch_11_fact.wav",
+    "mp3_file": "enoch_11_fact.mp3"
+  },
+  {
+    "id": "enoch_11_error",
+    "type": "transmission_error",
+    "track_number": "11",
+    "track_title": "Zos Kia (Austin Osman Spare's Alphabet of Desire)",
+    "script": "Wait a second... Sausage and mash. No. Zos and Kia. Yeah. Let's keep it rolling.",
+    "duration": 5.42,
+    "wav_file": "enoch_11_error.wav",
+    "mp3_file": "enoch_11_error.mp3"
+  },
+  {
+    "id": "enoch_12_intro",
+    "type": "track_intro",
+    "track_number": "12",
+    "track_title": "The Golden Dawn Is Mine (The Great Schism)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 12, The Golden Dawn Is Mine (The Great Schism). W.B. Yeats defending a London magical vault against Aleister Crowley in Highland dress. A true story. Let's drop the needle.",
+    "duration": 17.65,
+    "wav_file": "enoch_12_intro.wav",
+    "mp3_file": "enoch_12_intro.mp3"
+  },
+  {
+    "id": "enoch_12_fact",
+    "type": "fact_tangent",
+    "track_number": "12",
+    "track_title": "The Golden Dawn Is Mine (The Great Schism)",
+    "script": "Doc Enoch with a transmission note on The Golden Dawn Is Mine (The Great Schism). The Hermetic Order of the Golden Dawn was founded in 1888 by William Wynn Westcott, Samuel Liddell MacGregor Mathers, and William Robert Woodman. Prominent members included W.B. Yeats, Maud Gonne, Arthur Machen, and Florence Farr. Remember travelers, that's Magick with a K.",
+    "duration": 20.98,
+    "wav_file": "enoch_12_fact.wav",
+    "mp3_file": "enoch_12_fact.mp3"
+  },
+  {
+    "id": "enoch_12_error",
+    "type": "transmission_error",
+    "track_number": "12",
+    "track_title": "The Golden Dawn Is Mine (The Great Schism)",
+    "script": "Wait a second... The Golden Horn. No. The Golden Dawn. Yeah. Let's keep it rolling.",
+    "duration": 5.22,
+    "wav_file": "enoch_12_error.wav",
+    "mp3_file": "enoch_12_error.mp3"
+  },
+  {
+    "id": "enoch_13_intro",
+    "type": "track_intro",
+    "track_number": "13",
+    "track_title": "Sea Priestess (Dion Fortune's Inner Planes)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 13, Sea Priestess (Dion Fortune's Inner Planes). Psychic defense over the White Cliffs of Dover and ancient tides summoned at Glastonbury. Let's drop the needle.",
+    "duration": 16.95,
+    "wav_file": "enoch_13_intro.wav",
+    "mp3_file": "enoch_13_intro.mp3"
+  },
+  {
+    "id": "enoch_13_fact",
+    "type": "fact_tangent",
+    "track_number": "13",
+    "track_title": "Sea Priestess (Dion Fortune's Inner Planes)",
+    "script": "Doc Enoch with a transmission note on Sea Priestess (Dion Fortune's Inner Planes). Dion Fortune (Violet Firth) took her magical motto from the Latin 'Deo, non fortuna' ('By God, not by chance'). She founded the Society of the Inner Light after breaking with Moina Mathers and the Hermetic Order of the Golden Dawn. Remember travelers, that's Magick with a K.",
+    "duration": 21.7,
+    "wav_file": "enoch_13_fact.wav",
+    "mp3_file": "enoch_13_fact.mp3"
+  },
+  {
+    "id": "enoch_13_error",
+    "type": "transmission_error",
+    "track_number": "13",
+    "track_title": "Sea Priestess (Dion Fortune's Inner Planes)",
+    "script": "Wait a second... Violet Firth. Deo non fortuna. Glastonbury Tor misty night patrol, 1940. Yeah. Let's keep it rolling.",
+    "duration": 9.22,
+    "wav_file": "enoch_13_error.wav",
+    "mp3_file": "enoch_13_error.mp3"
+  },
+  {
+    "id": "enoch_14_intro",
+    "type": "track_intro",
+    "track_number": "14",
+    "track_title": "Chaos Magic (The Permission Slip)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 14, Chaos Magic (The Permission Slip). When you strip the Latin and the velvet robes away, all you have left is a pen, some paper, and a lot of confidence. Let's drop the needle.",
+    "duration": 17.02,
+    "wav_file": "enoch_14_intro.wav",
+    "mp3_file": "enoch_14_intro.mp3"
+  },
+  {
+    "id": "enoch_14_fact",
+    "type": "fact_tangent",
+    "track_number": "14",
+    "track_title": "Chaos Magic (The Permission Slip)",
+    "script": "Doc Enoch with a transmission note on Chaos Magic (The Permission Slip). Chaos Magic originated in the late 1970s through Peter J. Carroll and Ray Sherwin, founders of the Illuminates of Thanateros (IOT). Carroll published Liber Null & Psychonaut, synthesizing Austin Osman Spare's sigil techniques with pragmatic belief-shifting. Remember travelers, that's Magick with a K.",
+    "duration": 23.07,
+    "wav_file": "enoch_14_fact.wav",
+    "mp3_file": "enoch_14_fact.mp3"
+  },
+  {
+    "id": "enoch_14_error",
+    "type": "transmission_error",
+    "track_number": "14",
+    "track_title": "Chaos Magic (The Permission Slip)",
+    "script": "Wait a second... Permission chip. No. Permission slip. Yeah. Let's keep it rolling.",
+    "duration": 5.25,
+    "wav_file": "enoch_14_error.wav",
+    "mp3_file": "enoch_14_error.mp3"
+  },
+  {
+    "id": "enoch_15_intro",
+    "type": "track_intro",
+    "track_number": "15",
+    "track_title": "The Eighth Sphere (Steiner's Moon-Demon Problem)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 15, The Eighth Sphere (Steiner's Moon-Demon Problem). A Swiss wooden palace burned to ashes, and a lecture series warning listeners not to get stuck on the Moon. Let's drop the needle.",
+    "duration": 17.3,
+    "wav_file": "enoch_15_intro.wav",
+    "mp3_file": "enoch_15_intro.mp3"
+  },
+  {
+    "id": "enoch_15_fact",
+    "type": "fact_tangent",
+    "track_number": "15",
+    "track_title": "The Eighth Sphere (Steiner's Moon-Demon Problem)",
+    "script": "Doc Enoch with a transmission note on The Eighth Sphere (Steiner's Moon-Demon Problem). Rudolf Steiner founded Anthroposophy after separating from the Theosophical Society. In his 1915 lectures, Steiner described the 'Eighth Sphere' as a detour of planetary evolution where human souls could be trapped between Lucifer and Ahriman. Remember travelers, that's Magick with a K.",
+    "duration": 22.52,
+    "wav_file": "enoch_15_fact.wav",
+    "mp3_file": "enoch_15_fact.mp3"
+  },
+  {
+    "id": "enoch_15_error",
+    "type": "transmission_error",
+    "track_number": "15",
+    "track_title": "The Eighth Sphere (Steiner's Moon-Demon Problem)",
+    "script": "Wait a second... The eighth spear. No. The Eighth Sphere. Yeah. Let's keep it rolling.",
+    "duration": 4.97,
+    "wav_file": "enoch_15_error.wav",
+    "mp3_file": "enoch_15_error.mp3"
+  },
+  {
+    "id": "enoch_16_intro",
+    "type": "track_intro",
+    "track_number": "16",
+    "track_title": "Blavatsky & the Mahatmas",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 16, Blavatsky & the Mahatmas. Letters dropping from the ceiling, a worldwide society, and twenty years of ink on Russian cigarettes. Let's drop the needle.",
+    "duration": 16.43,
+    "wav_file": "enoch_16_intro.wav",
+    "mp3_file": "enoch_16_intro.mp3"
+  },
+  {
+    "id": "enoch_16_fact",
+    "type": "fact_tangent",
+    "track_number": "16",
+    "track_title": "Blavatsky & the Mahatmas",
+    "script": "Doc Enoch with a transmission note on Blavatsky & the Mahatmas. Helena Petrovna Blavatsky co-founded the Theosophical Society in New York in 1875 alongside Henry Steel Olcott. She wrote Isis Unveiled (1877) and The Secret Doctrine (1888). Remember travelers, that's Magick with a K.",
+    "duration": 20.25,
+    "wav_file": "enoch_16_fact.wav",
+    "mp3_file": "enoch_16_fact.mp3"
+  },
+  {
+    "id": "enoch_16_error",
+    "type": "transmission_error",
+    "track_number": "16",
+    "track_title": "Blavatsky & the Mahatmas",
+    "script": "Wait a second... Madame Blue-sky. No. Madame Blavatsky. Yeah. Let's keep it rolling.",
+    "duration": 5.58,
+    "wav_file": "enoch_16_error.wav",
+    "mp3_file": "enoch_16_error.mp3"
+  },
+  {
+    "id": "enoch_17_intro",
+    "type": "track_intro",
+    "track_number": "17",
+    "track_title": "Eliphas L\u00e9vi Invokes Apollonius",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 17, Eliphas L\u00e9vi Invokes Apollonius. A Parisian ex-cleric in a London attic, wearing a linen robe and holding a consecrated blade. Let's drop the needle.",
+    "duration": 17.02,
+    "wav_file": "enoch_17_intro.wav",
+    "mp3_file": "enoch_17_intro.mp3"
+  },
+  {
+    "id": "enoch_17_fact",
+    "type": "fact_tangent",
+    "track_number": "17",
+    "track_title": "Eliphas L\u00e9vi Invokes Apollonius",
+    "script": "Doc Enoch with a transmission note on Eliphas L\u00e9vi Invokes Apollonius. Alphonse Louis Constant wrote under the Hebrew pseudonym \u00c9liphas L\u00e9vi. His 1854\u20131856 work Dogme et Rituel de la Haute Magie shaped modern Western occultism and popularized the Baphomet goat diagram. Remember travelers, that's Magick with a K.",
+    "duration": 22.12,
+    "wav_file": "enoch_17_fact.wav",
+    "mp3_file": "enoch_17_fact.mp3"
+  },
+  {
+    "id": "enoch_17_error",
+    "type": "transmission_error",
+    "track_number": "17",
+    "track_title": "Eliphas L\u00e9vi Invokes Apollonius",
+    "script": "Wait a second... Elephant Levi. No. \u00c9liphas L\u00e9vi. Yeah. Let's keep it rolling.",
+    "duration": 5.45,
+    "wav_file": "enoch_17_error.wav",
+    "mp3_file": "enoch_17_error.mp3"
+  },
+  {
+    "id": "enoch_18_intro",
+    "type": "track_intro",
+    "track_number": "18",
+    "track_title": "The Rosicrucian Manifestos",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 18, The Rosicrucian Manifestos. Three pamphlets published four hundred years ago that everybody replied to and nobody could find. Let's drop the needle.",
+    "duration": 16.57,
+    "wav_file": "enoch_18_intro.wav",
+    "mp3_file": "enoch_18_intro.mp3"
+  },
+  {
+    "id": "enoch_18_fact",
+    "type": "fact_tangent",
+    "track_number": "18",
+    "track_title": "The Rosicrucian Manifestos",
+    "script": "Doc Enoch with a transmission note on The Rosicrucian Manifestos. Between 1614 and 1616, three anonymous pamphlets appeared in Germany: Fama Fraternitatis, Confessio Fraternitatis, and The Chymical Wedding of Christian Rosenkreutz. They announced a secret brotherhood founded by Christian Rosenkreutz, whose tomb was supposedly discovered uncorrupted after 120 years. Remember travelers, that's Magick with a K.",
+    "duration": 24.82,
+    "wav_file": "enoch_18_fact.wav",
+    "mp3_file": "enoch_18_fact.mp3"
+  },
+  {
+    "id": "enoch_18_error",
+    "type": "transmission_error",
+    "track_number": "18",
+    "track_title": "The Rosicrucian Manifestos",
+    "script": "Wait a second... Rosy cruiser. No. Rosicrucian. Yeah. Let's keep it rolling.",
+    "duration": 5.2,
+    "wav_file": "enoch_18_error.wav",
+    "mp3_file": "enoch_18_error.mp3"
+  },
+  {
+    "id": "enoch_19_intro",
+    "type": "track_intro",
+    "track_number": "19",
+    "track_title": "The Aldebaran Transmission",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 19, The Aldebaran Transmission. A medium, a signal from sixty-five light years away, and one sentence in German. The story goes. Let's drop the needle.",
+    "duration": 16.6,
+    "wav_file": "enoch_19_intro.wav",
+    "mp3_file": "enoch_19_intro.mp3"
+  },
+  {
+    "id": "enoch_19_fact",
+    "type": "fact_tangent",
+    "track_number": "19",
+    "track_title": "The Aldebaran Transmission",
+    "script": "Doc Enoch with a transmission note on The Aldebaran Transmission. The term 'vril' originates in Edward Bulwer-Lytton's 1871 science-fiction novel The Coming Race. Aldebaran (Alpha Tauri) is an orange giant star located approximately 65 light years from Earth. Remember travelers, that's Magick with a K.",
+    "duration": 20.07,
+    "wav_file": "enoch_19_fact.wav",
+    "mp3_file": "enoch_19_fact.mp3"
+  },
+  {
+    "id": "enoch_19_error",
+    "type": "transmission_error",
+    "track_number": "19",
+    "track_title": "The Aldebaran Transmission",
+    "script": "Wait a second... Nimrod blight here. No. Niemand bleibt hier. Nobody stays here. Yeah. Let's keep it rolling.",
+    "duration": 7.33,
+    "wav_file": "enoch_19_error.wav",
+    "mp3_file": "enoch_19_error.mp3"
+  },
+  {
+    "id": "enoch_20_intro",
+    "type": "track_intro",
+    "track_number": "20",
+    "track_title": "Carcosa (The Lake of Hali)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 20, Carcosa (The Lake of Hali). A fictional play in a yellow cover that drove readers out of their minds, written in Paris in the nineties. Let's drop the needle.",
+    "duration": 16.35,
+    "wav_file": "enoch_20_intro.wav",
+    "mp3_file": "enoch_20_intro.mp3"
+  },
+  {
+    "id": "enoch_20_fact",
+    "type": "fact_tangent",
+    "track_number": "20",
+    "track_title": "Carcosa (The Lake of Hali)",
+    "script": "Doc Enoch with a transmission note on Carcosa (The Lake of Hali). Ambrose Bierce coined the city 'Carcosa' and 'Hali' in his 1886 short story 'An Inhabitant of Carcosa'. Robert W. Chambers expanded the motif in his 1895 collection The King in Yellow, featuring a fictional play that drives its readers insane. Remember travelers, that's Magick with a K.",
+    "duration": 22.3,
+    "wav_file": "enoch_20_fact.wav",
+    "mp3_file": "enoch_20_fact.mp3"
+  },
+  {
+    "id": "enoch_20_error",
+    "type": "transmission_error",
+    "track_number": "20",
+    "track_title": "Carcosa (The Lake of Hali)",
+    "script": "Wait a second... Calcutta. No. Carcosa. Yeah. Let's keep it rolling.",
+    "duration": 4.55,
+    "wav_file": "enoch_20_error.wav",
+    "mp3_file": "enoch_20_error.mp3"
+  },
+  {
+    "id": "enoch_21_intro",
+    "type": "track_intro",
+    "track_number": "21",
+    "track_title": "The Yellow Sign",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 21, The Yellow Sign. Have you seen it? The church watchman has, and he isn't speaking. Let's drop the needle.",
+    "duration": 13.2,
+    "wav_file": "enoch_21_intro.wav",
+    "mp3_file": "enoch_21_intro.mp3"
+  },
+  {
+    "id": "enoch_21_fact",
+    "type": "fact_tangent",
+    "track_number": "21",
+    "track_title": "The Yellow Sign",
+    "script": "Doc Enoch with a transmission note on The Yellow Sign. In Chambers' story 'The Yellow Sign' (1895), an artist and his model encounter a sinister talisman inscribed with an unearthly glyph. H.P. Lovecraft praised Chambers' work in Supernatural Horror in Literature, adopting elements into his own Cthulhu Mythos. Remember travelers, that's Magick with a K.",
+    "duration": 22.4,
+    "wav_file": "enoch_21_fact.wav",
+    "mp3_file": "enoch_21_fact.mp3"
+  },
+  {
+    "id": "enoch_21_error",
+    "type": "transmission_error",
+    "track_number": "21",
+    "track_title": "The Yellow Sign",
+    "script": "Wait a second... The yellow shine. No. The Yellow Sign. Yeah. Let's keep it rolling.",
+    "duration": 5.15,
+    "wav_file": "enoch_21_error.wav",
+    "mp3_file": "enoch_21_error.mp3"
+  },
+  {
+    "id": "enoch_23_intro",
+    "type": "track_intro",
+    "track_number": "23",
+    "track_title": "The Voynich Manuscript (Nobody's Read It)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 23, The Voynich Manuscript (Nobody's Read It). Real fifteenth-century vellum, real ink, botanical drawings of plants that don't exist, and nobody can read a single word. Let's drop the needle.",
+    "duration": 18.32,
+    "wav_file": "enoch_23_intro.wav",
+    "mp3_file": "enoch_23_intro.mp3"
+  },
+  {
+    "id": "enoch_23_fact",
+    "type": "fact_tangent",
+    "track_number": "23",
+    "track_title": "The Voynich Manuscript (Nobody's Read It)",
+    "script": "Doc Enoch with a transmission note on The Voynich Manuscript (Nobody's Read It). Radiocarbon dating of the vellum calfskin dates it between 1404 and 1438. It is preserved in Yale University's Beinecke Rare Book & Manuscript Library under catalog call number MS 408. Remember travelers, that's Magick with a K.",
+    "duration": 20.45,
+    "wav_file": "enoch_23_fact.wav",
+    "mp3_file": "enoch_23_fact.mp3"
+  },
+  {
+    "id": "enoch_23_error",
+    "type": "transmission_error",
+    "track_number": "23",
+    "track_title": "The Voynich Manuscript (Nobody's Read It)",
+    "script": "Wait a second... Four hundred and eight pages. No. Call number four-oh-eight. Two hundred and forty pages. Yeah. Let's keep it rolling.",
+    "duration": 8.53,
+    "wav_file": "enoch_23_error.wav",
+    "mp3_file": "enoch_23_error.mp3"
+  },
+  {
+    "id": "enoch_24_intro",
+    "type": "track_intro",
+    "track_number": "24",
+    "track_title": "The Comte de Saint-Germain (The Man Who Wouldn't Die)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 24, The Comte de Saint-Germain (The Man Who Wouldn't Die). He spoke a dozen languages, never ate in public, and Voltaire called him the man who knows everything. Let's drop the needle.",
+    "duration": 17.0,
+    "wav_file": "enoch_24_intro.wav",
+    "mp3_file": "enoch_24_intro.mp3"
+  },
+  {
+    "id": "enoch_24_fact",
+    "type": "fact_tangent",
+    "track_number": "24",
+    "track_title": "The Comte de Saint-Germain (The Man Who Wouldn't Die)",
+    "script": "Doc Enoch with a transmission note on The Comte de Saint-Germain (The Man Who Wouldn't Die). The Comte de Saint-Germain was a real historical gentleman, virtuoso violinist, and chemist who moved through high European courts in the 18th century. Voltaire famously described him in a letter to Frederick the Great as 'a man who never dies, and who knows everything.' Remember travelers, that's Magick with a K.",
+    "duration": 21.27,
+    "wav_file": "enoch_24_fact.wav",
+    "mp3_file": "enoch_24_fact.mp3"
+  },
+  {
+    "id": "enoch_24_error",
+    "type": "transmission_error",
+    "track_number": "24",
+    "track_title": "The Comte de Saint-Germain (The Man Who Wouldn't Die)",
+    "script": "Wait a second... Count of Monte Cristo. No. Comte de Saint-Germain. Yeah. Let's keep it rolling.",
+    "duration": 6.33,
+    "wav_file": "enoch_24_error.wav",
+    "mp3_file": "enoch_24_error.mp3"
+  },
+  {
+    "id": "enoch_25_intro",
+    "type": "track_intro",
+    "track_number": "25",
+    "track_title": "Bruno's Fire (The Campo de' Fiori, 1600)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 25, Bruno's Fire (The Campo de' Fiori, 1600). Eight years in an Inquisition cell, and a refusal to recant that the stars went on forever. Let's drop the needle.",
+    "duration": 17.2,
+    "wav_file": "enoch_25_intro.wav",
+    "mp3_file": "enoch_25_intro.mp3"
+  },
+  {
+    "id": "enoch_25_fact",
+    "type": "fact_tangent",
+    "track_number": "25",
+    "track_title": "Bruno's Fire (The Campo de' Fiori, 1600)",
+    "script": "Doc Enoch with a transmission note on Bruno's Fire (The Campo de' Fiori, 1600). Giordano Bruno was a Dominican friar, mathematician, and Hermetic philosopher who asserted that the universe is infinite and filled with countless populated worlds. He was imprisoned by the Roman Inquisition for approximately eight years. Remember travelers, that's Magick with a K.",
+    "duration": 22.1,
+    "wav_file": "enoch_25_fact.wav",
+    "mp3_file": "enoch_25_fact.mp3"
+  },
+  {
+    "id": "enoch_25_error",
+    "type": "transmission_error",
+    "track_number": "25",
+    "track_title": "Bruno's Fire (The Campo de' Fiori, 1600)",
+    "script": "Wait a second... Bruno's wire. No. Bruno's Fire. Yeah. Let's keep it rolling.",
+    "duration": 5.12,
+    "wav_file": "enoch_25_error.wav",
+    "mp3_file": "enoch_25_error.mp3"
+  },
+  {
+    "id": "enoch_26_intro",
+    "type": "track_intro",
+    "track_number": "26",
+    "track_title": "Nicolas Flamel's Empty Grave",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 26, Nicolas Flamel's Empty Grave. The oldest house in Paris is a bistro, and the copyist who built it was accused of living forever. Let's drop the needle.",
+    "duration": 16.48,
+    "wav_file": "enoch_26_intro.wav",
+    "mp3_file": "enoch_26_intro.mp3"
+  },
+  {
+    "id": "enoch_26_fact",
+    "type": "fact_tangent",
+    "track_number": "26",
+    "track_title": "Nicolas Flamel's Empty Grave",
+    "script": "Doc Enoch with a transmission note on Nicolas Flamel's Empty Grave. Nicolas Flamel was a real Parisian scrivener, copyist, and manuscript seller who died in 1418. He and his wife Perenelle donated substantial wealth to parish churches and hospitals; property deeds and foundation records survive. Remember travelers, that's Magick with a K.",
+    "duration": 21.05,
+    "wav_file": "enoch_26_fact.wav",
+    "mp3_file": "enoch_26_fact.mp3"
+  },
+  {
+    "id": "enoch_26_error",
+    "type": "transmission_error",
+    "track_number": "26",
+    "track_title": "Nicolas Flamel's Empty Grave",
+    "script": "Wait a second... Flaming grave. No. Flamel's empty grave. Yeah. Let's keep it rolling.",
+    "duration": 5.75,
+    "wav_file": "enoch_26_error.wav",
+    "mp3_file": "enoch_26_error.mp3"
+  },
+  {
+    "id": "enoch_27_intro",
+    "type": "track_intro",
+    "track_number": "27",
+    "track_title": "The Priory of Sion",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 27, The Priory of Sion. A low-stakes social club in the French Alps filed some paperwork and accidentally convinced forty million people. Let's drop the needle.",
+    "duration": 16.93,
+    "wav_file": "enoch_27_intro.wav",
+    "mp3_file": "enoch_27_intro.mp3"
+  },
+  {
+    "id": "enoch_27_fact",
+    "type": "fact_tangent",
+    "track_number": "27",
+    "track_title": "The Priory of Sion",
+    "script": "Doc Enoch with a transmission note on The Priory of Sion. Pierre Plantard registered a modest social club called the Priory of Sion in 1956 under the French Associations Act. In the 1960s, Plantard and his associate Philippe de Ch\u00e9risey fabricated genealogies and deposited them in the Biblioth\u00e8que nationale de France as the 'Dossiers Secrets'. Remember travelers, that's Magick with a K.",
+    "duration": 23.32,
+    "wav_file": "enoch_27_fact.wav",
+    "mp3_file": "enoch_27_fact.mp3"
+  },
+  {
+    "id": "enoch_27_error",
+    "type": "transmission_error",
+    "track_number": "27",
+    "track_title": "The Priory of Sion",
+    "script": "Wait a second... Priory of Zionism. No. Priory of Sion. With an S. Yeah. Let's keep it rolling.",
+    "duration": 6.58,
+    "wav_file": "enoch_27_error.wav",
+    "mp3_file": "enoch_27_error.mp3"
+  },
+  {
+    "id": "enoch_28_intro",
+    "type": "track_intro",
+    "track_number": "28",
+    "track_title": "As Above, So Below",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 28, As Above, So Below. The oldest sentence in Western esotericism, recorded in Arabic, translated by Newton, and sung in the hills. Let's drop the needle.",
+    "duration": 16.9,
+    "wav_file": "enoch_28_intro.wav",
+    "mp3_file": "enoch_28_intro.mp3"
+  },
+  {
+    "id": "enoch_28_fact",
+    "type": "fact_tangent",
+    "track_number": "28",
+    "track_title": "As Above, So Below",
+    "script": "Doc Enoch with a transmission note on As Above, So Below. The Latin phrase 'Quod est inferius est sicut quod est superius' ('That which is below is like that which is above') originates from the Emerald Tablet of Hermes Trismegistus. The oldest known surviving version of the text appears in Arabic treatises dating to the 8th and 9th centuries. Remember travelers, that's Magick with a K.",
+    "duration": 23.48,
+    "wav_file": "enoch_28_fact.wav",
+    "mp3_file": "enoch_28_fact.mp3"
+  },
+  {
+    "id": "enoch_28_error",
+    "type": "transmission_error",
+    "track_number": "28",
+    "track_title": "As Above, So Below",
+    "script": "Wait a second... As below, so below. No. As above, so below. Yeah. Let's keep it rolling.",
+    "duration": 6.08,
+    "wav_file": "enoch_28_error.wav",
+    "mp3_file": "enoch_28_error.mp3"
+  },
+  {
+    "id": "enoch_29_intro",
+    "type": "track_intro",
+    "track_number": "29",
+    "track_title": "Welcome to the Parsonage",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 29, Welcome to the Parsonage. Rocket fuel in the bathtub, poets in the attic, and an FBI file growing thicker by the week. Let's drop the needle.",
+    "duration": 15.97,
+    "wav_file": "enoch_29_intro.wav",
+    "mp3_file": "enoch_29_intro.mp3"
+  },
+  {
+    "id": "enoch_29_fact",
+    "type": "fact_tangent",
+    "track_number": "29",
+    "track_title": "Welcome to the Parsonage",
+    "script": "Doc Enoch with a transmission note on Welcome to the Parsonage. 1003 South Orange Grove Avenue in Pasadena was an eleven-room craftsman mansion leased by Jack Parsons. It housed members of the Agape Lodge, science-fiction writers, Caltech bohemians, and eccentric roomers. Remember travelers, that's Magick with a K.",
+    "duration": 19.85,
+    "wav_file": "enoch_29_fact.wav",
+    "mp3_file": "enoch_29_fact.mp3"
+  },
+  {
+    "id": "enoch_29_error",
+    "type": "transmission_error",
+    "track_number": "29",
+    "track_title": "Welcome to the Parsonage",
+    "script": "Wait a second... Welcome to the orphanage. No. The Parsonage. Yeah. Let's keep it rolling.",
+    "duration": 5.85,
+    "wav_file": "enoch_29_error.wav",
+    "mp3_file": "enoch_29_error.mp3"
+  },
+  {
+    "id": "enoch_30_intro",
+    "type": "track_intro",
+    "track_number": "30",
+    "track_title": "The Breach (Chasing Shadows)",
+    "script": "Doc Enoch here on W-OCCULT 99.3. Coming up next on the reel: Track 30, The Breach (Chasing Shadows). Five minutes and thirty-eight seconds of funk, shadows, and the breach in the static. Let's drop the needle.",
+    "duration": 14.72,
+    "wav_file": "enoch_30_intro.wav",
+    "mp3_file": "enoch_30_intro.mp3"
+  },
+  {
+    "id": "enoch_30_fact",
+    "type": "fact_tangent",
+    "track_number": "30",
+    "track_title": "The Breach (Chasing Shadows)",
+    "script": "Doc Enoch with a transmission note on The Breach (Chasing Shadows). Composed, produced, and performed by The Magic Static Society. 5-minute 38-second epic closer synthesizing high funk, cosmic weirdcore, and the definitive author lyrics. Remember travelers, that's Magick with a K.",
+    "duration": 18.7,
+    "wav_file": "enoch_30_fact.wav",
+    "mp3_file": "enoch_30_fact.mp3"
+  },
+  {
+    "id": "enoch_30_error",
+    "type": "transmission_error",
+    "track_number": "30",
+    "track_title": "The Breach (Chasing Shadows)",
+    "script": "Wait a second... Chasing shallow. No. Chasing Shadows. Yeah. Let's keep it rolling.",
+    "duration": 5.3,
+    "wav_file": "enoch_30_error.wav",
+    "mp3_file": "enoch_30_error.mp3"
+  }
+]

@@ -5,9 +5,12 @@ import { StrangeletSuiteMenu } from './StrangeletSuiteMenu';
 import {
   INTERZONE_RADIO_STATIONS,
   SAMPLE_VINTAGE_ADS,
+  VINTAGE_RADIO_ADS,
+  DOC_ENOCH_MANIFEST,
   DOC_ENOCH_SAMPLES,
   getR2BaseUrl,
   setR2BaseUrl,
+  resolveRadioAudioUrl,
 } from '../constants/radioStations';
 import { playTunerStatic } from '../utils/radioTunerAudio';
 
@@ -129,6 +132,8 @@ export function InterzoneDriveInTheater({
   const [showR2ConfigModal, setShowR2ConfigModal] = useState(false);
   const [r2UrlInput, setR2UrlInput] = useState(() => getR2BaseUrl());
   const [interstitialMode, setInterstitialMode] = useState(true);
+  const [radioSubTab, setRadioSubTab] = useState('tracks'); // 'tracks' | 'enoch' | 'ads'
+  const [activeEnochFilter, setActiveEnochFilter] = useState('all'); // 'all' | 'intro' | 'fact' | 'error' | 'station'
 
   const activeStation =
     INTERZONE_RADIO_STATIONS.find((s) => s.id === activeStationId) || INTERZONE_RADIO_STATIONS[0];
@@ -1908,42 +1913,197 @@ export function InterzoneDriveInTheater({
                 </div>
               </div>
 
-              {/* Station Track Picker Dropdown */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 260 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 8, color: activeStation.color, fontFamily: "'Syncopate', sans-serif", fontWeight: 700 }}>
-                    STATION TRACK SELECTOR ({activeStation.tracks.length} CUTS):
-                  </span>
-                  {activeStation.id === 'w_occult' && (
-                    <span style={{ fontSize: 7.5, color: '#ff6b00', fontFamily: 'monospace' }}>
-                      30-TRACK ALBUM
-                    </span>
-                  )}
+              {/* Station Audio Dispatch & Track Picker Cluster */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 290 }}>
+                {/* Audio Mode Tabs */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setRadioSubTab('tracks')}
+                    style={{
+                      background: radioSubTab === 'tracks' ? activeStation.color : 'rgba(255,255,255,0.06)',
+                      color: radioSubTab === 'tracks' ? '#000' : '#d4d4d8',
+                      border: `1px solid ${radioSubTab === 'tracks' ? activeStation.color : 'rgba(255,255,255,0.15)'}`,
+                      borderRadius: 3,
+                      padding: '2px 7px',
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    🎵 MUSIC ({activeStation.tracks.length})
+                  </button>
+                  <button
+                    onClick={() => setRadioSubTab('enoch')}
+                    style={{
+                      background: radioSubTab === 'enoch' ? '#ff6b00' : 'rgba(255,255,255,0.06)',
+                      color: radioSubTab === 'enoch' ? '#000' : '#ffaa55',
+                      border: `1px solid ${radioSubTab === 'enoch' ? '#ff6b00' : 'rgba(255,107,0,0.3)'}`,
+                      borderRadius: 3,
+                      padding: '2px 7px',
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    🎙️ DOC ENOCH ({DOC_ENOCH_MANIFEST.length})
+                  </button>
+                  <button
+                    onClick={() => setRadioSubTab('ads')}
+                    style={{
+                      background: radioSubTab === 'ads' ? '#00e5ff' : 'rgba(255,255,255,0.06)',
+                      color: radioSubTab === 'ads' ? '#000' : '#67e8f9',
+                      border: `1px solid ${radioSubTab === 'ads' ? '#00e5ff' : 'rgba(0,229,255,0.3)'}`,
+                      borderRadius: 3,
+                      padding: '2px 7px',
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    📻 1960s ADS ({VINTAGE_RADIO_ADS.length})
+                  </button>
                 </div>
-                <select
-                  value={activeStation.tracks.find((t) => t.title === currentTrackTitle)?.id || ''}
-                  onChange={(e) => {
-                    const sel = activeStation.tracks.find((t) => t.id === e.target.value);
-                    if (sel && onSelectTrack) onSelectTrack(sel);
-                  }}
-                  style={{
-                    backgroundColor: '#0a0a14',
-                    color: '#fff',
-                    border: `1px solid ${activeStation.color}`,
-                    borderRadius: 4,
-                    padding: '6px 10px',
-                    fontFamily: 'monospace',
-                    fontSize: 9.5,
-                    cursor: 'pointer',
-                    boxShadow: `0 0 8px ${activeStation.glow}`,
-                  }}
-                >
-                  {activeStation.tracks.map((t, idx) => (
-                    <option key={t.id || idx} value={t.id}>
-                      {t.num ? `${t.num}. ` : `${idx + 1}. `}{t.title} ({Math.floor(t.duration / 60)}:{(t.duration % 60).toString().padStart(2, '0')})
-                    </option>
-                  ))}
-                </select>
+
+                {/* SubTab 1: Standard Station Music Cuts */}
+                {radioSubTab === 'tracks' && (
+                  <select
+                    value={activeStation.tracks.find((t) => t.title === currentTrackTitle)?.id || ''}
+                    onChange={(e) => {
+                      const sel = activeStation.tracks.find((t) => t.id === e.target.value);
+                      if (sel && onSelectTrack) onSelectTrack(sel);
+                    }}
+                    style={{
+                      backgroundColor: '#0a0a14',
+                      color: '#fff',
+                      border: `1px solid ${activeStation.color}`,
+                      borderRadius: 4,
+                      padding: '6px 10px',
+                      fontFamily: 'monospace',
+                      fontSize: 9.5,
+                      cursor: 'pointer',
+                      boxShadow: `0 0 8px ${activeStation.glow}`,
+                      width: '100%',
+                    }}
+                  >
+                    {activeStation.tracks.map((t, idx) => (
+                      <option key={t.id || idx} value={t.id}>
+                        {t.num ? `${t.num}. ` : `${idx + 1}. `}{t.title} ({Math.floor(t.duration / 60)}:{(t.duration % 60).toString().padStart(2, '0')})
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                {/* SubTab 2: Doc Enoch 91 Voice Drops */}
+                {radioSubTab === 'enoch' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      {['all', 'intro', 'fact', 'error', 'station'].map((filt) => (
+                        <button
+                          key={filt}
+                          onClick={() => setActiveEnochFilter(filt)}
+                          style={{
+                            background: activeEnochFilter === filt ? '#ff6b00' : 'rgba(255,255,255,0.05)',
+                            color: activeEnochFilter === filt ? '#000' : '#a1a1aa',
+                            border: '1px solid rgba(255,107,0,0.3)',
+                            borderRadius: 2,
+                            padding: '1px 5px',
+                            fontSize: 7,
+                            fontFamily: 'monospace',
+                            cursor: 'pointer',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {filt}
+                        </button>
+                      ))}
+                    </div>
+                    <select
+                      onChange={(e) => {
+                        const drop = DOC_ENOCH_MANIFEST.find((d) => d.id === e.target.value);
+                        if (drop && onSelectTrack) {
+                          onSelectTrack({
+                            id: drop.id,
+                            title: `[DJ DROP] ${drop.track_title || drop.id}`,
+                            artist: 'Doc Enoch · W-OCCULT 99.3',
+                            url: resolveRadioAudioUrl(drop.url),
+                            duration: drop.duration,
+                            script: drop.script,
+                          });
+                        }
+                      }}
+                      style={{
+                        backgroundColor: '#120d08',
+                        color: '#ffaa55',
+                        border: '1px solid #ff6b00',
+                        borderRadius: 4,
+                        padding: '6px 8px',
+                        fontFamily: 'monospace',
+                        fontSize: 9,
+                        cursor: 'pointer',
+                        boxShadow: '0 0 10px rgba(255,107,0,0.4)',
+                        width: '100%',
+                      }}
+                    >
+                      <option value="">🎙️ Select a Doc Enoch Drop to Broadcast...</option>
+                      {DOC_ENOCH_MANIFEST.filter((d) => {
+                        if (activeEnochFilter === 'all') return true;
+                        if (activeEnochFilter === 'intro') return d.type === 'track_intro';
+                        if (activeEnochFilter === 'fact') return d.type === 'fact_tangent';
+                        if (activeEnochFilter === 'error') return d.type === 'transmission_error';
+                        if (activeEnochFilter === 'station') return d.type === 'station_id' || d.type === 'weather' || d.type === 'bumper';
+                        return true;
+                      }).map((d) => (
+                        <option key={d.id} value={d.id}>
+                          [{d.type.toUpperCase()}] {d.track_title} ({d.duration}s)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* SubTab 3: Authentic 1960s Radio Ads */}
+                {radioSubTab === 'ads' && (
+                  <select
+                    onChange={(e) => {
+                      const ad = VINTAGE_RADIO_ADS.find((a) => a.id === e.target.value);
+                      if (ad && onSelectTrack) {
+                        onSelectTrack({
+                          id: ad.id,
+                          title: `[AD] ${ad.title}`,
+                          artist: 'Interzone Concessions (1965-1969)',
+                          url: resolveRadioAudioUrl(ad.url),
+                          duration: ad.duration,
+                          script: ad.text,
+                        });
+                      }
+                    }}
+                    style={{
+                      backgroundColor: '#051016',
+                      color: '#67e8f9',
+                      border: '1px solid #00e5ff',
+                      borderRadius: 4,
+                      padding: '6px 8px',
+                      fontFamily: 'monospace',
+                      fontSize: 9,
+                      cursor: 'pointer',
+                      boxShadow: '0 0 10px rgba(0,229,255,0.4)',
+                      width: '100%',
+                    }}
+                  >
+                    <option value="">📻 Select a 1960s Drive-In Spot to Broadcast...</option>
+                    {VINTAGE_RADIO_ADS.map((ad) => (
+                      <option key={ad.id} value={ad.id}>
+                        [{ad.tag}] {ad.title} ({ad.duration}s)
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 

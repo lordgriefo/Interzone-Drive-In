@@ -1,5 +1,6 @@
 // src/constants/radioStations.js
 // Interzone Drive-In Multi-Channel Pirate Radio Network
+import docEnochManifest from './docEnochManifest.json';
 
 // Configurable Cloudflare R2 bucket base URL.
 // Can be customized via localStorage ('interzone_r2_url') or VITE_R2_RADIO_URL.
@@ -21,71 +22,109 @@ export function setR2BaseUrl(url) {
   }
 }
 
-// ── SAMPLE VINTAGE ADS & CONCESSION BUMPERS (BUILT-IN DRIVE-IN ADS) ──
-export const SAMPLE_VINTAGE_ADS = [
+// Resolve any radio audio URL (prepends R2 base URL if relative or local)
+export function resolveRadioAudioUrl(item) {
+  if (!item) return '';
+  const r2 = getR2BaseUrl();
+  const raw = typeof item === 'string' ? item : (item.url || item.mp3_file || item.wav_file || item.file || '');
+  if (!raw) return '';
+  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('blob:')) {
+    return raw;
+  }
+  if (r2) {
+    const clean = raw.replace(/^\.?\/+/, '');
+    return `${r2}/${clean}`;
+  }
+  return raw;
+}
+
+// ── SLICED AUTHENTIC 1960s VINTAGE ADS & CONCESSION SPOTS ──
+export const VINTAGE_RADIO_ADS = [
   {
-    id: 'ad_snack_bar_01',
-    title: 'Interzone Snack Bar: Centipede Burgers & Mescaline Malts',
-    duration: 18,
-    text: "Visit the concession stand now! Try our atomic chili dogs, piping hot buttered popcorn, and the world-famous Interzone Centipede Burger with radioactive mescaline malt!",
-    tag: 'CONCESSION STAND'
+    id: 'ad_radioactive_01_snack_bar',
+    title: 'Interzone Concession Stand - Atomic Popcorn & Malts',
+    duration: 24,
+    file: 'ad_radioactive_01_snack_bar.mp3',
+    url: './assets-bg/ad_radioactive_01_snack_bar.mp3',
+    tag: 'CONCESSION STAND',
+    text: "Visit the intermission concession stand now! Piping hot buttered popcorn, atomic chili dogs, and radioactive mescaline malts!"
   },
   {
-    id: 'ad_movie_trailer_01',
-    title: 'Coming Friday: Reform School Archon Girls in Shock-O-Vision',
+    id: 'ad_radioactive_02_hotrod_shock',
+    title: 'Shock-O-Vision Hotrod Monster B-Movie Trailer',
+    duration: 26,
+    file: 'ad_radioactive_02_hotrod_shock.mp3',
+    url: './assets-bg/ad_radioactive_02_hotrod_shock.mp3',
+    tag: 'COMING ATTRACTION',
+    text: "Coming this Friday to the giant outdoor screen: Hotrod Monsters in Shock-O-Vision! Unearthly thrills and astral jailbreaks!"
+  },
+  {
+    id: 'ad_radioactive_03_car_speaker',
+    title: 'Malibu Window Speaker Courtesy Reminder',
     duration: 22,
-    text: "Coming this Friday to the giant outdoor screen: Reform School Archon Girls! Detention in the fourth dimension! Bad girls, rayguns, and hotrod astral jailbreaks! Rated XXX!",
-    tag: 'COMING ATTRACTION'
+    file: 'ad_radioactive_03_car_speaker.mp3',
+    url: './assets-bg/ad_radioactive_03_car_speaker.mp3',
+    tag: 'DRIVE-IN PSA',
+    text: "Drive-In courtesy reminder: Please dim your headlights, keep your window speaker hooked, and do not inspect the trunk of the 1964 Malibu."
   },
   {
-    id: 'ad_drivein_rules_01',
-    title: 'Mojave Drive-In Courtesy Reminder: Do Not Look in the Trunk',
-    duration: 15,
-    text: "Drive-In courtesy reminder: Please dim your headlights, keep your window speaker volume at a reasonable level, and under no circumstances look inside the trunk of the 1964 Malibu.",
-    tag: 'DRIVE-IN PSA'
+    id: 'ad_radioactive_04_midnight_creeps',
+    title: 'Midnight Creature Double Feature Trailer',
+    duration: 28,
+    file: 'ad_radioactive_04_midnight_creeps.mp3',
+    url: './assets-bg/ad_radioactive_04_midnight_creeps.mp3',
+    tag: 'SOMETHING WEIRD',
+    text: "Midnight madness returns to the desert! Two terrifying features back-to-back under the Mojave stars in glorious Technicolor!"
   },
   {
-    id: 'ad_something_weird_01',
-    title: 'Midnight Monsterfest: Attack of the 50-Foot Thelemite',
-    duration: 20,
-    text: "Midnight madness returns to the desert! See the 50-Foot Thelemite terrorize the 1966 Vegas Strip! Packed with thrills, chills, and unearthly magick in glorious Technicolor!",
-    tag: 'SOMETHING WEIRD'
+    id: 'ad_radioactive_05_space_patrol',
+    title: 'Area 51 Radar Warning & Flying Saucer Spot',
+    duration: 25,
+    file: 'ad_radioactive_05_space_patrol.mp3',
+    url: './assets-bg/ad_radioactive_05_space_patrol.mp3',
+    tag: 'PARANORMAL ALERT',
+    text: "Special desert dispatch: Unidentified craft reported hovering over the perimeter fence. Keep your car radio tuned to 99.3 FM."
+  },
+  {
+    id: 'ad_radioactive_06_diner_special',
+    title: 'Interzone All-Night Diner & Centipede Chili Dog',
+    duration: 26,
+    file: 'ad_radioactive_06_diner_special.mp3',
+    url: './assets-bg/ad_radioactive_06_diner_special.mp3',
+    tag: 'CONCESSION STAND',
+    text: "Open 24 hours behind Screen 3! Cold iced tea, hot apple pie, and the legendary Interzone midnight plate."
+  },
+  {
+    id: 'ad_radioactive_07_thelemite_50ft',
+    title: 'Attack of the 50-Foot Thelemite Coming Attraction',
+    duration: 28,
+    file: 'ad_radioactive_07_thelemite_50ft.mp3',
+    url: './assets-bg/ad_radioactive_07_thelemite_50ft.mp3',
+    tag: 'COMING ATTRACTION',
+    text: "Terrorizing the Vegas Strip! Towering over casinos, invoking forces beyond human control! Rated Triple-X Shock!"
+  },
+  {
+    id: 'ad_radioactive_08_last_chance_gas',
+    title: 'Last Chance Mojave Gas & Roentgen Oil',
+    duration: 25,
+    file: 'ad_radioactive_08_last_chance_gas.mp3',
+    url: './assets-bg/ad_radioactive_08_last_chance_gas.mp3',
+    tag: 'DESERT SPONSOR',
+    text: "Last gas for 90 miles across the salt flats! Premium leaded, cold sodas, and motor oil for your interstellar crossing."
   }
 ];
 
-// ── DOC ENOCH SAMPLE RADIO INTROS & DISPATCHES ──
-export const DOC_ENOCH_SAMPLES = [
-  {
-    id: 'enoch_intro_dee',
-    title: "Doc Enoch: John Dee's Obsidian Mirror",
-    duration: 16,
-    text: "Doc Enoch here on W-OCCULT 99.3... that's Magick with a K, travelers. Queen Elizabeth's mathematician gazing into an Aztec black mirror while angels give questionable domestic advice. Drop the needle.",
-    tag: 'DOC ENOCH'
-  },
-  {
-    id: 'enoch_intro_babalon',
-    title: "Doc Enoch: Pasadena 1946",
-    duration: 14,
-    text: "Riding with Doc Enoch through the midnight stretch. 1003 South Orange Grove, solid rocket fuel, and red hair howling in the Pasadena wind. Here is the Babalon Working Blues.",
-    tag: 'DOC ENOCH'
-  },
-  {
-    id: 'enoch_weather_mojave',
-    title: "Doc Enoch: High Desert Weather",
-    duration: 15,
-    text: "Late-night Mojave weather: 71 degrees, a forty percent chance of localized temporal anomalies, and a steady 3.8 roentgens coming off the Malibu in the back row.",
-    tag: 'MOJAVE WEATHER'
-  },
-  {
-    id: 'enoch_error_zos',
-    title: "Doc Enoch: Transmission Slip",
-    duration: 12,
-    text: "Wait a second... sausage and mash? No. Zos and Kia. Austin Osman Spare and the Alphabet of Desire. Correction noted. Keep it rolling.",
-    tag: 'TRANSMISSION ERROR'
-  }
-];
+export const SAMPLE_VINTAGE_ADS = VINTAGE_RADIO_ADS;
 
-// ── THE 5 INTERZONE PIRATE RADIO STATIONS ──
+// ── FULL 91 DOC ENOCH DROPS MANIFEST ──
+export const DOC_ENOCH_MANIFEST = docEnochManifest.map((item) => ({
+  ...item,
+  url: item.mp3_file ? `./assets-bg/enoch/${item.mp3_file}` : `./assets-bg/enoch/${item.wav_file}`
+}));
+
+export const DOC_ENOCH_SAMPLES = DOC_ENOCH_MANIFEST.slice(0, 10);
+
+// ── 5 INTERZONE PIRATE RADIO STATIONS ──
 export const INTERZONE_RADIO_STATIONS = [
   {
     id: 'w_occult',
@@ -93,20 +132,22 @@ export const INTERZONE_RADIO_STATIONS = [
     freqNumber: 99.3,
     callSign: 'W-OCCULT',
     name: 'W-OCCULT 99.3 FM',
-    shortName: 'W-OCCULT',
-    genre: 'Occult Americana & Psych-Rock',
-    host: 'Doc Enoch (Magick with a K)',
-    vibe: 'Terence McKenna / Hunter S. Thompson Gonzo Desert Mystic',
-    slogan: 'Broadcasting between the Mojave dunes and Universe B',
+    shortName: 'W-OCCULT FM',
+    genre: 'Occult Rock, Crowleyana & High Mojave Magick',
+    host: 'Doc Enoch (Desert Transmitter Outpost)',
+    vibe: 'Terence McKenna / Hunter S. Thompson Gonzo Mystic (Magick with a K)',
+    slogan: 'As Above, So Below · Tape Hiss, Vacuum Tubes & Desert Transmissions',
     color: '#ff6b00',
-    glow: 'rgba(255, 107, 0, 0.65)',
-    icon: '📻',
-    featuredAlbum: 'As Above, So Below: An Occult Songbook',
+    glow: 'rgba(255, 107, 0, 0.7)',
+    icon: '🔮',
+    featuredAlbum: 'As Above, So Below: An Occult Songbook (30 Master Tracks)',
+    djVoice: 'Doc Enoch',
+    enochDrops: DOC_ENOCH_MANIFEST,
     tracks: [
-      { id: 'aasb_01', num: '01', title: 'Babalon Working Blues', artist: "'O' Shibboleth", url: './assets-bg/babalon-working-blues.mp3', duration: 214 },
-      { id: 'aasb_02', num: '02', title: 'Do What Thou Wilt (Hillbilly Hadit)', artist: "'O' Shibboleth", url: './assets-bg/excavating-neverland.mp3', duration: 237 },
-      { id: 'aasb_03', num: '03', title: 'The Lam & the Grey', artist: "'O' Shibboleth", url: './assets-bg/wait-till-you-see-it.mp3', duration: 226 },
-      { id: 'aasb_04', num: '04', title: 'Thelema Mountain', artist: "'O' Shibboleth", url: './assets-bg/thelema-mountain.mp3', duration: 280 },
+      { id: 'aasb_01', num: '01', title: 'Babalon Working Blues', artist: "'O' Shibboleth", url: './assets-bg/babalon-working-blues.mp3', duration: 254 },
+      { id: 'aasb_02', num: '02', title: 'Do What Thou Wilt (Hillbilly Hadit)', artist: "'O' Shibboleth", url: './assets-bg/the-breach.mp3', duration: 212 },
+      { id: 'aasb_03', num: '03', title: 'The Lam & the Grey', artist: "'O' Shibboleth", url: './assets-bg/the-eighth-sphere.mp3', duration: 278 },
+      { id: 'aasb_04', num: '04', title: 'Thelema Mountain', artist: "'O' Shibboleth", url: './assets-bg/thelema-mountain.mp3', duration: 302 },
       { id: 'aasb_05', num: '05', title: "The Con Man Sails Away (L. Ron's Excellent Adventure)", artist: "'O' Shibboleth", url: './assets-bg/high-roller.mp3', duration: 191 },
       { id: 'aasb_06', num: '06', title: 'Cameron (The Scarlet Woman of Pasadena)', artist: "'O' Shibboleth", url: './assets-bg/the-breach.mp3', duration: 257 },
       { id: 'aasb_07', num: '07', title: 'Kenneth Grant & the Typhonian Transmission', artist: "'O' Shibboleth", url: './assets-bg/the-eighth-sphere.mp3', duration: 245 },
@@ -179,58 +220,56 @@ export const INTERZONE_RADIO_STATIONS = [
     color: '#00e5ff',
     glow: 'rgba(0, 229, 255, 0.65)',
     icon: '⚡',
-    featuredAlbum: 'Repo Malibu Overdrive Cuts',
+    featuredAlbum: 'Repo Man / Edge City Vault',
     tracks: [
-      { id: 'ec_01', title: 'High Roller (Vegas Overclock)', artist: 'MonoAtomiX', url: './assets-bg/high-roller.mp3', duration: 210 },
-      { id: 'ec_02', title: '1964 Malibu Acceleration Surge', artist: 'Edge City Sound', url: './assets-bg/the-breach.mp3', duration: 185 },
-      { id: 'ec_03', title: 'Sands Casino Neon Explosion', artist: 'MonoAtomiX', url: './assets-bg/thelema-mountain.mp3', duration: 205 },
-      { id: 'ec_04', title: 'Cathode Burn (Neutron Jam)', artist: 'Edge City Sound', url: './assets-bg/babalon-working-blues.mp3', duration: 220 },
-      { id: 'ec_05', title: 'Don’t Look in the Trunk', artist: 'MonoAtomiX', url: './assets-bg/the-eighth-sphere.mp3', duration: 240 }
+      { id: 'ec_01', title: 'Neutron Glider (Repo Overdrive)', artist: 'Edge City Outlaws', url: './assets-bg/the-breach.mp3', duration: 198 },
+      { id: 'ec_02', title: 'Ordinary Fucking People', artist: 'Edge City Outlaws', url: './assets-bg/babalon-working-blues.mp3', duration: 215 },
+      { id: 'ec_03', title: "Otto's Malibu Ignition", artist: 'Edge City Outlaws', url: './assets-bg/thelema-mountain.mp3', duration: 184 },
+      { id: 'ec_04', title: 'Flying Chevy in the Sunset', artist: 'Edge City Outlaws', url: './assets-bg/high-roller.mp3', duration: 232 },
+      { id: 'ec_05', title: 'Speed of Chrome', artist: 'Edge City Outlaws', url: './assets-bg/excavating-neverland.mp3', duration: 205 }
     ]
   },
   {
-    id: 'underground',
+    id: 'interzone_cassette',
     dial: '91.1 FM',
     freqNumber: 91.1,
-    callSign: 'KZON',
+    callSign: 'IZ-TAPE',
     name: 'INTERZONE CASSETTE UNDERGROUND 91.1 FM',
-    shortName: 'UNDERGROUND',
-    genre: 'Dusty Hip-Hop, Indie Cuts & Community Tapes',
-    host: 'The Strangelet Lounge DJ Crew',
-    vibe: 'Lo-Fi Boom-Bap, 4-Track Cassettes & Friends Showcase',
-    slogan: 'Independent beats, dust-covered 4-track gems & community drops',
+    shortName: 'IZ CASSETTE',
+    genre: 'Lo-Fi Hip-Hop, Underground Beats & Community Tapes',
+    host: 'The Tape Archivist',
+    vibe: 'Saturated Analog Cassette Hiss, MPC Drum Chops & Late-Night Strobe',
+    slogan: 'Community Tapes, Friend Submissions & Strangelet Beats',
     color: '#fbbf24',
     glow: 'rgba(251, 191, 36, 0.65)',
     icon: '📼',
-    featuredAlbum: 'Strangelet Community Cassette Vol. 1',
+    featuredAlbum: 'Strangelet Community Tapes Vol. 1',
     tracks: [
-      { id: 'ug_01', title: 'Wait Till You SEE It (Dusk Mix)', artist: 'The Magic Static Society', url: './assets-bg/wait-till-you-see-it.mp3', duration: 356 },
-      { id: 'ug_02', title: 'Excavating Neverland (Vinyl Cut)', artist: 'The Magic Static Society', url: './assets-bg/excavating-neverland.mp3', duration: 310 },
-      { id: 'ug_03', title: 'Mojave Tape Dust (Instrumental)', artist: 'Strangelet Beats', url: './assets-bg/the-breach.mp3', duration: 198 },
-      { id: 'ug_04', title: 'Synchro-Vox Breakbeat', artist: 'Interzone Crew', url: './assets-bg/thelema-mountain.mp3', duration: 215 },
-      { id: 'ug_05', title: 'North Park After Dark', artist: 'Strangelet Beats', url: './assets-bg/the-eighth-sphere.mp3', duration: 225 }
+      { id: 'izc_01', title: 'High Roller (Cassette MPC Mix)', artist: 'Strangelet Beats', url: './assets-bg/high-roller.mp3', duration: 216 },
+      { id: 'izc_02', title: 'Excavating Neverland (Dusty Chop)', artist: 'Strangelet Beats', url: './assets-bg/excavating-neverland.mp3', duration: 195 },
+      { id: 'izc_03', title: 'Wait Till You See It (Tape Saturation)', artist: 'Strangelet Beats', url: './assets-bg/wait-till-you-see-it.mp3', duration: 234 },
+      { id: 'izc_04', title: 'Underground Frequency 04', artist: 'Strangelet Beats', url: './assets-bg/the-breach.mp3', duration: 210 }
     ]
   },
   {
-    id: 'phase_4',
+    id: 'phase4_theater',
     dial: 'AM 880',
     freqNumber: 880,
-    callSign: 'KP4R',
+    callSign: 'PHASE-4',
     name: 'PHASE 4 RADIO THEATER AM 880',
     shortName: 'PHASE 4 RADIO',
-    genre: 'Old-Fashioned Radio Mystery & Voice Theater',
-    host: 'Phase 4 Radio Players',
-    vibe: 'Golden Age Radio Drama, Rainstorms, Footsteps & Midnight Suspense',
-    slogan: 'Step back into the golden age of mystery, suspense & episodic drama',
-    color: '#c084fc',
-    glow: 'rgba(192, 132, 252, 0.65)',
+    genre: 'Vintage Mystery Plays & Audio Dramas',
+    host: 'The Master of Ceremonies',
+    vibe: 'Old-Time Radio Foley, Organ Chords & Suspense Dramas',
+    slogan: 'A Theater of the Mind · Vintage & Modern Mystery Plays',
+    color: '#ff0055',
+    glow: 'rgba(255, 0, 85, 0.65)',
     icon: '🎭',
-    featuredAlbum: 'Face for Radio Theater Dispatches',
+    featuredAlbum: 'Phase 4 Mystery Plays Series',
     tracks: [
-      { id: 'p4_01', title: 'The Voice from the Attic Tube', artist: 'Phase 4 Players', url: './assets-bg/the-eighth-sphere.mp3', duration: 245 },
-      { id: 'p4_02', title: 'Shadow Over Mojave Corridor', artist: 'Phase 4 Players', url: './assets-bg/wait-till-you-see-it.mp3', duration: 280 },
-      { id: 'p4_03', title: 'The Midnight Call at 1003 South Orange', artist: 'Phase 4 Players', url: './assets-bg/the-breach.mp3', duration: 260 },
-      { id: 'p4_04', title: 'The Enochian Calling Protocol', artist: 'Phase 4 Players', url: './assets-bg/thelema-mountain.mp3', duration: 230 }
+      { id: 'p4_01', title: 'The Parsonage Incident (Act 1)', artist: 'Phase 4 Players', url: './assets-bg/babalon-working-blues.mp3', duration: 320 },
+      { id: 'p4_02', title: 'The Obsidian Mirror Transmission', artist: 'Phase 4 Players', url: './assets-bg/the-eighth-sphere.mp3', duration: 285 },
+      { id: 'p4_03', title: 'The Shadow in the Desert Screen', artist: 'Phase 4 Players', url: './assets-bg/thelema-mountain.mp3', duration: 298 }
     ]
   }
 ];
