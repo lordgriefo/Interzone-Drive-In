@@ -674,7 +674,7 @@ export function InterzoneDriveInTheater({
                       KENETICUT
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Audio-reactive video montage, beat-synced pacing & living reel choreography.
+                      Audio-reactive video montage, beat-synced pacing, living reel choreography & VJ cut-up lab.
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
@@ -718,7 +718,7 @@ export function InterzoneDriveInTheater({
                   </div>
                 </div>
 
-                {/* 2. Face for Radio */}
+                {/* 2. Phase 4 Radio (Face for Radio) */}
                 <a
                   href="https://perchance.org/face-for-radio"
                   target="_blank"
@@ -753,10 +753,13 @@ export function InterzoneDriveInTheater({
                       <span style={{ fontSize: 8.5, color: '#39ff14', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#39ff14' }}>
-                      FACE FOR RADIO
+                      PHASE 4 RADIO
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#86efac', fontFamily: 'monospace', marginTop: 1 }}>
+                      (FACE FOR RADIO)
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Character voice synthesis, radio transmissions & vocal audio generation.
+                      Vintage & modern radio plays: write old-fashioned radio dramas, episodic voice plays & character dialogue.
                     </div>
                   </div>
                   <div
@@ -769,7 +772,7 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    LAUNCH VOICE STATION ➔
+                    WRITE RADIO PLAYS ➔
                   </div>
                 </a>
 
@@ -810,8 +813,11 @@ export function InterzoneDriveInTheater({
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
                       THE WUNDERBAR
                     </div>
+                    <div style={{ fontSize: 7.5, color: '#fde047', fontFamily: 'monospace', marginTop: 1 }}>
+                      DOES PRETTY MUCH EVERYTHING
+                    </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Alchemical prompt engine, lyric craft & sonic physics collisions.
+                      Music videos, character creation, alchemical prompts & storyboards. The all-in-one creative catalyst.
                     </div>
                   </div>
                   <div
@@ -865,8 +871,11 @@ export function InterzoneDriveInTheater({
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#f43f5e' }}>
                       PHASE 4 PICTURES
                     </div>
+                    <div style={{ fontSize: 7.5, color: '#fda4af', fontFamily: 'monospace', marginTop: 1 }}>
+                      AI SCREENPLAY GENERATOR
+                    </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Cinematic scene generator, vintage film aesthetics & surreal photo generation.
+                      Take any amount of influences and an AI will write a screenplay for you, or you can co-write it together.
                     </div>
                   </div>
                   <div
@@ -879,7 +888,7 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    LAUNCH PICTURES STUDIO ➔
+                    GENERATE SCREENPLAY ➔
                   </div>
                 </a>
 
@@ -920,8 +929,11 @@ export function InterzoneDriveInTheater({
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#c084fc' }}>
                       THE LSC
                     </div>
+                    <div style={{ fontSize: 7.5, color: '#e9d5ff', fontFamily: 'monospace', marginTop: 1 }}>
+                      MUSICIAN'S TOOLKIT & PROMPTS
+                    </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Large Sonic Collider: high-energy prompt physics ordering chaos for AI music.
+                      Prompt builder, lyric writing, track mastering, audio-to-MIDI conversions & taking songs apart.
                     </div>
                   </div>
                   <div
@@ -934,11 +946,11 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    COLLIDE PARTICLES ➔
+                    OPEN MUSICIAN'S TOOLKIT ➔
                   </div>
                 </a>
 
-                {/* 6. Audio Arc */}
+                {/* 6. AudioArc */}
                 <a
                   href="https://perchance.org/audioarc"
                   target="_blank"
@@ -973,10 +985,13 @@ export function InterzoneDriveInTheater({
                       <span style={{ fontSize: 8.5, color: '#38bdf8', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#38bdf8' }}>
-                      AUDIO ARC
+                      AUDIOARC
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#bae6fd', fontFamily: 'monospace', marginTop: 1 }}>
+                      STORYBOARDS · SCRIPTS · SHORT FILMS
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Dynamic audio timeline, wave shaping & multi-part stem pacing.
+                      Storyboard, screenwriting, music video & short film creator app with narrative pacing.
                     </div>
                   </div>
                   <div
@@ -989,7 +1004,7 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    OPEN AUDIO ARC ➔
+                    OPEN AUDIOARC ➔
                   </div>
                 </a>
 

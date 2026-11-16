@@ -148,17 +148,24 @@ export function StrangeletSuiteMenu({ currentAppId = 'keneticut', align = 'right
                   <div style={{ fontSize: 16, lineHeight: 1, marginTop: 2 }}>{app.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-                      <span
-                        style={{
-                          fontFamily: "'Syncopate', sans-serif",
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: app.color,
-                          letterSpacing: 0.5,
-                        }}
-                      >
-                        {app.title}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                        <span
+                          style={{
+                            fontFamily: "'Syncopate', sans-serif",
+                            fontSize: 9,
+                            fontWeight: 700,
+                            color: app.color,
+                            letterSpacing: 0.5,
+                          }}
+                        >
+                          {app.title}
+                        </span>
+                        {app.subtitle && (
+                          <span style={{ fontSize: 7, color: '#71717a', fontFamily: 'monospace' }}>
+                            {app.subtitle}
+                          </span>
+                        )}
+                      </div>
                       {isCurrent ? (
                         <span
                           style={{

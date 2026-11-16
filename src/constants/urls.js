@@ -1,5 +1,5 @@
 // src/constants/urls.js
-// Centralized URLs for Interzone Drive-In & Strangelet Creative Suite
+// Centralized URLs and tool identities for Interzone Drive-In & Strangelet Creative Suite
 
 export const WEB_APP_URL = 'https://interzone-drive-in.vercel.app/';
 
@@ -31,71 +31,72 @@ export const OCCULT_SONGBOOK_URL = 'https://buymeacoffee.com/magicstatic/';
 // Google Flow Syncro-Vox Tool (Talking Mouth Shape Generator)
 export const GOOGLE_FLOW_SYNCRO_VOX_URL = 'https://flow.google.com/shared/tool/245908d5-dceb-42ed-884c-9c2f8f21b98a';
 
-// ── STRUCTURED ROSTER OF ALL 6 ACTIVE SITES FOR SUITE MENUS & HUBS ──
+// ── ACCURATE CREATIVE ROSTER DIRECTLY FROM THE CREATOR ──
 export const STRANGELET_SUITE_APPS = [
   {
     id: 'keneticut',
     title: 'KenetiCut',
-    tagline: 'Audio-Reactive Montage & Reel Studio',
+    tagline: 'Audio-Reactive Montage & Living Reel Studio',
     badge: 'CHOREOGRAPHY & LIVING REEL',
     icon: '🎞️',
     url: PERCHANCE_KENETICUT_URL,
-    desc: 'Audio-reactive video montage, beat-synced pacing & living reel choreography.',
+    desc: 'Audio-reactive video montage, beat-synced pacing, living reel choreography & VJ cut-up lab.',
     color: '#00e5ff',
     glow: 'rgba(0, 229, 255, 0.45)',
   },
   {
     id: 'the-wunderbar',
     title: 'The Wunderbar',
-    tagline: 'Prompt Physics & Lyric Catalyst',
-    badge: 'PROMPT PHYSICS & LYRIC CATALYST',
+    tagline: 'Music Videos · Characters · Prompts · Storyboards',
+    badge: 'DOES PRETTY MUCH EVERYTHING',
     icon: '⚡',
     url: PERCHANCE_WUNDERBAR_URL,
-    desc: 'Alchemical prompt engine, lyric craft & sonic physics collisions.',
+    desc: 'The all-in-one creative engine: music video crafting, character creation, prompt physics & storyboards.',
     color: '#fbbf24',
     glow: 'rgba(251, 191, 36, 0.45)',
   },
   {
     id: 'phase-4-pictures',
     title: 'Phase 4 Pictures',
-    tagline: 'Visual Staging & Cinematic Scene AI',
-    badge: 'VISUAL STAGING & CINEMATIC AI',
+    tagline: 'Multi-Influence AI Screenplay Generator',
+    badge: 'SCREENPLAY & CINEMATIC AI',
     icon: '🎬',
     url: PERCHANCE_PHASE_4_PICTURES_URL,
-    desc: 'Cinematic scene generator, vintage film aesthetics & surreal photo generation.',
+    desc: 'Screenplay generator: blend any amount of influences and AI will write the screenplay for you, or co-write it together.',
     color: '#f43f5e',
     glow: 'rgba(244, 63, 94, 0.45)',
   },
   {
     id: 'face-for-radio',
-    title: 'Face for Radio',
-    tagline: 'Character Audio & Voice Synthesizer',
-    badge: 'VOICE & RADIO BROADCAST',
+    title: 'Phase 4 Radio',
+    subtitle: '(Face for Radio)',
+    tagline: 'Vintage & Modern Radio Play Studio',
+    badge: 'OLD-FASHIONED RADIO PLAYS',
     icon: '🎙️',
     url: PERCHANCE_FACE_FOR_RADIO_URL,
-    desc: 'Character voice synthesis, radio transmissions & vocal audio generation.',
+    desc: 'Audio play & vintage broadcast tool for writing classic, old-fashioned radio plays and episodic voice theater.',
     color: '#39ff14',
     glow: 'rgba(57, 255, 20, 0.45)',
   },
   {
     id: 'thelsc',
     title: 'The LSC',
-    tagline: 'Large Sonic Collider AI Music Generator',
-    badge: 'LARGE SONIC COLLIDER',
+    tagline: "Musician's Swiss-Army Knife & Prompt Engine",
+    badge: 'LYRICS · MASTERING · AUDIO-TO-MIDI',
     icon: '⚛️',
     url: PERCHANCE_THE_LSC_URL,
-    desc: 'High-energy prompt physics ordering chaos for AI music generation.',
+    desc: "Prompt builder & general musician's use tool: lyric writing, track mastering, audio-to-MIDI & song deconstruction.",
     color: '#c084fc',
     glow: 'rgba(192, 132, 252, 0.45)',
   },
   {
     id: 'audioarc',
-    title: 'Audio Arc',
-    tagline: 'Audio Timeline & Stem Pacing',
-    badge: 'AUDIO ARRANGEMENT & STEMS',
+    title: 'AudioArc',
+    tagline: 'Storyboards · Screenwriting · Music Videos · Short Films',
+    badge: 'FILM & MUSIC VIDEO SUITE',
     icon: '🎚️',
     url: PERCHANCE_AUDIO_ARC_URL,
-    desc: 'Dynamic audio timeline, wave shaping & multi-part stem pacing.',
+    desc: 'Full-spectrum storytelling app for storyboarding, screenwriting, music video directing & short film production.',
     color: '#38bdf8',
     glow: 'rgba(56, 189, 248, 0.45)',
   },
