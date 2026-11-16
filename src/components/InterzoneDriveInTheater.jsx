@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import communityReelData from '../constants/communityReel.json';
+import { STRANGELET_SUITE_APPS } from '../constants/urls';
+import { StrangeletSuiteMenu } from './StrangeletSuiteMenu';
 
 export const FAKE_MARQUEE_MOVIES = [
   {
@@ -310,34 +312,37 @@ export function InterzoneDriveInTheater({
           </div>
         </div>
 
-        {/* ── JUMP TO CHOREOGRAPHY STUDIO TAB ── */}
-        <button
-          onClick={onSwitchToStudio}
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(0, 229, 255, 0.2))',
-            color: '#fff',
-            border: '1px solid #ff6b00',
-            borderRadius: 4,
-            padding: '7px 16px',
-            fontFamily: "'Syncopate', sans-serif",
-            fontWeight: 800,
-            fontSize: 10,
-            letterSpacing: 2,
-            cursor: 'pointer',
-            boxShadow: '0 0 12px rgba(255, 107, 0, 0.4)',
-            transition: 'transform 0.15s, box-shadow 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.04)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 107, 0, 0.7)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1.0)';
-            e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 107, 0, 0.4)';
-          }}
-        >
-          🎬 OPEN CHOREOGRAPHY STUDIO →
-        </button>
+        {/* ── SUITE DROPDOWN & JUMP TO CHOREOGRAPHY STUDIO TAB ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <StrangeletSuiteMenu currentAppId="keneticut" align="right" />
+          <button
+            onClick={onSwitchToStudio}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(0, 229, 255, 0.2))',
+              color: '#fff',
+              border: '1px solid #ff6b00',
+              borderRadius: 4,
+              padding: '7px 16px',
+              fontFamily: "'Syncopate', sans-serif",
+              fontWeight: 800,
+              fontSize: 10,
+              letterSpacing: 2,
+              cursor: 'pointer',
+              boxShadow: '0 0 12px rgba(255, 107, 0, 0.4)',
+              transition: 'transform 0.15s, box-shadow 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.04)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 107, 0, 0.7)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1.0)';
+              e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 107, 0, 0.4)';
+            }}
+          >
+            🎬 OPEN CHOREOGRAPHY STUDIO →
+          </button>
+        </div>
       </header>
 
       {/* ── MAIN VIEW SWITCHER: GATE vs LOT ── */}
@@ -604,176 +609,492 @@ export function InterzoneDriveInTheater({
               DRIVE IN: ENTER THEATER LOT ➔
             </button>
 
-            {/* ── TICKET BOOTH SUITE LAUNCHERS & LOCAL SPONSOR ── */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-                gap: 16,
-                width: '100%',
-              }}
-            >
-              {/* Studio Launcher Card */}
+            {/* ── TICKET BOOTH SUITE LAUNCHERS & ROADSIDE NETWORK ── */}
+            <div style={{ width: '100%', marginBottom: 16 }}>
               <div
-                onClick={onSwitchToStudio}
                 style={{
-                  padding: 18,
-                  backgroundColor: 'rgba(15, 15, 30, 0.82)',
-                  borderRadius: 6,
-                  border: '1px solid rgba(255, 107, 0, 0.4)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'border-color 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#ff6b00';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255, 107, 0, 0.4)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 10,
+                  letterSpacing: 3,
+                  color: '#fbbf24',
+                  textShadow: '0 0 10px rgba(251, 191, 36, 0.7)',
+                  fontWeight: 800,
+                  marginBottom: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
                 }}
               >
-                <div style={{ fontSize: 20, marginBottom: 6 }}>🎬</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#ff6b00' }}>
-                  SONG CHOREOGRAPHY STUDIO
-                </div>
-                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 4, lineHeight: 1.4 }}>
-                  The multi-track timeline, beat-synced cutting, puppet slots, and audio-reactive VJ engine.
-                </div>
+                <span>⚡</span>
+                <span>INTERZONE CREATIVE NETWORK · 6 LIVE SITES ONLINE</span>
+                <span>⚡</span>
               </div>
 
-              {/* Hey Books Scene Card */}
               <div
-                onClick={() => {
-                  setDriveInView('lot');
-                  setScreenChannel('hey_books');
-                }}
                 style={{
-                  padding: 18,
-                  backgroundColor: 'rgba(25, 15, 30, 0.85)',
-                  borderRadius: 6,
-                  border: '1px solid rgba(244, 63, 94, 0.5)',
-                  boxShadow: '0 0 12px rgba(244, 63, 94, 0.25)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'border-color 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#f43f5e';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(244, 63, 94, 0.5)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: 14,
+                  width: '100%',
                 }}
               >
-                <div style={{ fontSize: 20, marginBottom: 6 }}>📚</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#f43f5e' }}>
-                  HEY BOOKS · SAN DIEGO
+                {/* 1. KenetiCut (Studio Switcher + Perchance Link) */}
+                <div
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(15, 20, 35, 0.88)',
+                    borderRadius: 6,
+                    border: '1px solid #00e5ff',
+                    boxShadow: '0 0 15px rgba(0, 229, 255, 0.25)',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>🎞️</span>
+                      <span
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          color: '#00e5ff',
+                          border: '1px solid #00e5ff',
+                          padding: '2px 5px',
+                          borderRadius: 3,
+                          fontWeight: 800,
+                        }}
+                      >
+                        ACTIVE STUDIO
+                      </span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#00e5ff' }}>
+                      KENETICUT
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Audio-reactive video montage, beat-synced pacing & living reel choreography.
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
+                    <button
+                      onClick={onSwitchToStudio}
+                      style={{
+                        flex: 1,
+                        background: 'linear-gradient(90deg, #00e5ff, #00b0ff)',
+                        color: '#000',
+                        border: 'none',
+                        borderRadius: 3,
+                        padding: '6px 8px',
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontWeight: 800,
+                        fontSize: 8,
+                        letterSpacing: 0.5,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ENTER STUDIO ➔
+                    </button>
+                    <a
+                      href="https://perchance.org/keneticut"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open KenetiCut on Perchance"
+                      style={{
+                        background: 'rgba(255,255,255,0.08)',
+                        color: '#00e5ff',
+                        border: '1px solid rgba(0, 229, 255, 0.4)',
+                        borderRadius: 3,
+                        padding: '6px 10px',
+                        fontSize: 10,
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      ↗
+                    </a>
+                  </div>
                 </div>
-                <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                  Matthew's neighborhood bookstore in North Park. Watch the late-night storefront scene ➔
+
+                {/* 2. Face for Radio */}
+                <a
+                  href="https://perchance.org/face-for-radio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(15, 25, 20, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(57, 255, 20, 0.45)',
+                    boxShadow: '0 0 12px rgba(57, 255, 20, 0.15)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#39ff14';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(57, 255, 20, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(57, 255, 20, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(57, 255, 20, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>🎙️</span>
+                      <span style={{ fontSize: 8.5, color: '#39ff14', fontFamily: 'monospace' }}>perchance.org ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#39ff14' }}>
+                      FACE FOR RADIO
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Character voice synthesis, radio transmissions & vocal audio generation.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#39ff14',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    LAUNCH VOICE STATION ➔
+                  </div>
+                </a>
+
+                {/* 3. The Wunderbar */}
+                <a
+                  href="https://perchance.org/the-wunderbar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(25, 22, 15, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(251, 191, 36, 0.45)',
+                    boxShadow: '0 0 12px rgba(251, 191, 36, 0.15)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#fbbf24';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(251, 191, 36, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(251, 191, 36, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>⚡</span>
+                      <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>perchance.org ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
+                      THE WUNDERBAR
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Alchemical prompt engine, lyric craft & sonic physics collisions.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#fbbf24',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    ENTER WUNDERBAR ➔
+                  </div>
+                </a>
+
+                {/* 4. Phase 4 Pictures */}
+                <a
+                  href="https://perchance.org/phase-4-pictures"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(25, 15, 20, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(244, 63, 94, 0.45)',
+                    boxShadow: '0 0 12px rgba(244, 63, 94, 0.15)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#f43f5e';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(244, 63, 94, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(244, 63, 94, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(244, 63, 94, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>🎬</span>
+                      <span style={{ fontSize: 8.5, color: '#f43f5e', fontFamily: 'monospace' }}>perchance.org ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#f43f5e' }}>
+                      PHASE 4 PICTURES
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Cinematic scene generator, vintage film aesthetics & surreal photo generation.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#f43f5e',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    LAUNCH PICTURES STUDIO ➔
+                  </div>
+                </a>
+
+                {/* 5. The LSC */}
+                <a
+                  href="https://perchance.org/thelsc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(20, 15, 30, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(192, 132, 252, 0.45)',
+                    boxShadow: '0 0 12px rgba(192, 132, 252, 0.15)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#c084fc';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(192, 132, 252, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(192, 132, 252, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(192, 132, 252, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>⚛️</span>
+                      <span style={{ fontSize: 8.5, color: '#c084fc', fontFamily: 'monospace' }}>perchance.org ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#c084fc' }}>
+                      THE LSC
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Large Sonic Collider: high-energy prompt physics ordering chaos for AI music.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#c084fc',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    COLLIDE PARTICLES ➔
+                  </div>
+                </a>
+
+                {/* 6. Audio Arc */}
+                <a
+                  href="https://perchance.org/audioarc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(15, 25, 35, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(56, 189, 248, 0.45)',
+                    boxShadow: '0 0 12px rgba(56, 189, 248, 0.15)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#38bdf8';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(56, 189, 248, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(56, 189, 248, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>🎚️</span>
+                      <span style={{ fontSize: 8.5, color: '#38bdf8', fontFamily: 'monospace' }}>perchance.org ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#38bdf8' }}>
+                      AUDIO ARC
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Dynamic audio timeline, wave shaping & multi-part stem pacing.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#38bdf8',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    OPEN AUDIO ARC ➔
+                  </div>
+                </a>
+
+                {/* 7. Hey Books Scene Card */}
+                <div
+                  onClick={() => {
+                    setDriveInView('lot');
+                    setScreenChannel('hey_books');
+                  }}
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(25, 15, 30, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(244, 63, 94, 0.5)',
+                    boxShadow: '0 0 12px rgba(244, 63, 94, 0.25)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#f43f5e';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(244, 63, 94, 0.5)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 22, marginBottom: 6 }}>📚</div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#f43f5e' }}>
+                      HEY BOOKS · SAN DIEGO
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Matthew's neighborhood bookstore in North Park. Watch the late-night storefront scene on Screen 3.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#f43f5e',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    WATCH ON SCREEN 3 ➔
+                  </div>
+                </div>
+
+                {/* 8. Community Reel Card */}
+                <div
+                  onClick={() => {
+                    setDriveInView('lot');
+                    setScreenChannel('community_reel');
+                  }}
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(20, 15, 35, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(168, 85, 247, 0.5)',
+                    boxShadow: '0 0 12px rgba(168, 85, 247, 0.25)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#c084fc';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 22, marginBottom: 6 }}>📼</div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#c084fc' }}>
+                      COMMUNITY REEL SHOWCASE
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Screen 4! Watch music videos made by the community using KenetiCut & the Strangelet Suite.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#c084fc',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    WATCH ON SCREEN 4 ➔
+                  </div>
                 </div>
               </div>
-
-              {/* Community Reel Card */}
-              <div
-                onClick={() => {
-                  setDriveInView('lot');
-                  setScreenChannel('community_reel');
-                }}
-                style={{
-                  padding: 18,
-                  backgroundColor: 'rgba(20, 15, 35, 0.85)',
-                  borderRadius: 6,
-                  border: '1px solid rgba(168, 85, 247, 0.5)',
-                  boxShadow: '0 0 12px rgba(168, 85, 247, 0.25)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'border-color 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#c084fc';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{ fontSize: 20, marginBottom: 6 }}>📼</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#c084fc' }}>
-                  COMMUNITY REEL SHOWCASE
-                </div>
-                <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                  Screen 4! Watch music videos made by the community using KenetiCut and Strangelet Stitch ➔
-                </div>
-              </div>
-
-              {/* Strangelet Stitch Launcher Card */}
-              <a
-                href="http://127.0.0.1:8765"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: 18,
-                  backgroundColor: 'rgba(15, 15, 30, 0.82)',
-                  borderRadius: 6,
-                  border: '1px solid rgba(0, 229, 255, 0.4)',
-                  textDecoration: 'none',
-                  textAlign: 'left',
-                  transition: 'border-color 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#00e5ff';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0, 229, 255, 0.4)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{ fontSize: 20, marginBottom: 6 }}>🧵</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#00e5ff' }}>
-                  STRANGELET STITCH
-                </div>
-                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 4, lineHeight: 1.4 }}>
-                  Dual-bay generative music video orchestrator & DJ Fact Cards (Port 8765).
-                </div>
-              </a>
-
-              {/* Strangelet Lab Launcher Card */}
-              <a
-                href="http://localhost:8081"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: 18,
-                  backgroundColor: 'rgba(15, 15, 30, 0.82)',
-                  borderRadius: 6,
-                  border: '1px solid rgba(57, 255, 20, 0.4)',
-                  textDecoration: 'none',
-                  textAlign: 'left',
-                  transition: 'border-color 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#39ff14';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(57, 255, 20, 0.4)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{ fontSize: 20, marginBottom: 6 }}>🧪</div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 700, color: '#39ff14' }}>
-                  STRANGELET LAB
-                </div>
-                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 4, lineHeight: 1.4 }}>
-                  The research lab, lyric graph networks, D3 visualizer, and GenAI console (Port 8081).
-                </div>
-              </a>
             </div>
           </div>
         </div>

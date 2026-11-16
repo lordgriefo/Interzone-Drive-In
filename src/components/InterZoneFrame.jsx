@@ -5,7 +5,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { InterzoneBackground } from './InterzoneBackground.jsx';
 import { isDesktopEnvironment } from '../utils/exportPipeline';
-import { DESKTOP_EXE_DOWNLOAD_URL, BUY_ME_A_COFFEE_URL } from '../constants/urls';
+import { DESKTOP_EXE_DOWNLOAD_URL, BUY_ME_A_COFFEE_URL, STRANGELET_SUITE_APPS } from '../constants/urls';
+import { StrangeletSuiteMenu } from './StrangeletSuiteMenu';
 
 const TIMELINE_MIN_H = 100;
 const TIMELINE_MAX_H = 600;
@@ -341,6 +342,35 @@ export function InterzoneFrame({
 
           {/* Right: Studio Tab Switcher & Master Audio/Video Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, justifyContent: 'flex-end' }}>
+            {/* Strangelet Suite Launcher Dropdown */}
+            <StrangeletSuiteMenu currentAppId="keneticut" align="right" />
+
+            {/* Direct Link / Tab to Interzone Drive-In Theater */}
+            <button
+              onClick={() => onTabChange && onTabChange('drivein')}
+              title="Open the Interzone Drive-In Theater"
+              style={{
+                background: 'linear-gradient(90deg, #ff6b00, #ff8800)',
+                color: '#000',
+                border: '1px solid #ff6b00',
+                borderRadius: 4,
+                padding: '3px 7px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontWeight: 800,
+                fontSize: 7.5,
+                letterSpacing: 0.8,
+                cursor: 'pointer',
+                boxShadow: '0 0 8px rgba(255, 107, 0, 0.4)',
+                transition: 'all 0.15s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                flexShrink: 0,
+              }}
+            >
+              🍿 DRIVE-IN
+            </button>
+
             {/* Link / Tab to Choreography Studio */}
             <button
               onClick={() => onTabChange && onTabChange(activeTab === 'studio' ? 'editor' : 'studio')}
@@ -794,7 +824,7 @@ export function InterzoneFrame({
         </div>
       )}
 
-      {/* ── BUY ME A COFFEE (Clean footer link) ── */}
+      {/* ── FOOTER: STRANGELET SUITE SISTER ATTRACTIONS & BUY ME A COFFEE ── */}
       {!cinemaMode && (
         <div style={{
           position: 'relative',
@@ -802,10 +832,49 @@ export function InterzoneFrame({
           marginTop: 2,
           marginBottom: 6,
           display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
           justifyContent: 'center',
           alignItems: 'center',
           flexShrink: 0,
         }}>
+          {/* Quick links to the 5 sister Perchance tools */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 5,
+            padding: '2px 8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 14,
+            fontSize: 7.5,
+            fontFamily: "'Syncopate', sans-serif",
+            letterSpacing: '0.5px',
+          }}>
+            <span style={{ color: '#fbbf24', fontWeight: 800 }}>⚡ SUITE:</span>
+            {STRANGELET_SUITE_APPS.filter(app => app.id !== 'keneticut').map(app => (
+              <a
+                key={app.id}
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`${app.title} — ${app.desc}`}
+                style={{
+                  color: app.color,
+                  textDecoration: 'none',
+                  padding: '1px 5px',
+                  borderRadius: 3,
+                  transition: 'background-color 0.15s',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                {app.icon} {app.title}
+              </a>
+            ))}
+          </div>
+
           <a
             href={BUY_ME_A_COFFEE_URL}
             target="_blank"
