@@ -29,6 +29,13 @@ export const CINE_SAMPLER_URL = PERCHANCE_CINE_SAMPLER_URL;
 // Music & Album Releases
 export const OCCULT_SONGBOOK_URL = 'https://buymeacoffee.com/magicstatic/';
 
+// Strangelet Lab (Quantum-Acoustic Production Workstation & Particle Collider DAW)
+export const STRANGELET_LAB_URL = 'https://github.com/lordgriefo/Strangelet-Lab';
+export const STRANGELET_LAB_BETA_URL = 'https://github.com/lordgriefo/Strangelet-Lab/releases';
+
+// Strangelet Stitch (Living Reel Montage & Video Stitcher)
+export const STRANGELET_STITCH_URL = 'https://github.com/lordgriefo/strangelet-kineto-cut';
+
 // Google Flow Syncro-Vox Tool (Talking Mouth Shape Generator)
 export const GOOGLE_FLOW_SYNCRO_VOX_URL = 'https://flow.google.com/shared/tool/245908d5-dceb-42ed-884c-9c2f8f21b98a';
 
@@ -112,5 +119,31 @@ export const STRANGELET_SUITE_APPS = [
     desc: 'Cinematographic shot library, lens angles, visual framing compositions & reference catalog v2.0.',
     color: '#34d399',
     glow: 'rgba(52, 211, 153, 0.45)',
+  },
+  {
+    id: 'strangelet-lab',
+    title: 'Strangelet Lab',
+    subtitle: 'v2.5 Beta',
+    tagline: 'Particle Collider DAW · Faust DSP · GHOST AI Companion',
+    badge: 'DESKTOP DAW v2.5 BETA',
+    icon: '⚡',
+    url: STRANGELET_LAB_BETA_URL,
+    external: true,
+    isBeta: true,
+    desc: 'Quantum-acoustic desktop DAW & sonic collider: Faust WebAssembly DSP, level-matched FFT mastering, drum transient replacer & air-gapped GHOST AI studio companion.',
+    color: '#fbbf24',
+    glow: 'rgba(251, 191, 36, 0.55)',
+  },
+  {
+    id: 'strangelet-stitch',
+    title: 'Strangelet Stitch',
+    tagline: 'Living Reel Montage & Video Stitcher',
+    badge: 'CINEMATIC REEL STITCHER',
+    icon: '🪡',
+    url: STRANGELET_STITCH_URL,
+    external: true,
+    desc: 'Beat-synced video montage choreography, multi-scene living reel stitcher, fast cuts & audio-reactive visual cut-up laboratory.',
+    color: '#c084fc',
+    glow: 'rgba(192, 132, 252, 0.55)',
   },
 ];

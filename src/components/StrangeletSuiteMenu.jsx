@@ -165,6 +165,22 @@ export function StrangeletSuiteMenu({ currentAppId = 'keneticut', align = 'right
                             {app.subtitle}
                           </span>
                         )}
+                        {app.isBeta && (
+                          <span
+                            style={{
+                              fontSize: 6.5,
+                              fontFamily: "'Syncopate', sans-serif",
+                              fontWeight: 800,
+                              color: '#000',
+                              background: '#fbbf24',
+                              padding: '1px 4px',
+                              borderRadius: 2,
+                              letterSpacing: 0.5,
+                            }}
+                          >
+                            BETA v2.5
+                          </span>
+                        )}
                       </div>
                       {isCurrent ? (
                         <span

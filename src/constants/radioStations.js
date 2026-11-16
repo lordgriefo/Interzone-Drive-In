@@ -3,13 +3,15 @@
 import docEnochManifest from './docEnochManifest.json';
 
 // Configurable Cloudflare R2 bucket base URL.
-// Can be customized via localStorage ('interzone_r2_url') or VITE_R2_RADIO_URL.
+// Default points to live Interzone Drive-In R2 bucket.
+export const DEFAULT_R2_URL = 'https://pub-cfb35735ad354d289b3f356684357a95.r2.dev';
+
 export function getR2BaseUrl() {
   if (typeof window !== 'undefined') {
     const custom = window.localStorage.getItem('interzone_r2_url');
     if (custom) return custom.replace(/\/+$/, '');
   }
-  return (import.meta.env.VITE_R2_RADIO_URL || '').replace(/\/+$/, '');
+  return (import.meta.env.VITE_R2_RADIO_URL || DEFAULT_R2_URL).replace(/\/+$/, '');
 }
 
 export function setR2BaseUrl(url) {

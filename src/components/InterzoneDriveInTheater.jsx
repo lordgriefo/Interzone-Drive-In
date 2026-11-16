@@ -358,8 +358,43 @@ export function InterzoneDriveInTheater({
         </div>
 
         {/* ── SUITE DROPDOWN & JUMP TO CHOREOGRAPHY STUDIO TAB ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <StrangeletSuiteMenu currentAppId="keneticut" align="right" />
+          <a
+            href="https://github.com/lordgriefo/Strangelet-Lab/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Download Strangelet Lab v2.5 Beta (Windows x64 / Faust WebAssembly / GHOST AI DAW)"
+            style={{
+              background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(255, 107, 0, 0.2))',
+              color: '#fbbf24',
+              border: '1px solid #fbbf24',
+              borderRadius: 4,
+              padding: '6px 12px',
+              fontFamily: "'Syncopate', sans-serif",
+              fontWeight: 800,
+              fontSize: 9,
+              letterSpacing: 1.5,
+              textDecoration: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 0 10px rgba(251, 191, 36, 0.35)',
+              transition: 'all 0.15s ease',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.04)';
+              e.currentTarget.style.boxShadow = '0 0 18px rgba(251, 191, 36, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1.0)';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(251, 191, 36, 0.35)';
+            }}
+          >
+            <span>⚡ LAB BETA</span>
+            <span style={{ fontSize: 8 }}>↗</span>
+          </a>
           <button
             onClick={onSwitchToStudio}
             style={{
@@ -367,11 +402,11 @@ export function InterzoneDriveInTheater({
               color: '#fff',
               border: '1px solid #ff6b00',
               borderRadius: 4,
-              padding: '7px 16px',
+              padding: '7px 14px',
               fontFamily: "'Syncopate', sans-serif",
               fontWeight: 800,
-              fontSize: 10,
-              letterSpacing: 2,
+              fontSize: 9.5,
+              letterSpacing: 1.5,
               cursor: 'pointer',
               boxShadow: '0 0 12px rgba(255, 107, 0, 0.4)',
               transition: 'transform 0.15s, box-shadow 0.15s',
@@ -672,7 +707,7 @@ export function InterzoneDriveInTheater({
                 }}
               >
                 <span>⚡</span>
-                <span>INTERZONE CREATIVE NETWORK · 7 LIVE SITES ONLINE</span>
+                <span>INTERZONE CREATIVE NETWORK · SUITE TOOLS & BETA APPS</span>
                 <span>⚡</span>
               </div>
 
@@ -1111,7 +1146,135 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 8. Hey Books Scene Card */}
+                {/* 8. Strangelet Lab (v2.5 Beta Native DAW) */}
+                <a
+                  href="https://github.com/lordgriefo/Strangelet-Lab/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(30, 24, 12, 0.88)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(251, 191, 36, 0.55)',
+                    boxShadow: '0 0 14px rgba(251, 191, 36, 0.25)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#fbbf24';
+                    e.currentTarget.style.boxShadow = '0 0 22px rgba(251, 191, 36, 0.5)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.55)';
+                    e.currentTarget.style.boxShadow = '0 0 14px rgba(251, 191, 36, 0.25)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>⚡</span>
+                      <span
+                        style={{
+                          fontSize: 7,
+                          fontFamily: "'Syncopate', sans-serif",
+                          fontWeight: 800,
+                          color: '#000',
+                          backgroundColor: '#fbbf24',
+                          padding: '2px 5px',
+                          borderRadius: 2,
+                        }}
+                      >
+                        BETA v2.5
+                      </span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
+                      STRANGELET LAB
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#fef08a', fontFamily: 'monospace', marginTop: 1 }}>
+                      PARTICLE COLLIDER DAW
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Quantum-acoustic DAW: Faust WebAssembly DSP, level-matched FFT mastering, drum transient replacer & air-gapped GHOST AI companion.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#fbbf24',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    DOWNLOAD v2.5 BETA (.EXE / ZIP) ➔
+                  </div>
+                </a>
+
+                {/* 9. Strangelet Stitch */}
+                <a
+                  href="https://github.com/lordgriefo/strangelet-kineto-cut"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(25, 15, 35, 0.88)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(192, 132, 252, 0.55)',
+                    boxShadow: '0 0 14px rgba(192, 132, 252, 0.25)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#c084fc';
+                    e.currentTarget.style.boxShadow = '0 0 22px rgba(192, 132, 252, 0.5)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(192, 132, 252, 0.55)';
+                    e.currentTarget.style.boxShadow = '0 0 14px rgba(192, 132, 252, 0.25)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>🪡</span>
+                      <span style={{ fontSize: 8.5, color: '#c084fc', fontFamily: 'monospace' }}>github.com ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#c084fc' }}>
+                      STRANGELET STITCH
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#e9d5ff', fontFamily: 'monospace', marginTop: 1 }}>
+                      LIVING REEL STITCHER
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Beat-synced video montage choreography, multi-scene living reel stitcher & audio-reactive visual cut-up laboratory.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#c084fc',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    EXPLORE STRANGELET STITCH ➔
+                  </div>
+                </a>
+
+                {/* 10. Hey Books Scene Card */}
                 <div
                   onClick={() => {
                     setDriveInView('lot');
