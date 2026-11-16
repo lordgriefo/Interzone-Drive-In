@@ -2,6 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import communityReelData from '../constants/communityReel.json';
 import { STRANGELET_SUITE_APPS } from '../constants/urls';
 import { StrangeletSuiteMenu } from './StrangeletSuiteMenu';
+import {
+  INTERZONE_RADIO_STATIONS,
+  SAMPLE_VINTAGE_ADS,
+  DOC_ENOCH_SAMPLES,
+  getR2BaseUrl,
+  setR2BaseUrl,
+} from '../constants/radioStations';
+import { playTunerStatic } from '../utils/radioTunerAudio';
 
 export const FAKE_MARQUEE_MOVIES = [
   {
@@ -115,6 +123,30 @@ export function InterzoneDriveInTheater({
       return () => clearTimeout(timer);
     }
   }, [malibuFlying]);
+
+  // ── MULTI-CHANNEL PIRATE RADIO STATE ──
+  const [activeStationId, setActiveStationId] = useState('w_occult');
+  const [showR2ConfigModal, setShowR2ConfigModal] = useState(false);
+  const [r2UrlInput, setR2UrlInput] = useState(() => getR2BaseUrl());
+  const [interstitialMode, setInterstitialMode] = useState(true);
+
+  const activeStation =
+    INTERZONE_RADIO_STATIONS.find((s) => s.id === activeStationId) || INTERZONE_RADIO_STATIONS[0];
+
+  const handleTuneStation = (stationId) => {
+    playTunerStatic(0.35);
+    setActiveStationId(stationId);
+    const station = INTERZONE_RADIO_STATIONS.find((s) => s.id === stationId);
+    if (station && station.tracks.length > 0 && onSelectTrack) {
+      onSelectTrack(station.tracks[0]);
+    }
+  };
+
+  const handleSaveR2Url = (e) => {
+    e.preventDefault();
+    setR2BaseUrl(r2UrlInput);
+    setShowR2ConfigModal(false);
+  };
 
   const handleRollMarquee = () => {
     setMarqueeIndex((prev) => (prev + 1) % FAKE_MARQUEE_MOVIES.length);
@@ -293,21 +325,29 @@ export function InterzoneDriveInTheater({
             {videoPlaying ? '🎬 VIDEO: ON' : '⏸ VIDEO: OFF'}
           </button>
 
-          <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 4 }}>
-            <span style={{ fontSize: 8, color: '#39ff14', letterSpacing: 1.5, fontWeight: 700 }}>
-              📻 99.3 FM CAR SPEAKER TUNER
+          <div
+            onClick={() => {
+              const idx = INTERZONE_RADIO_STATIONS.findIndex((s) => s.id === activeStationId);
+              const nextStation = INTERZONE_RADIO_STATIONS[(idx + 1) % INTERZONE_RADIO_STATIONS.length];
+              handleTuneStation(nextStation.id);
+            }}
+            style={{ display: 'flex', flexDirection: 'column', marginLeft: 4, cursor: 'pointer' }}
+            title="Click to cycle to the next radio station on the dial"
+          >
+            <span style={{ fontSize: 8, color: activeStation.color, letterSpacing: 1.5, fontWeight: 700 }}>
+              {activeStation.icon} {activeStation.dial} · {activeStation.shortName}
             </span>
             <span
               style={{
                 fontSize: 10,
                 color: '#e4e4e7',
-                maxWidth: 200,
+                maxWidth: 220,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
               }}
             >
-              {currentTrackTitle || 'Station Offline'}
+              {currentTrackTitle || activeStation.host}
             </span>
           </div>
         </div>
@@ -1714,70 +1754,386 @@ export function InterzoneDriveInTheater({
             style={{
               width: '100%',
               maxWidth: 1040,
-              backgroundColor: 'rgba(12, 12, 20, 0.85)',
-              borderRadius: 6,
-              border: '1px solid rgba(255, 107, 0, 0.3)',
-              padding: '14px 20px',
+              backgroundColor: 'rgba(10, 10, 18, 0.94)',
+              borderRadius: 8,
+              border: `2px solid ${activeStation.color}`,
+              boxShadow: `0 0 25px ${activeStation.glow}, inset 0 0 30px rgba(0,0,0,0.9)`,
+              padding: '16px 20px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 16,
+              flexDirection: 'column',
+              gap: 14,
+              transition: 'border-color 0.3s, box-shadow 0.3s',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '50%',
-                  backgroundColor: '#0a0a14',
-                  border: '2px solid #39ff14',
-                  boxShadow: '0 0 12px rgba(57, 255, 20, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 22,
-                }}
-              >
-                ☢️
+            {/* Top Row: Vehicle Diagnostics & Broadcast Switches */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 12,
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                paddingBottom: 10,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    backgroundColor: '#05050c',
+                    border: '2px solid #39ff14',
+                    boxShadow: '0 0 10px rgba(57, 255, 20, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 20,
+                  }}
+                >
+                  ☢️
+                </div>
+                <div>
+                  <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10, fontWeight: 800, color: '#39ff14', letterSpacing: 1 }}>
+                    1964 CHEVY MALIBU · REPO RAD-METER: 3.8 ROENTGENS
+                  </div>
+                  <div style={{ fontSize: 8.5, color: '#a1a1aa', fontFamily: 'monospace', marginTop: 2 }}>
+                    Flight Mode: {malibuFlying ? '⚡ ACTIVE (ORBITAL)' : 'STANDBY'} · Antenna: 99.3 FM WHIP
+                  </div>
+                </div>
               </div>
-              <div>
-                <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 11, fontWeight: 700, color: '#39ff14' }}>
-                  1964 CHEVY MALIBU (TRUNK EMITTING 3.8 ROENTGENS)
-                </div>
-                <div style={{ fontSize: 9.5, color: '#a1a1aa', marginTop: 2 }}>
-                  Repo Man Interdimensional Flight Mode: {malibuFlying ? 'ACTIVE ⚡' : 'STANDBY'}
-                </div>
+
+              {/* R2 Sync & Doc Enoch DJ Toggle Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setShowR2ConfigModal(true)}
+                  style={{
+                    background: r2UrlInput ? 'rgba(57, 255, 20, 0.15)' : 'rgba(255, 107, 0, 0.15)',
+                    color: r2UrlInput ? '#39ff14' : '#ff6b00',
+                    border: `1px solid ${r2UrlInput ? '#39ff14' : '#ff6b00'}`,
+                    borderRadius: 3,
+                    padding: '4px 9px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontSize: 7.5,
+                    fontWeight: 800,
+                    letterSpacing: 0.8,
+                    cursor: 'pointer',
+                  }}
+                  title="Configure Cloudflare R2 bucket link for custom radio audio"
+                >
+                  ⚙️ {r2UrlInput ? 'R2 BUCKET: CONNECTED' : 'CONNECT CLOUDFLARE R2'}
+                </button>
+
+                <button
+                  onClick={() => setInterstitialMode((prev) => !prev)}
+                  style={{
+                    background: interstitialMode ? 'rgba(251, 191, 36, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                    color: interstitialMode ? '#fbbf24' : '#888',
+                    border: `1px solid ${interstitialMode ? '#fbbf24' : 'rgba(255, 255, 255, 0.2)'}`,
+                    borderRadius: 3,
+                    padding: '4px 9px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontSize: 7.5,
+                    fontWeight: 800,
+                    letterSpacing: 0.8,
+                    cursor: 'pointer',
+                  }}
+                  title="Toggle Doc Enoch DJ commentary, B-movie ads & snack bar bumpers between tracks"
+                >
+                  🎙️ {interstitialMode ? 'DJ DOC ENOCH & ADS: ON' : 'DJ CHATTER: OFF'}
+                </button>
               </div>
             </div>
 
-            {/* Quick Song Picker for the Drive-In Radio */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 9.5, color: '#71717a' }}>TUNER:</span>
-              <select
-                onChange={(e) => {
-                  const selected = playlist.find((p) => p.id === e.target.value);
-                  if (selected && onSelectTrack) onSelectTrack(selected);
-                }}
+            {/* Middle Row: Vacuum Tube Tuner Display Face */}
+            <div
+              style={{
+                backgroundColor: '#05050a',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: 5,
+                padding: '12px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 14,
+                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.95)',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: 32,
+                      letterSpacing: 4,
+                      color: activeStation.color,
+                      textShadow: `0 0 14px ${activeStation.color}`,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {activeStation.dial}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      color: '#fff',
+                      letterSpacing: 2,
+                    }}
+                  >
+                    {activeStation.name}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 8,
+                      fontFamily: 'monospace',
+                      color: activeStation.color,
+                      border: `1px solid ${activeStation.color}`,
+                      padding: '2px 6px',
+                      borderRadius: 3,
+                    }}
+                  >
+                    {activeStation.genre}
+                  </span>
+                </div>
+
+                <div style={{ fontSize: 9.5, color: '#fbbf24', fontFamily: 'monospace' }}>
+                  🎙️ HOST: <strong style={{ color: '#fff' }}>{activeStation.host}</strong> · {activeStation.vibe}
+                </div>
+                <div style={{ fontSize: 9, color: '#a1a1aa', fontStyle: 'italic', marginTop: 3 }}>
+                  "{activeStation.slogan}"
+                </div>
+              </div>
+
+              {/* Station Track Picker Dropdown */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 260 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 8, color: activeStation.color, fontFamily: "'Syncopate', sans-serif", fontWeight: 700 }}>
+                    STATION TRACK SELECTOR ({activeStation.tracks.length} CUTS):
+                  </span>
+                  {activeStation.id === 'w_occult' && (
+                    <span style={{ fontSize: 7.5, color: '#ff6b00', fontFamily: 'monospace' }}>
+                      30-TRACK ALBUM
+                    </span>
+                  )}
+                </div>
+                <select
+                  value={activeStation.tracks.find((t) => t.title === currentTrackTitle)?.id || ''}
+                  onChange={(e) => {
+                    const sel = activeStation.tracks.find((t) => t.id === e.target.value);
+                    if (sel && onSelectTrack) onSelectTrack(sel);
+                  }}
+                  style={{
+                    backgroundColor: '#0a0a14',
+                    color: '#fff',
+                    border: `1px solid ${activeStation.color}`,
+                    borderRadius: 4,
+                    padding: '6px 10px',
+                    fontFamily: 'monospace',
+                    fontSize: 9.5,
+                    cursor: 'pointer',
+                    boxShadow: `0 0 8px ${activeStation.glow}`,
+                  }}
+                >
+                  {activeStation.tracks.map((t, idx) => (
+                    <option key={t.id || idx} value={t.id}>
+                      {t.num ? `${t.num}. ` : `${idx + 1}. `}{t.title} ({Math.floor(t.duration / 60)}:{(t.duration % 60).toString().padStart(2, '0')})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Bottom Row: 5 Tactile Pushbutton Preset Switches */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 8, color: '#71717a', fontFamily: "'Syncopate', sans-serif", letterSpacing: 1.5, fontWeight: 700 }}>
+                PIRATE RADIO FREQUENCY PRESETS (CLICK TO TUNE):
+              </div>
+              <div
                 style={{
-                  backgroundColor: '#05050a',
-                  color: '#ff6b00',
-                  border: '1px solid #ff6b00',
-                  borderRadius: 4,
-                  padding: '5px 10px',
-                  fontFamily: 'inherit',
-                  fontSize: 10,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: 8,
+                }}
+              >
+                {INTERZONE_RADIO_STATIONS.map((station) => {
+                  const isActive = station.id === activeStationId;
+                  return (
+                    <button
+                      key={station.id}
+                      onClick={() => handleTuneStation(station.id)}
+                      style={{
+                        background: isActive
+                          ? `linear-gradient(135deg, ${station.color}, #0a0a14)`
+                          : 'rgba(255, 255, 255, 0.04)',
+                        color: isActive ? '#000' : '#e4e4e7',
+                        border: `1px solid ${isActive ? station.color : 'rgba(255, 255, 255, 0.15)'}`,
+                        borderRadius: 4,
+                        padding: '8px 10px',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        boxShadow: isActive ? `0 0 14px ${station.glow}` : 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.borderColor = station.color;
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
+                        }
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9, fontWeight: 800 }}>
+                          {station.icon} {station.dial}
+                        </span>
+                        {isActive && (
+                          <span style={{ fontSize: 7, fontWeight: 800, color: '#000', backgroundColor: '#fff', padding: '1px 4px', borderRadius: 2 }}>
+                            LIVE
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 8.5, fontWeight: 700, marginTop: 2, color: isActive ? '#000' : station.color }}>
+                        {station.shortName}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── CLOUDFLARE R2 BUCKET CONFIGURATION MODAL ── */}
+      {showR2ConfigModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1100,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+          onClick={() => setShowR2ConfigModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#0a0a14',
+              border: '2px solid #ff6b00',
+              borderRadius: 8,
+              boxShadow: '0 0 35px rgba(255, 107, 0, 0.5), inset 0 0 25px rgba(0,0,0,0.8)',
+              maxWidth: 520,
+              width: '100%',
+              padding: 24,
+              color: '#fff',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, letterSpacing: 3, color: '#ff6b00' }}>
+                ⚙️ CLOUDFLARE R2 RADIO TRANSMITTER SYNC
+              </div>
+              <button
+                onClick={() => setShowR2ConfigModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#888',
+                  fontSize: 18,
                   cursor: 'pointer',
                 }}
               >
-                {playlist.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.title}
-                  </option>
-                ))}
-              </select>
+                ✕
+              </button>
             </div>
+
+            <p style={{ fontSize: 10, color: '#a1a1aa', lineHeight: 1.5, marginBottom: 16 }}>
+              Connect your Cloudflare R2 bucket public endpoint so the 1964 Malibu car radio can pull custom audio tracks, Doc Enoch DJ dispatches, and B-movie ads directly from your cloud storage.
+            </p>
+
+            <form onSubmit={handleSaveR2Url} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 8.5, fontFamily: "'Syncopate', sans-serif", fontWeight: 700, color: '#39ff14', display: 'block', marginBottom: 4 }}>
+                  R2 PUBLIC BASE URL (R2.DEV SUBDOMAIN OR CUSTOM DOMAIN):
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://pub-xxxxxxxxxxxxxx.r2.dev"
+                  value={r2UrlInput}
+                  onChange={(e) => setR2UrlInput(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    backgroundColor: '#05050c',
+                    border: '1px solid #39ff14',
+                    borderRadius: 4,
+                    color: '#fff',
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                    boxShadow: '0 0 10px rgba(57, 255, 20, 0.25)',
+                  }}
+                />
+              </div>
+
+              <div style={{ fontSize: 8.5, color: '#fbbf24', background: 'rgba(251, 191, 36, 0.08)', padding: '6px 10px', borderRadius: 4, border: '1px solid rgba(251, 191, 36, 0.3)' }}>
+                💡 Tip: Make sure public access is allowed on your R2 bucket settings and CORS allows GET requests.
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                {r2UrlInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setR2UrlInput('');
+                      setR2BaseUrl('');
+                      setShowR2ConfigModal(false);
+                    }}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      color: '#f87171',
+                      border: '1px solid #ef4444',
+                      borderRadius: 4,
+                      padding: '6px 12px',
+                      fontSize: 9,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    DISCONNECT
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  style={{
+                    background: 'linear-gradient(90deg, #ff6b00, #ff8800)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: 4,
+                    padding: '6px 18px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontWeight: 800,
+                    fontSize: 9,
+                    letterSpacing: 1,
+                    cursor: 'pointer',
+                    boxShadow: '0 0 14px rgba(255, 107, 0, 0.5)',
+                  }}
+                >
+                  SAVE & SYNC TRANSMITTER
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
