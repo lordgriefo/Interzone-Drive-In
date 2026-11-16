@@ -11,19 +11,20 @@ export const DESKTOP_EXE_DOWNLOAD_URL =
 // Creator Support Page (Buy Me a Coffee)
 export const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/magicstatic/';
 
-// ── THE 6 ACTIVE PERCHANCE SITES IN THE STRANGELET SUITE ──
+// ── THE 7 ACTIVE PERCHANCE SITES IN THE STRANGELET SUITE ──
 export const PERCHANCE_KENETICUT_URL = 'https://perchance.org/keneticut';
 export const PERCHANCE_WUNDERBAR_URL = 'https://perchance.org/the-wunderbar';
 export const PERCHANCE_FACE_FOR_RADIO_URL = 'https://perchance.org/face-for-radio';
 export const PERCHANCE_PHASE_4_PICTURES_URL = 'https://perchance.org/phase-4-pictures';
 export const PERCHANCE_THE_LSC_URL = 'https://perchance.org/thelsc';
 export const PERCHANCE_AUDIO_ARC_URL = 'https://perchance.org/audioarc';
+export const PERCHANCE_CINE_SAMPLER_URL = 'https://perchance.org/strangelet-cine-sampler';
 
 // Sister Roadside Attractions & Suite Tools (backwards compatible aliases)
 export const KINETO_CUT_URL = 'https://strangelet-kineto-cut.vercel.app/';
 export const AUDIO_ARC_URL = PERCHANCE_AUDIO_ARC_URL;
 export const WUNDERBAR_URL = PERCHANCE_WUNDERBAR_URL;
-export const CINE_SAMPLER_URL = 'https://perchance.org/strangelet-cine-sampler';
+export const CINE_SAMPLER_URL = PERCHANCE_CINE_SAMPLER_URL;
 
 // Music & Album Releases
 export const OCCULT_SONGBOOK_URL = 'https://buymeacoffee.com/magicstatic/';
@@ -99,5 +100,17 @@ export const STRANGELET_SUITE_APPS = [
     desc: 'Full-spectrum storytelling app for storyboarding, screenwriting, music video directing & short film production.',
     color: '#38bdf8',
     glow: 'rgba(56, 189, 248, 0.45)',
+  },
+  {
+    id: 'cine-sampler',
+    title: 'Strangelet Cine-Sampler',
+    subtitle: 'Shot Library v2.0',
+    tagline: 'Cinematographic Shot Library & Lens Sampler',
+    badge: 'SHOT LIBRARY v2.0',
+    icon: '📽️',
+    url: PERCHANCE_CINE_SAMPLER_URL,
+    desc: 'Cinematographic shot library, lens angles, visual framing compositions & reference catalog v2.0.',
+    color: '#34d399',
+    glow: 'rgba(52, 211, 153, 0.45)',
   },
 ];

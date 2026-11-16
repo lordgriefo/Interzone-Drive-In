@@ -108,7 +108,7 @@ export function StrangeletSuiteMenu({ currentAppId = 'keneticut', align = 'right
               ⚡ INTERZONE CREATIVE NETWORK
             </div>
             <div style={{ fontSize: 8, color: '#a1a1aa', fontFamily: 'monospace' }}>
-              6 LIVE SITES
+              {STRANGELET_SUITE_APPS.length} LIVE SITES
             </div>
           </div>
 

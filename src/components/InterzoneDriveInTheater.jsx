@@ -627,7 +627,7 @@ export function InterzoneDriveInTheater({
                 }}
               >
                 <span>⚡</span>
-                <span>INTERZONE CREATIVE NETWORK · 6 LIVE SITES ONLINE</span>
+                <span>INTERZONE CREATIVE NETWORK · 7 LIVE SITES ONLINE</span>
                 <span>⚡</span>
               </div>
 
@@ -1008,7 +1008,65 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 7. Hey Books Scene Card */}
+                {/* 7. Strangelet Cine-Sampler */}
+                <a
+                  href="https://perchance.org/strangelet-cine-sampler"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(15, 30, 25, 0.85)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(52, 211, 153, 0.45)',
+                    boxShadow: '0 0 12px rgba(52, 211, 153, 0.15)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#34d399';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(52, 211, 153, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(52, 211, 153, 0.45)';
+                    e.currentTarget.style.boxShadow = '0 0 12px rgba(52, 211, 153, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>📽️</span>
+                      <span style={{ fontSize: 8.5, color: '#34d399', fontFamily: 'monospace' }}>perchance.org ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#34d399' }}>
+                      CINE-SAMPLER
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#a7f3d0', fontFamily: 'monospace', marginTop: 1 }}>
+                      SHOT LIBRARY v2.0
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Cinematographic shot library, lens angles, visual framing compositions & reference catalog v2.0.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#34d399',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    BROWSE SHOT LIBRARY ➔
+                  </div>
+                </a>
+
+                {/* 8. Hey Books Scene Card */}
                 <div
                   onClick={() => {
                     setDriveInView('lot');
