@@ -1,187 +1,203 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interzone Drive-In Theater — Mojave Interdimensional Outpost</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #030308;
-      --orange: #ff6b00;
-      --cyan: #00e5ff;
-      --pink: #ff0055;
-      --gold: #fbbf24;
-      --green: #39ff14;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      background-color: var(--bg);
-      color: #fff;
-      font-family: 'Space Mono', monospace;
-    }
+<!-- ================================================================= -->
+<!-- PERCHANCE INTERZONE DRIVE-IN THEATER (BULLETPROOF FULL-SCREEN)    -->
+<!-- Paste this entire block directly into the HTML panel on Perchance -->
+<!-- ================================================================= -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700;800&display=swap');
 
-    /* ── Floating Neon HUD Bar ── */
-    #drivein-hud {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justifyContent: space-between;
-      gap: 10px;
-      padding: 6px 14px;
-      background: rgba(5, 5, 12, 0.92);
-      border-bottom: 1px solid rgba(255, 107, 0, 0.4);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
-      transition: transform 0.25s ease, opacity 0.25s ease;
-    }
+  /* Override Perchance body and default output wrapper constraints */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: #030308 !important;
+    color: #ffffff !important;
+    font-family: 'Space Mono', monospace, sans-serif !important;
+  }
 
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .hud-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px;
-      letter-spacing: 3px;
-      color: var(--orange);
-      text-shadow: 0 0 10px rgba(255, 107, 0, 0.7);
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .hud-sub {
-      font-family: 'Syncopate', sans-serif;
-      font-size: 7.5px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--cyan);
-      text-transform: uppercase;
-    }
+  #output, .output, .perchance-output, #main-output, div[id*="output"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: static !important;
+  }
 
-    .hud-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: nowrap;
-    }
+  /* Fixed Root Container - covers entire viewport regardless of Perchance wrapper */
+  #drivein-root {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999999 !important;
+    background: #030308 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
 
-    /* Suite Selector Dropdown */
-    .suite-select {
-      background: #121020;
-      color: var(--gold);
-      border: 1px solid rgba(251, 191, 36, 0.6);
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-family: 'Syncopate', sans-serif;
-      font-size: 8px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.25);
-    }
-    .suite-select:hover {
-      border-color: var(--gold);
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
-    }
+  /* Top HUD Bar */
+  #drivein-hud {
+    height: 42px !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 16px !important;
+    background: rgba(5, 5, 12, 0.96) !important;
+    border-bottom: 1px solid rgba(255, 107, 0, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85) !important;
+    box-sizing: border-box !important;
+    z-index: 1000 !important;
+  }
 
-    /* Buttons */
-    .btn-hud {
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      padding: 4px 10px;
-      font-family: 'Syncopate', sans-serif;
-      font-size: 8px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-    .btn-hud:hover {
-      background: rgba(255, 255, 255, 0.16);
-      border-color: #fff;
-    }
-    .btn-studio {
-      background: linear-gradient(90deg, #00e5ff, #00b0ff);
-      color: #000;
-      border-color: #00e5ff;
-      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
-    }
-    .btn-studio:hover {
-      background: #33ecff;
-      box-shadow: 0 0 16px rgba(0, 229, 255, 0.7);
-    }
+  .hud-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+  .hud-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 21px;
+    letter-spacing: 3px;
+    color: #ff6b00;
+    text-shadow: 0 0 10px rgba(255, 107, 0, 0.7);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hud-sub {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #00e5ff;
+    text-transform: uppercase;
+  }
 
-    /* ── Main Iframe Frame ── */
-    #drivein-frame-container {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      padding-top: 42px; /* space for HUD */
-      background: #000;
-    }
-    #drivein-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
+  .hud-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-    /* Loading Overlay */
-    #loading-overlay {
-      position: absolute;
-      inset: 42px 0 0 0;
-      background: #030308;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justifyContent: center;
-      gap: 14px;
-      z-index: 500;
-      transition: opacity 0.4s ease;
-    }
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 3px solid rgba(255, 107, 0, 0.2);
-      border-top-color: var(--orange);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
+  .suite-select {
+    background: #121020;
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.6);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.25);
+    outline: none;
+  }
+  .suite-select:hover {
+    border-color: #fbbf24;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+  }
+
+  .btn-hud {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .btn-hud:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: #fff;
+  }
+  .btn-studio {
+    background: linear-gradient(90deg, #00e5ff, #00b0ff);
+    color: #000;
+    border-color: #00e5ff;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+  }
+  .btn-studio:hover {
+    background: #33ecff;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.7);
+  }
+
+  /* Main Iframe Container - fills remaining height */
+  #drivein-body {
+    flex: 1 !important;
+    width: 100% !important;
+    height: calc(100vh - 42px) !important;
+    position: relative !important;
+    background: #000 !important;
+    overflow: hidden !important;
+  }
+
+  #drivein-iframe {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    display: block !important;
+  }
+
+  /* Loading Overlay */
+  #loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: #030308;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    z-index: 50;
+    transition: opacity 0.5s ease;
+  }
+  .spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(255, 107, 0, 0.2);
+    border-top-color: #ff6b00;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<div id="drivein-root" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999999; background:#030308; display:flex; flex-direction:column; overflow:hidden;">
 
   <!-- Top Floating HUD Bar -->
   <header id="drivein-hud">
-    <div class="brand-group">
+    <div class="hud-brand">
       <div>
-        <div class="hud-title">
-          <span>🍿 INTERZONE DRIVE-IN THEATER</span>
-        </div>
-        <div class="hud-sub">
-          MOJAVE INTERDIMENSIONAL OUTPOST · EST. 1964
-        </div>
+        <div class="hud-title">🍿 INTERZONE DRIVE-IN THEATER</div>
+        <div class="hud-sub">MOJAVE INTERDIMENSIONAL OUTPOST · EST. 1964</div>
       </div>
     </div>
 
@@ -198,7 +214,7 @@
         <option value="https://perchance.org/keneticut">🎞️ 7. KenetiCut (Choreography & Living Reel)</option>
       </select>
 
-      <!-- Jump to Choreography Studio -->
+      <!-- Jump to KenetiCut Choreography Studio -->
       <button class="btn-hud btn-studio" onclick="openStudioView()" title="Switch to KenetiCut Choreography Studio">
         🎬 STUDIO →
       </button>
@@ -209,70 +225,63 @@
       </button>
 
       <!-- Vercel Mirror Link -->
-      <a href="https://interzone-drive-in.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-hud" style="color:var(--cyan); text-decoration:none;" title="Open standalone Vercel deployment">
+      <a href="https://interzone-drive-in.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-hud" style="color:#00e5ff;" title="Open standalone Vercel deployment">
         VERCEL ↗
       </a>
     </div>
   </header>
 
-  <!-- Loading State -->
-  <div id="loading-overlay">
-    <div class="spinner"></div>
-    <div style="font-family:'Syncopate',sans-serif; font-size:10px; letter-spacing:2px; color:var(--orange); font-weight:700;">
-      TUNING 99.3 FM CAR SPEAKER TRANSMITTER...
+  <!-- Drive-In Body with Loading Overlay and Fullscreen Iframe -->
+  <div id="drivein-body" style="flex:1; width:100%; height:calc(100vh - 42px); position:relative; background:#000;">
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <div style="font-family:'Syncopate',sans-serif; font-size:10px; letter-spacing:2px; color:#ff6b00; font-weight:700;">
+        TUNING 99.3 FM CAR SPEAKER TRANSMITTER...
+      </div>
+      <div style="font-size:9px; color:#888;">
+        Loading Drive-In Screen 1 (Feature), Screen 2 (Vegas UFO), Screen 3 (Hey Books) & Screen 4 (Community Reel)
+      </div>
     </div>
-    <div style="font-size:9px; color:#888;">
-      Loading Drive-In Screen 1 (Feature), Screen 2 (Vegas UFO), Screen 3 (Hey Books) & Screen 4 (Community Reel)
-    </div>
-  </div>
 
-  <!-- Main Drive-In Application Iframe -->
-  <div id="drivein-frame-container">
     <iframe
       id="drivein-iframe"
-      src="https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=drivein"
+      src="https://interzone-drive-in.vercel.app/"
       allow="autoplay; clipboard-write; display-capture; camera; microphone; fullscreen"
       onload="onIframeLoaded()"
+      style="position:absolute; top:0; left:0; width:100%; height:100%; border:none; display:block;"
     ></iframe>
   </div>
 
-  <script>
-    function onIframeLoaded() {
-      const overlay = document.getElementById('loading-overlay');
-      if (overlay) {
-        overlay.style.opacity = '0';
-        setTimeout(() => { overlay.style.display = 'none'; }, 400);
+</div>
+
+<script>
+  function onIframeLoaded() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => { overlay.style.display = 'none'; }, 500);
+    }
+  }
+
+  function openStudioView() {
+    const frame = document.getElementById('drivein-iframe');
+    if (frame) {
+      frame.src = 'https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=editor';
+    }
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.warn('Fullscreen error:', err);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
       }
     }
+  }
 
-    function openStudioView() {
-      const frame = document.getElementById('drivein-iframe');
-      if (frame) {
-        frame.src = "https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=editor";
-      }
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen().catch(() => {});
-        }
-      }
-    }
-
-    // Fallback: If GitHub Pages takes > 5 seconds, attempt loading Vercel mirror
-    setTimeout(() => {
-      const overlay = document.getElementById('loading-overlay');
-      if (overlay && overlay.style.display !== 'none') {
-        const frame = document.getElementById('drivein-iframe');
-        if (frame && !frame.dataset.fallbackTried) {
-          frame.dataset.fallbackTried = "true";
-          frame.src = "https://interzone-drive-in.vercel.app/?tab=drivein";
-        }
-      }
-    }, 6000);
-  </script>
-</body>
-</html>
+  // Fallback timer to hide loader if iframe event fires asynchronously
+  setTimeout(onIframeLoaded, 4000);
+</script>
