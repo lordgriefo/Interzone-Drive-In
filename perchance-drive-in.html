@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interzone Drive-In Theater — Mojave Interdimensional Outpost</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030308;
+      --orange: #ff6b00;
+      --cyan: #00e5ff;
+      --pink: #ff0055;
+      --gold: #fbbf24;
+      --green: #39ff14;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: #fff;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── Floating Neon HUD Bar ── */
+    #drivein-hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justifyContent: space-between;
+      gap: 10px;
+      padding: 6px 14px;
+      background: rgba(5, 5, 12, 0.92);
+      border-bottom: 1px solid rgba(255, 107, 0, 0.4);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hud-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: var(--orange);
+      text-shadow: 0 0 10px rgba(255, 107, 0, 0.7);
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-sub {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    /* Suite Selector Dropdown */
+    .suite-select {
+      background: #121020;
+      color: var(--gold);
+      border: 1px solid rgba(251, 191, 36, 0.6);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-family: 'Syncopate', sans-serif;
+      font-size: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.25);
+    }
+    .suite-select:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+    }
+
+    /* Buttons */
+    .btn-hud {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: 'Syncopate', sans-serif;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-hud:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: #fff;
+    }
+    .btn-studio {
+      background: linear-gradient(90deg, #00e5ff, #00b0ff);
+      color: #000;
+      border-color: #00e5ff;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    }
+    .btn-studio:hover {
+      background: #33ecff;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.7);
+    }
+
+    /* ── Main Iframe Frame ── */
+    #drivein-frame-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      padding-top: 42px; /* space for HUD */
+      background: #000;
+    }
+    #drivein-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Loading Overlay */
+    #loading-overlay {
+      position: absolute;
+      inset: 42px 0 0 0;
+      background: #030308;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justifyContent: center;
+      gap: 14px;
+      z-index: 500;
+      transition: opacity 0.4s ease;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 107, 0, 0.2);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Floating HUD Bar -->
+  <header id="drivein-hud">
+    <div class="brand-group">
+      <div>
+        <div class="hud-title">
+          <span>🍿 INTERZONE DRIVE-IN THEATER</span>
+        </div>
+        <div class="hud-sub">
+          MOJAVE INTERDIMENSIONAL OUTPOST · EST. 1964
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-controls">
+      <!-- 7-Site Strangelet Creative Suite Quick-Hop Selector -->
+      <select class="suite-select" onchange="if(this.value){window.open(this.value,'_blank');this.selectedIndex=0;}" title="Jump across all 7 Strangelet Suite Apps on Perchance">
+        <option value="" selected>⚡ STRANGELET SUITE ▾</option>
+        <option value="https://perchance.org/strangelet-cine-sampler">📽️ 1. Cine-Sampler (Shot Library v2.0)</option>
+        <option value="https://perchance.org/audioarc">🎚️ 2. AudioArc (Storyboards · Scripts · Short Films)</option>
+        <option value="https://perchance.org/thelsc">⚛️ 3. The LSC (Lyrics · Mastering · Audio-to-MIDI)</option>
+        <option value="https://perchance.org/phase-4-pictures">🎬 4. Phase 4 Pictures (Multi-Influence Screenplay AI)</option>
+        <option value="https://perchance.org/face-for-radio">🎙️ 5. Phase 4 Radio (Old-Fashioned Radio Plays)</option>
+        <option value="https://perchance.org/the-wunderbar">⚡ 6. The Wunderbar (Music Videos · Characters · Prompts)</option>
+        <option value="https://perchance.org/keneticut">🎞️ 7. KenetiCut (Choreography & Living Reel)</option>
+      </select>
+
+      <!-- Jump to Choreography Studio -->
+      <button class="btn-hud btn-studio" onclick="openStudioView()" title="Switch to KenetiCut Choreography Studio">
+        🎬 STUDIO →
+      </button>
+
+      <!-- Toggle Fullscreen -->
+      <button class="btn-hud" onclick="toggleFullscreen()" title="Toggle full-screen cinema view">
+        ⛶ FULLSCREEN
+      </button>
+
+      <!-- Vercel Mirror Link -->
+      <a href="https://interzone-drive-in.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-hud" style="color:var(--cyan); text-decoration:none;" title="Open standalone Vercel deployment">
+        VERCEL ↗
+      </a>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div style="font-family:'Syncopate',sans-serif; font-size:10px; letter-spacing:2px; color:var(--orange); font-weight:700;">
+      TUNING 99.3 FM CAR SPEAKER TRANSMITTER...
+    </div>
+    <div style="font-size:9px; color:#888;">
+      Loading Drive-In Screen 1 (Feature), Screen 2 (Vegas UFO), Screen 3 (Hey Books) & Screen 4 (Community Reel)
+    </div>
+  </div>
+
+  <!-- Main Drive-In Application Iframe -->
+  <div id="drivein-frame-container">
+    <iframe
+      id="drivein-iframe"
+      src="https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=drivein"
+      allow="autoplay; clipboard-write; display-capture; camera; microphone; fullscreen"
+      onload="onIframeLoaded()"
+    ></iframe>
+  </div>
+
+  <script>
+    function onIframeLoaded() {
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(() => { overlay.style.display = 'none'; }, 400);
+      }
+    }
+
+    function openStudioView() {
+      const frame = document.getElementById('drivein-iframe');
+      if (frame) {
+        frame.src = "https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=editor";
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    // Fallback: If GitHub Pages takes > 5 seconds, attempt loading Vercel mirror
+    setTimeout(() => {
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay && overlay.style.display !== 'none') {
+        const frame = document.getElementById('drivein-iframe');
+        if (frame && !frame.dataset.fallbackTried) {
+          frame.dataset.fallbackTried = "true";
+          frame.src = "https://interzone-drive-in.vercel.app/?tab=drivein";
+        }
+      }
+    }, 6000);
+  </script>
+</body>
+</html>

@@ -712,8 +712,11 @@
   <!-- Top Header Bar -->
   <header>
     <div class="brand">
-      <button class="btn-return-keneticut" onclick="returnToKenetiCut()" title="Return to Strangelet KenetiCut Timeline & Media Bin">
-        ← BACK TO KENETICUT (MEDIA BIN)
+      <button class="btn-return-keneticut" onclick="returnToKenetiCut('editor')" title="Open Strangelet KenetiCut Timeline & Media Bin">
+        🎬 KENETICUT
+      </button>
+      <button class="btn-return-keneticut" onclick="returnToKenetiCut('drivein')" style="background:linear-gradient(90deg, #ff0055, #ff6b00); border-color:#ff0055; box-shadow:0 0 10px rgba(255,0,85,0.4);" title="Open Interzone Drive-In Theater">
+        🍿 DRIVE-IN
       </button>
       <div id="beat-dot" class="beat-dot"></div>
       <h1>AI Choreography & Living Reel Studio</h1>
@@ -990,32 +993,34 @@
       }
     }
 
-    function returnToKenetiCut() {
+    function returnToKenetiCut(targetTab = 'editor') {
       // 1. If running embedded inside KenetiCut app itself, tell parent to switch tab
       const isEmbeddedInKenetiCut = window.parent && window.parent !== window &&
         !window.location.hostname.includes('perchance.org') &&
         !window.location.href.includes('null');
 
       if (isEmbeddedInKenetiCut) {
-        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
+        postToKenetiCut({ type: 'SWITCH_TAB', tab: targetTab });
         return;
       }
 
       // 2. If running as popup from KenetiCut, notify opener
       if (window.opener) {
-        try { window.opener.postMessage({ type: 'SWITCH_TAB', tab: 'editor' }, '*'); } catch (_) {}
+        try { window.opener.postMessage({ type: 'SWITCH_TAB', tab: targetTab }, '*'); } catch (_) {}
         try { window.close(); return; } catch (_) {}
       }
 
-      // 3. Running directly on Perchance or standalone: open embedded KenetiCut right here on the same page!
+      // 3. Running directly on Perchance or standalone: open embedded KenetiCut / Drive-In right here on the same page!
       const container = document.getElementById('keneticut-embedded-container');
-      if (container) {
+      const frame = document.getElementById('keneticut-embedded-iframe');
+      if (container && frame) {
+        frame.src = `https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=${targetTab}`;
         container.style.display = 'flex';
         return;
       }
 
       // Fallback
-      window.location.href = './index.html?tab=editor';
+      window.location.href = `./index.html?tab=${targetTab}`;
     }
 
     function switchToFlipbookView() {

@@ -209,15 +209,18 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const studioIframeRef = useRef(null);
 
-  // ── Deep-linkable Tab Router (URL search param ?tab=studio or hash #studio) ──
-  // Default to 'editor' (KenetiCut) so user lands directly into the working editor!
-  // 'studio' switches to the AI Choreography & Flipbook Studio.
+  // ── Deep-linkable Tab Router (URL search param ?tab=drivein|studio|editor or hash) ──
+  // If domain is interzone-drive-in, defaults to 'drivein'. Otherwise defaults to 'editor'.
   const [activeTab, setActiveTab] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
         if (tab === 'studio' || tab === 'drivein' || tab === 'editor') return tab;
+        // Default to 'drivein' if accessed via interzone-drive-in domain or drive-in path
+        if (window.location.hostname.includes('drive-in') || window.location.pathname.includes('drivein')) {
+          return 'drivein';
+        }
       }
     } catch (_) {}
     return 'editor';
