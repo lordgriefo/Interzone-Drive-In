@@ -111,6 +111,115 @@ export const VINTAGE_RADIO_ADS = [
     url: './assets-bg/ad_radioactive_08_last_chance_gas.mp3',
     tag: 'DESERT SPONSOR',
     text: "Last gas for 90 miles across the salt flats! Premium leaded, cold sodas, and motor oil for your interstellar crossing."
+  },
+  // ── TRASH-O-RAMA & SOMETHING WEIRD RADIO COME-ONS (GOOGLE DRIVE VAULT) ──
+  {
+    id: 'trash_01_chrome_hot_leather',
+    title: 'Chrome and Hot Leather (Rated GP)',
+    duration: 51,
+    file: 'trash_01_chrome_hot_leather.mp3',
+    url: './assets-bg/trashorama/trash_01_chrome_hot_leather.mp3',
+    tag: 'TRASH-O-RAMA',
+    text: "Green Beret vs. Cycle Pack! Four special forces commandos track down a roving desert gang on two wheels!"
+  },
+  {
+    id: 'trash_02_hells_angels_69',
+    title: "Hell's Angels '69 (Rated M)",
+    duration: 67,
+    file: 'trash_02_hells_angels_69.mp3',
+    url: './assets-bg/trashorama/trash_02_hells_angels_69.mp3',
+    tag: 'TRASH-O-RAMA',
+    text: "Two rich boys join the Angels to rob Caesar's Palace in Las Vegas! Starring Sonny Barger and the real Oakland Angels!"
+  },
+  {
+    id: 'trash_03_evel_knievel',
+    title: 'Evel Knievel: Live-Action Daredevil (Rated GP)',
+    duration: 58,
+    file: 'trash_03_evel_knievel.mp3',
+    url: './assets-bg/trashorama/trash_03_evel_knievel.mp3',
+    tag: 'TRASH-O-RAMA',
+    text: "The living legend defying death across 19 cars! Red, white and blue chrome tearing up the outdoor screen!"
+  },
+  {
+    id: 'trash_04_destroy_all_monsters',
+    title: 'Destroy All Monsters: Toho Kaiju War (Rated G)',
+    duration: 61,
+    file: 'trash_04_destroy_all_monsters.mp3',
+    url: './assets-bg/trashorama/trash_04_destroy_all_monsters.mp3',
+    tag: 'KAIJU SHOCK',
+    text: "Godzilla, Rodan, Mothra, Ghidorah! Eleven giant monsters clash at Mount Fuji in all-out Technicolor annihilation!"
+  },
+  {
+    id: 'trash_05_tentacles',
+    title: 'Tentacles: Giant Sea Terror (Rated PG)',
+    duration: 56,
+    file: 'trash_05_tentacles.mp3',
+    url: './assets-bg/trashorama/trash_05_tentacles.mp3',
+    tag: 'B-MOVIE CREATURE',
+    text: "From the fathomless ocean trench! Starring John Huston, Shelley Winters, and Bo Hopkins versus the giant mutant octopus!"
+  },
+  {
+    id: 'trash_06_empire_of_the_ants',
+    title: "H.G. Wells' Empire of the Ants (Rated PG)",
+    duration: 59,
+    file: 'trash_06_empire_of_the_ants.mp3',
+    url: './assets-bg/trashorama/trash_06_empire_of_the_ants.mp3',
+    tag: 'CREATURE FEATURE',
+    text: "Joan Collins trapped on an island with radioactive giant ants! An American International shock classic!"
+  },
+  {
+    id: 'trash_07_futureworld',
+    title: 'Futureworld: Robot Conspiracy (Rated PG)',
+    duration: 33,
+    file: 'trash_07_futureworld.mp3',
+    url: './assets-bg/trashorama/trash_07_futureworld.mp3',
+    tag: 'SCI-FI PULP',
+    text: "Beyond Westworld! What happens when the guests never leave and the android duplicates run the world?"
+  },
+  {
+    id: 'trash_08_squirm',
+    title: 'Squirm: The Day the Earth Trembled (Rated R)',
+    duration: 60,
+    file: 'trash_08_squirm.mp3',
+    url: './assets-bg/trashorama/trash_08_squirm.mp3',
+    tag: 'GRINDHOUSE SHOCK',
+    text: "Severed power cables send millions of carnivorous worms burrowing out of the swamp! You will squirm!"
+  },
+  {
+    id: 'trash_09_blood_drinkers',
+    title: 'The Blood Drinkers + The Black Cat (Double Bill)',
+    duration: 64,
+    file: 'trash_09_blood_drinkers.mp3',
+    url: './assets-bg/trashorama/trash_09_blood_drinkers.mp3',
+    tag: 'SOMETHING WEIRD',
+    text: "Filmed in blood-curdling Color Glow! Two vampire twin nightmares for the price of one single car admission!"
+  },
+  {
+    id: 'trash_10_beyond_valley_of_dolls',
+    title: 'Beyond the Valley of the Dolls + Myra Breckenridge',
+    duration: 60,
+    file: 'trash_10_beyond_valley_of_dolls.mp3',
+    url: './assets-bg/trashorama/trash_10_beyond_valley_of_dolls.mp3',
+    tag: 'CULT EXPLOITATION',
+    text: "Russ Meyer's rock and roll psychedelic kaleidoscope! The Carrie Nations live at the midnight rock bash!"
+  },
+  {
+    id: 'trash_11_the_naked_witch',
+    title: 'The Naked Witch: Buried 300 Years (Shock Thrill)',
+    duration: 25,
+    file: 'trash_11_the_naked_witch.mp3',
+    url: './assets-bg/trashorama/trash_11_the_naked_witch.mp3',
+    tag: 'SOMETHING WEIRD',
+    text: "Buried alive with a stake in her heart! Now she walks the Texas swamps for unholy revenge!"
+  },
+  {
+    id: 'trash_12_peter_fonda_festival',
+    title: 'Peter Fonda Triple Feature: The Wild Angels + The Trip',
+    duration: 64,
+    file: 'trash_12_peter_fonda_festival.mp3',
+    url: './assets-bg/trashorama/trash_12_peter_fonda_festival.mp3',
+    tag: 'ACID HOTROD',
+    text: "Three masterworks of high-octane 1960s counterculture back-to-back under the stars! Bring your friends!"
   }
 ];
 
