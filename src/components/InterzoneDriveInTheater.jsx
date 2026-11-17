@@ -95,8 +95,26 @@ export function InterzoneDriveInTheater({
   const [driveInView, setDriveInView] = useState('lot');
   // 'feature' | 'ufo_broll' | 'hey_books' | 'community_reel'
   const [screenChannel, setScreenChannel] = useState('feature');
+  // Panoramic 4-Screen Camera Panning: 0 (Feature/Strangelet), 1 (Indie MV/KinetoCut), 2 (Midnight Grindhouse), 3 (Live Visualizer/Radio)
+  const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [malibuFlying, setMalibuFlying] = useState(false);
   const [internalVideoPlaying, setInternalVideoPlaying] = useState(true);
+
+  const handleSelectScreen = (idx) => {
+    const clamped = Math.max(0, Math.min(3, idx));
+    setActiveScreenIndex(clamped);
+    if (clamped === 0) setScreenChannel('feature');
+    else if (clamped === 1) setScreenChannel('community_reel');
+    else if (clamped === 2) setScreenChannel('hey_books');
+    else if (clamped === 3) setScreenChannel('ufo_broll');
+  };
+
+  useEffect(() => {
+    if (screenChannel === 'feature') setActiveScreenIndex(0);
+    else if (screenChannel === 'community_reel') setActiveScreenIndex(1);
+    else if (screenChannel === 'hey_books') setActiveScreenIndex(2);
+    else if (screenChannel === 'ufo_broll') setActiveScreenIndex(3);
+  }, [screenChannel]);
 
   const videoPlaying = externalToggleVideo ? externalVideoPlaying : internalVideoPlaying;
   const toggleVideo = externalToggleVideo || (() => setInternalVideoPlaying((prev) => !prev));
@@ -1437,68 +1455,80 @@ export function InterzoneDriveInTheater({
               ← RETURN TO FRONT GATE
             </button>
 
-            {/* Screen Channel Selector */}
+            {/* Screen Channel Selector (Panoramic 4-Screen Multiplex) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 9, color: '#71717a', textTransform: 'uppercase' }}>Screen:</span>
+              <span style={{ fontSize: 9, color: '#71717a', textTransform: 'uppercase', fontFamily: "'Syncopate', sans-serif" }}>Field:</span>
               <button
-                onClick={() => setScreenChannel('feature')}
+                onClick={() => handleSelectScreen(0)}
                 style={{
-                  background: screenChannel === 'feature' ? '#ff6b00' : 'rgba(20,20,35,0.8)',
-                  color: screenChannel === 'feature' ? '#000' : '#fff',
-                  border: '1px solid #ff6b00',
+                  background: activeScreenIndex === 0 ? '#ff6b00' : 'rgba(20,20,35,0.85)',
+                  color: activeScreenIndex === 0 ? '#000' : '#fff',
+                  border: activeScreenIndex === 0 ? '1px solid #ff6b00' : '1px solid rgba(255, 107, 0, 0.35)',
                   borderRadius: 3,
                   padding: '4px 10px',
-                  fontSize: 9.5,
-                  fontWeight: 700,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  fontFamily: "'Syncopate', sans-serif",
                   cursor: 'pointer',
+                  boxShadow: activeScreenIndex === 0 ? '0 0 14px rgba(255, 107, 0, 0.55)' : 'none',
+                  transition: 'all 0.2s',
                 }}
               >
-                SCREEN 1: FEATURE CUT
+                SCREEN 1: ⚡ STRANGELET LAB
               </button>
               <button
-                onClick={() => setScreenChannel('ufo_broll')}
+                onClick={() => handleSelectScreen(1)}
                 style={{
-                  background: screenChannel === 'ufo_broll' ? '#00e5ff' : 'rgba(20,20,35,0.8)',
-                  color: screenChannel === 'ufo_broll' ? '#000' : '#fff',
-                  border: '1px solid #00e5ff',
+                  background: activeScreenIndex === 1 ? '#00e5ff' : 'rgba(20,20,35,0.85)',
+                  color: activeScreenIndex === 1 ? '#000' : '#fff',
+                  border: activeScreenIndex === 1 ? '1px solid #00e5ff' : '1px solid rgba(0, 229, 255, 0.35)',
                   borderRadius: 3,
                   padding: '4px 10px',
-                  fontSize: 9.5,
-                  fontWeight: 700,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  fontFamily: "'Syncopate', sans-serif",
                   cursor: 'pointer',
+                  boxShadow: activeScreenIndex === 1 ? '0 0 14px rgba(0, 229, 255, 0.55)' : 'none',
+                  transition: 'all 0.2s',
                 }}
               >
-                SCREEN 2: 1960s VEGAS UFO B-ROLL
+                SCREEN 2: 📼 INDIE MV & STITCH
               </button>
               <button
-                onClick={() => setScreenChannel('hey_books')}
+                onClick={() => handleSelectScreen(2)}
                 style={{
-                  background: screenChannel === 'hey_books' ? '#f43f5e' : 'rgba(20,20,35,0.8)',
-                  color: screenChannel === 'hey_books' ? '#000' : '#f43f5e',
-                  border: '1px solid #f43f5e',
+                  background: activeScreenIndex === 2 ? '#f43f5e' : 'rgba(20,20,35,0.85)',
+                  color: activeScreenIndex === 2 ? '#000' : '#f43f5e',
+                  border: activeScreenIndex === 2 ? '1px solid #f43f5e' : '1px solid rgba(244, 63, 94, 0.35)',
                   borderRadius: 3,
                   padding: '4px 10px',
-                  fontSize: 9.5,
-                  fontWeight: 700,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  fontFamily: "'Syncopate', sans-serif",
                   cursor: 'pointer',
+                  boxShadow: activeScreenIndex === 2 ? '0 0 14px rgba(244, 63, 94, 0.55)' : 'none',
+                  transition: 'all 0.2s',
                 }}
               >
-                SCREEN 3: 📚 HEY BOOKS (SAN DIEGO)
+                SCREEN 3: 🩸 16MM GRINDHOUSE
               </button>
               <button
-                onClick={() => setScreenChannel('community_reel')}
+                onClick={() => handleSelectScreen(3)}
                 style={{
-                  background: screenChannel === 'community_reel' ? '#c084fc' : 'rgba(20,20,35,0.8)',
-                  color: screenChannel === 'community_reel' ? '#000' : '#c084fc',
-                  border: '1px solid #c084fc',
+                  background: activeScreenIndex === 3 ? '#c084fc' : 'rgba(20,20,35,0.85)',
+                  color: activeScreenIndex === 3 ? '#000' : '#c084fc',
+                  border: activeScreenIndex === 3 ? '1px solid #c084fc' : '1px solid rgba(192, 132, 252, 0.35)',
                   borderRadius: 3,
                   padding: '4px 10px',
-                  fontSize: 9.5,
-                  fontWeight: 700,
+                  fontSize: 9,
+                  fontWeight: 800,
+                  fontFamily: "'Syncopate', sans-serif",
                   cursor: 'pointer',
+                  boxShadow: activeScreenIndex === 3 ? '0 0 14px rgba(192, 132, 252, 0.55)' : 'none',
+                  transition: 'all 0.2s',
                 }}
               >
-                SCREEN 4: 📼 COMMUNITY REEL
+                SCREEN 4: 📻 VISUALIZER & RADIO
               </button>
             </div>
 
@@ -1526,129 +1556,269 @@ export function InterzoneDriveInTheater({
             </button>
           </div>
 
-          {/* ── GIANT OUTDOOR DRIVE-IN SCREEN FRAME ── */}
+          {/* ── PANORAMIC 4-SCREEN CLASSIC MULTIPLEX HORIZON ── */}
           <div
             style={{
               position: 'relative',
               width: '100%',
               maxWidth: 1040,
               aspectRatio: '16 / 9',
-              borderRadius: 6,
+              borderRadius: 8,
               overflow: 'hidden',
               border: '3px solid #1a1a2e',
               boxShadow: `0 0 ${35 + bass * 45}px rgba(0, 229, 255, 0.4), 0 20px 60px rgba(0, 0, 0, 0.95)`,
               marginBottom: 20,
-              backgroundColor: '#000',
+              backgroundColor: '#030308',
             }}
           >
-            {/* Screen Projection Content */}
-            {malibuFlying ? (
-              /* Repo Man Malibu Flying Acceleration Mode */
-              <video
-                src="./assets-bg/drive-in/Malibu_accelerates_into_cosmic_v._202608202035.mp4"
-                autoPlay={videoPlaying}
-                loop
-                muted
-                playsInline
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
-              />
-            ) : screenChannel === 'hey_books' ? (
-              /* Screen 3: Hey Books Storefront Scene */
-              <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
-                <video
-                  src="./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4"
-                  autoPlay={videoPlaying}
-                  loop
-                  muted
-                  playsInline
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    filter: 'contrast(1.15) saturate(1.2)',
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src = "./assets-bg/puppet-man/Puppet_man_walking_past_bookstore_202608202034.mp4";
-                  }}
-                  ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
-                />
-                {/* Store Logo in Background of Video */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 24,
-                    left: 28,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    pointerEvents: 'none',
-                    background: 'rgba(0, 0, 0, 0.45)',
-                    padding: '8px 14px',
-                    borderRadius: 4,
-                    border: '1px solid rgba(251, 146, 60, 0.4)',
-                    boxShadow: '0 0 16px rgba(251, 146, 60, 0.25)',
-                    backdropFilter: 'blur(3px)',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "'Bebas Neue', sans-serif",
-                      fontSize: 'clamp(1.8rem, 3.8vw, 3rem)',
-                      letterSpacing: 6,
-                      color: '#ffedd5',
-                      textShadow: '0 0 14px rgba(251, 146, 60, 0.9), 0 0 25px rgba(234, 88, 12, 0.5), 0 2px 4px rgba(0,0,0,0.9)',
-                      lineHeight: 1,
-                    }}
-                  >
-                    HEY BOOKS
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      letterSpacing: 3,
-                      color: '#fed7aa',
-                      textShadow: '0 1px 3px #000',
-                      fontFamily: "'Space Mono', monospace",
-                      fontWeight: 700,
-                      marginTop: 2,
-                    }}
-                  >
-                    SAN DIEGO · NORTH PARK
-                  </div>
-                </div>
+            {/* Embedded CSS Animations for Starfield, Glyphs, and Grindhouse Scratches */}
+            <style>{`
+              @keyframes star-twinkle {
+                0%, 100% { opacity: 0.2; transform: scale(0.85); }
+                50% { opacity: 0.95; transform: scale(1.3); }
+              }
+              @keyframes orbit-spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+              @keyframes glyph-pulse {
+                0%, 100% { opacity: 0.18; transform: scale(1); }
+                50% { opacity: 0.45; transform: scale(1.08); }
+              }
+              @keyframes molecule-float {
+                0% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-8px) rotate(4deg); }
+                100% { transform: translateY(0px) rotate(0deg); }
+              }
+              @keyframes film-scratch-jitter {
+                0% { transform: translate(0, 0); opacity: 0.7; }
+                20% { transform: translate(-2px, 1px); opacity: 0.9; }
+                40% { transform: translate(3px, -1px); opacity: 0.6; }
+                60% { transform: translate(-1px, 2px); opacity: 0.85; }
+                80% { transform: translate(2px, -2px); opacity: 0.5; }
+                100% { transform: translate(0, 0); opacity: 0.7; }
+              }
+              @keyframes slasher-strobe {
+                0%, 100% { opacity: 0.75; }
+                50% { opacity: 0.3; }
+              }
+              @keyframes censor-wobble {
+                0%, 100% { transform: scale(1) rotate(-1deg); }
+                50% { transform: scale(1.025) rotate(1deg); }
+              }
+            `}</style>
 
-                {/* Subtle Location Caption at Bottom */}
+            {/* 1. Cosmic Starfield & Pulsing Molecular/Wingding Sky Layer */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                zIndex: 1,
+                overflow: 'hidden',
+                background: 'radial-gradient(ellipse at 50% 12%, #0e0d1f 0%, #060714 55%, #020206 100%)',
+              }}
+            >
+              <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+                {/* 65 Twinkling Desert Stars */}
+                {Array.from({ length: 65 }).map((_, i) => {
+                  const cx = (i * 37) % 100;
+                  const cy = (i * 19) % 75;
+                  const r = (i % 3 === 0 ? 1.6 : i % 2 === 0 ? 1.1 : 0.7);
+                  const dur = 2.2 + (i % 5) * 1.1;
+                  const color = i % 4 === 0 ? '#00e5ff' : i % 5 === 0 ? '#fbbf24' : '#ffffff';
+                  return (
+                    <circle
+                      key={`star-${i}`}
+                      cx={`${cx}%`}
+                      cy={`${cy}%`}
+                      r={r}
+                      fill={color}
+                      style={{
+                        animation: `star-twinkle ${dur}s ease-in-out infinite alternate`,
+                        animationDelay: `${(i % 7) * 0.4}s`,
+                      }}
+                    />
+                  );
+                })}
+
+                {/* Pulsing Atomic Orbital Rings (Bohr Model) */}
+                <g transform="translate(140, 75) scale(0.65)" stroke="#00e5ff" fill="none" opacity="0.28">
+                  <circle cx="0" cy="0" r="7" fill="#00e5ff" opacity="0.8" />
+                  <ellipse cx="0" cy="0" rx="70" ry="24" strokeWidth="1.2" strokeDasharray="4 3" style={{ animation: 'orbit-spin 18s linear infinite', transformOrigin: '0 0' }} />
+                  <ellipse cx="0" cy="0" rx="70" ry="24" strokeWidth="1.2" strokeDasharray="4 3" transform="rotate(60)" style={{ animation: 'orbit-spin 14s linear infinite reverse', transformOrigin: '0 0' }} />
+                  <ellipse cx="0" cy="0" rx="70" ry="24" strokeWidth="1.2" strokeDasharray="4 3" transform="rotate(120)" style={{ animation: 'orbit-spin 22s linear infinite', transformOrigin: '0 0' }} />
+                </g>
+
+                {/* Sacred Geometry Vesica Piscis & Otzt Chiim Sephirot */}
+                <g transform="translate(480, 70) scale(0.55)" stroke="#fbbf24" fill="none" opacity="0.25" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>
+                  <circle cx="-35" cy="0" r="50" strokeWidth="1.2" />
+                  <circle cx="35" cy="0" r="50" strokeWidth="1.2" />
+                  <circle cx="0" cy="-55" r="50" strokeWidth="0.8" strokeDasharray="3 3" />
+                  <line x1="-35" y1="0" x2="35" y2="0" strokeWidth="1" />
+                  <line x1="0" y1="-55" x2="0" y2="55" strokeWidth="1" />
+                  <circle cx="0" cy="0" r="4" fill="#fbbf24" />
+                </g>
+
+                {/* Chemical Molecular Benzene Rings */}
+                <g transform="translate(780, 80) scale(0.55)" stroke="#00e5ff" fill="none" opacity="0.24" style={{ animation: 'molecule-float 9s ease-in-out infinite' }}>
+                  <polygon points="0,-36 32,-18 32,18 0,36 -32,18 -32,-18" strokeWidth="1.4" />
+                  <circle cx="0" cy="0" r="22" strokeWidth="1" strokeDasharray="4 2" />
+                  <polygon points="32,18 64,36 64,72 32,90 0,72 0,36" strokeWidth="1.2" />
+                  <line x1="-32" y1="-18" x2="-58" y2="-34" strokeWidth="1.4" />
+                  <text x="-74" y="-32" fill="#00e5ff" fontSize="12" fontFamily="monospace">OH</text>
+                  <text x="74" y="80" fill="#fbbf24" fontSize="12" fontFamily="monospace">CH₃</text>
+                </g>
+
+                {/* Translucent Retro Wingdings & Alchemical Glyphs */}
+                <text x="8%" y="22%" fill="#fbbf24" opacity="0.28" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>♄</text>
+                <text x="24%" y="16%" fill="#00e5ff" opacity="0.25" fontSize="20" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>♃</text>
+                <text x="42%" y="24%" fill="#ff6b00" opacity="0.28" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>🜂</text>
+                <text x="64%" y="18%" fill="#00e5ff" opacity="0.30" fontSize="22" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 9s ease-in-out infinite' }}>☢</text>
+                <text x="82%" y="24%" fill="#fbbf24" opacity="0.28" fontSize="20" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>🜄</text>
+                <text x="94%" y="16%" fill="#39ff14" opacity="0.25" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>☣</text>
+              </svg>
+            </div>
+
+            {/* 2. Panoramic 4-Screen Camera Track (Wide 400% Viewport Container) */}
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                width: '400%',
+                height: '100%',
+                transform: `translateX(-${activeScreenIndex * 25}%)`,
+                transition: 'transform 900ms cubic-bezier(0.22, 1, 0.36, 1)',
+                willChange: 'transform',
+                zIndex: 2,
+              }}
+            >
+              {/* ─── SCREEN 1: MAIN FEATURE // STRANGELET LAB SHOWCASE ─── */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: '#000',
+                  overflow: 'hidden',
+                }}
+              >
+                {malibuFlying ? (
+                  <video
+                    src="./assets-bg/drive-in/Malibu_accelerates_into_cosmic_v._202608202035.mp4"
+                    autoPlay={videoPlaying}
+                    loop
+                    muted
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
+                  />
+                ) : (
+                  <video
+                    src="./assets-bg/drive-in/1964_Chevy_Malibu_parked_drive-in_202608202035.mp4"
+                    autoPlay={videoPlaying}
+                    loop
+                    muted
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
+                  />
+                )}
+
+                {/* Screen 1 Marquee Header */}
                 <div
                   style={{
                     position: 'absolute',
-                    bottom: 18,
-                    left: 28,
+                    top: 14,
+                    left: 20,
+                    right: 20,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 8,
+                    justifyContent: 'space-between',
+                    zIndex: 10,
                     pointerEvents: 'none',
-                    background: 'rgba(0,0,0,0.6)',
-                    padding: '4px 10px',
-                    borderRadius: 3,
                   }}
                 >
-                  <span
+                  <div
                     style={{
-                      fontSize: 9,
-                      fontFamily: "'Space Mono', monospace",
-                      color: '#e4e4e7',
-                      letterSpacing: 1.5,
-                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      background: 'rgba(0,0,0,0.7)',
+                      backdropFilter: 'blur(4px)',
+                      padding: '6px 14px',
+                      borderRadius: 4,
+                      border: '1px solid rgba(255, 107, 0, 0.5)',
+                      boxShadow: '0 0 15px rgba(255, 107, 0, 0.3)',
                     }}
                   >
-                    Scene: Matthew's Bookstore at Night · North Park, CA
-                  </span>
+                    <img 
+                      src="./assets-bg/logos/strangelet-lab-logo.jpg" 
+                      alt="Strangelet Lab Seal" 
+                      style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid #ff6b00', objectFit: 'cover' }} 
+                    />
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9.5, fontWeight: 800, color: '#ff6b00', letterSpacing: 1.5 }}>
+                      SCREEN 1: STRANGELET LAB SHOWCASE
+                    </div>
+                  </div>
+
+                  <a
+                    href="https://github.com/lordgriefo/Strangelet-Lab/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      pointerEvents: 'auto',
+                      background: 'linear-gradient(90deg, #ff6b00, #fbbf24)',
+                      color: '#000',
+                      border: 'none',
+                      borderRadius: 3,
+                      padding: '5px 12px',
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontWeight: 800,
+                      fontSize: 8.5,
+                      letterSpacing: 1,
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 0 14px rgba(255, 107, 0, 0.5)',
+                    }}
+                  >
+                    ⚡ GET LAB v2.5 BETA ↗
+                  </a>
+                </div>
+
+                {/* Screen 1 Lower-Third */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 16,
+                    left: 20,
+                    zIndex: 10,
+                    background: 'rgba(0,0,0,0.65)',
+                    padding: '6px 14px',
+                    borderRadius: 4,
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: "'Syncopate', sans-serif", letterSpacing: 1 }}>
+                    NOW SCREENING:
+                  </div>
+                  <div style={{ fontSize: 13, color: '#fff', fontWeight: 800, fontFamily: "'Bebas Neue', sans-serif", letterSpacing: 2 }}>
+                    QUANTUM COLLIDER & FAUST DSP WORKSTATION
+                  </div>
                 </div>
               </div>
-            ) : screenChannel === 'community_reel' ? (
-              /* Screen 4: Community Reel Showcase */
-              <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
+
+              {/* ─── SCREEN 2: 24/7 INDIE MUSIC VIDEO & KINETO-CUT FESTIVAL ─── */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: '#000',
+                  overflow: 'hidden',
+                }}
+              >
                 <video
                   key={currentCommunityCut.id}
                   src={currentCommunityCut.videoUrl}
@@ -1665,7 +1835,7 @@ export function InterzoneDriveInTheater({
                   ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
                 />
 
-                {/* Community Reel Lower-Third & Top Tag */}
+                {/* Screen 2 Overlay */}
                 <div
                   style={{
                     position: 'absolute',
@@ -1673,7 +1843,7 @@ export function InterzoneDriveInTheater({
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    padding: '20px 28px',
+                    padding: '16px 22px',
                     background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 35%, rgba(0,0,0,0.85) 100%)',
                     pointerEvents: 'none',
                   }}
@@ -1684,21 +1854,22 @@ export function InterzoneDriveInTheater({
                         style={{
                           fontFamily: "'Syncopate', sans-serif",
                           fontSize: 9.5,
-                          letterSpacing: 3,
-                          color: '#c084fc',
+                          letterSpacing: 2.5,
+                          color: '#00e5ff',
                           fontWeight: 700,
-                          textShadow: '0 0 10px #c084fc',
+                          textShadow: '0 0 10px #00e5ff',
                         }}
                       >
-                        📼 COMMUNITY GUEST REEL
+                        📼 SCREEN 2: INDIE MV & KINETO-CUT
                       </span>
                       <span
                         style={{
-                          fontSize: 9,
+                          fontSize: 8.5,
                           color: '#a1a1aa',
                           background: 'rgba(255,255,255,0.1)',
                           padding: '2px 8px',
                           borderRadius: 3,
+                          fontFamily: 'monospace',
                         }}
                       >
                         CUT {communityIndex + 1} OF {communityReelData.length}
@@ -1708,7 +1879,7 @@ export function InterzoneDriveInTheater({
                     <button
                       onClick={() => setShowSubmitModal(true)}
                       style={{
-                        background: 'linear-gradient(90deg, #c084fc, #ff6b00)',
+                        background: 'linear-gradient(90deg, #00e5ff, #c084fc)',
                         color: '#000',
                         border: 'none',
                         borderRadius: 3,
@@ -1725,36 +1896,33 @@ export function InterzoneDriveInTheater({
                   </div>
 
                   <div style={{ pointerEvents: 'auto' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                      <span style={{ fontSize: 10, color: '#39ff14', fontWeight: 700, letterSpacing: 1.5 }}>
-                        NOW SCREENING:
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontSize: 9.5, color: '#39ff14', fontWeight: 700, letterSpacing: 1 }}>
+                        NOW PLAYING:
                       </span>
-                      <span style={{ fontSize: 10, color: '#fbbf24', letterSpacing: 1 }}>
-                        AUDIO: {currentCommunityCut.audioTrack}
+                      <span style={{ fontSize: 9.5, color: '#fbbf24', letterSpacing: 1 }}>
+                        {currentCommunityCut.audioTrack}
                       </span>
                     </div>
                     <h2
                       style={{
                         margin: 0,
                         fontFamily: "'Bebas Neue', sans-serif",
-                        fontSize: 'clamp(1.8rem, 4.5vw, 3.2rem)',
-                        letterSpacing: 6,
+                        fontSize: 'clamp(1.5rem, 3.8vw, 2.6rem)',
+                        letterSpacing: 4,
                         color: '#fff',
-                        textShadow: '0 0 16px rgba(192, 132, 252, 0.9), 0 0 30px #000',
+                        textShadow: '0 0 16px rgba(0, 229, 255, 0.9), 0 0 30px #000',
                         lineHeight: 1,
                       }}
                     >
                       {currentCommunityCut.title}
                     </h2>
-                    <div style={{ fontSize: 11, color: '#c084fc', marginTop: 4, fontWeight: 700 }}>
-                      CHOREOGRAPHED BY: {currentCommunityCut.creator} · PRESET: {currentCommunityCut.preset}
-                    </div>
-                    <div style={{ fontSize: 9.5, color: '#d4d4d8', marginTop: 4, maxWidth: 650 }}>
-                      "{currentCommunityCut.description}"
+                    <div style={{ fontSize: 10, color: '#00e5ff', marginTop: 2, fontWeight: 700 }}>
+                      BY: {currentCommunityCut.creator} · PRESET: {currentCommunityCut.preset}
                     </div>
 
-                    {/* Community Cut Stepper Controls */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                    {/* Stepper Buttons */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                       <button
                         onClick={() =>
                           setCommunityIndex((prev) => (prev - 1 + communityReelData.length) % communityReelData.length)
@@ -1764,38 +1932,238 @@ export function InterzoneDriveInTheater({
                           color: '#fff',
                           border: '1px solid rgba(255,255,255,0.3)',
                           borderRadius: 3,
-                          padding: '3px 10px',
-                          fontSize: 9,
+                          padding: '3px 9px',
+                          fontSize: 8.5,
                           cursor: 'pointer',
                         }}
                       >
-                        ◀ PREV GUEST CUT
+                        ◀ PREV CUT
                       </button>
                       <button
                         onClick={() => setCommunityIndex((prev) => (prev + 1) % communityReelData.length)}
                         style={{
-                          background: '#c084fc',
+                          background: '#00e5ff',
                           color: '#000',
                           border: 'none',
                           borderRadius: 3,
-                          padding: '3px 12px',
-                          fontSize: 9,
+                          padding: '3px 11px',
+                          fontSize: 8.5,
                           fontWeight: 700,
                           cursor: 'pointer',
                         }}
                       >
-                        NEXT GUEST CUT ▶
+                        NEXT CUT ▶
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-            ) : screenChannel === 'ufo_broll' ? (
-              /* Screen 2: 1960s Vegas UFO B-roll footage (Excavating Neverland Archive) */
-              (() => {
-                const currentUfoClip = VEGAS_UFO_BROLL_CLIPS[ufoClipIndex % VEGAS_UFO_BROLL_CLIPS.length];
-                return (
-                  <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#000' }}>
+
+              {/* ─── SCREEN 3: 16MM MIDNIGHT GRINDHOUSE // EXPLOITATION SIGHT GAG ─── */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: '#0a0004',
+                  overflow: 'hidden',
+                }}
+              >
+                <video
+                  src="./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4"
+                  autoPlay={videoPlaying}
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: 'contrast(1.4) saturate(1.4) hue-rotate(330deg)',
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.src = "./assets-bg/puppet-man/Puppet_man_walking_past_bookstore_202608202034.mp4";
+                  }}
+                  ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
+                />
+
+                {/* 16mm Film Scratches & Sprocket Jitter Simulation */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    zIndex: 5,
+                    background: 'repeating-linear-gradient(90deg, transparent, transparent 180px, rgba(255,255,255,0.06) 181px, transparent 183px)',
+                    animation: 'film-scratch-jitter 0.18s steps(2) infinite',
+                    mixBlendMode: 'screen',
+                  }}
+                />
+
+                {/* Dramatic Blood-Red Slasher Vignette Glow */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    zIndex: 6,
+                    background: 'radial-gradient(circle at 50% 50%, rgba(220, 20, 60, 0.15) 0%, rgba(136, 8, 28, 0.6) 80%, rgba(20, 0, 5, 0.95) 100%)',
+                    animation: 'slasher-strobe 4s ease-in-out infinite',
+                    mixBlendMode: 'multiply',
+                  }}
+                />
+
+                {/* ── CHEEKY 16MM GRINDHOUSE CENSOR SIGHT GAG OVERLAY ── */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 12,
+                    pointerEvents: 'none',
+                    width: '90%',
+                    maxWidth: 580,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    animation: 'censor-wobble 2.5s ease-in-out infinite alternate',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'rgba(180, 10, 20, 0.92)',
+                      border: '3px solid #ffdd00',
+                      boxShadow: '0 0 35px rgba(220, 20, 60, 0.9), inset 0 0 15px rgba(0,0,0,0.8)',
+                      padding: '10px 16px',
+                      borderRadius: 4,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontSize: 16 }}>⚠️</span>
+                      <span
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: 'clamp(1.3rem, 2.8vw, 2rem)',
+                          letterSpacing: 4,
+                          color: '#fff',
+                          textShadow: '0 2px 4px #000, 0 0 10px #ffdd00',
+                          lineHeight: 1,
+                        }}
+                      >
+                        RESTRICTED: TOO HOT & TOO GORY FOR TV!
+                      </span>
+                      <span style={{ fontSize: 16 }}>⚠️</span>
+                    </div>
+
+                    <div
+                      style={{
+                        fontFamily: "'Space Mono', monospace",
+                        fontSize: 8.5,
+                        color: '#ffdd00',
+                        fontWeight: 700,
+                        letterSpacing: 2,
+                        textTransform: 'uppercase',
+                        marginTop: 2,
+                      }}
+                    >
+                      THE MANAGEMENT WARNS THOSE WITH WEAK HEARTS: LOOK AWAY NOW!
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 12,
+                        marginTop: 6,
+                        borderTop: '1px solid rgba(255, 221, 0, 0.4)',
+                        paddingTop: 4,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          fontWeight: 800,
+                          backgroundColor: '#000',
+                          color: '#ffdd00',
+                          padding: '2px 6px',
+                          borderRadius: 2,
+                          border: '1px solid #ffdd00',
+                        }}
+                      >
+                        RATED X · UNRATED REEL
+                      </span>
+                      <span style={{ fontSize: 8, color: '#fed7aa', fontFamily: 'monospace' }}>
+                        16MM MIDNIGHT EXPLOITATION TRAILER REEL
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Screen 3 Top Marquee Header */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 14,
+                    left: 20,
+                    right: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    zIndex: 10,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontSize: 9.5,
+                      letterSpacing: 2,
+                      color: '#f43f5e',
+                      fontWeight: 800,
+                      background: 'rgba(0,0,0,0.75)',
+                      padding: '5px 12px',
+                      borderRadius: 3,
+                      border: '1px solid rgba(244, 63, 94, 0.5)',
+                      textShadow: '0 0 10px #f43f5e',
+                    }}
+                  >
+                    SCREEN 3: 16MM MIDNIGHT GRINDHOUSE
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 8.5,
+                      fontFamily: 'monospace',
+                      color: '#ffd',
+                      background: 'rgba(0,0,0,0.6)',
+                      padding: '3px 8px',
+                      borderRadius: 2,
+                    }}
+                  >
+                    SAN DIEGO · NORTH PARK VAULT
+                  </div>
+                </div>
+              </div>
+
+              {/* ─── SCREEN 4: LIVE AUDIO VISUALIZER & DELCO RADIO SIMULCAST ─── */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: '#02020a',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* 1960s Vegas UFO B-Roll in Background */}
+                {(() => {
+                  const currentUfoClip = VEGAS_UFO_BROLL_CLIPS[ufoClipIndex % VEGAS_UFO_BROLL_CLIPS.length];
+                  return (
                     <video
                       key={currentUfoClip.id}
                       src={currentUfoClip.url}
@@ -1804,104 +2172,271 @@ export function InterzoneDriveInTheater({
                       muted
                       playsInline
                       style={{
+                        position: 'absolute',
+                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        filter: 'contrast(1.25) saturate(1.3) sepia(0.15)',
+                        opacity: 0.45,
+                        filter: 'contrast(1.3) saturate(1.2) sepia(0.2)',
                       }}
                       ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
                     />
-                    {/* Screen 2 Lower-Third Overlay */}
-                    <div
+                  );
+                })()}
+
+                {/* Real-time Oscilloscope & Spectrum Visualizer Layer */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 4,
+                    padding: '20px',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {/* Dynamic Audio-Reactive Waveform SVG */}
+                  <svg width="100%" height="110" viewBox="0 0 600 110" style={{ overflow: 'visible' }}>
+                    <defs>
+                      <linearGradient id="spectrum-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.9" />
+                        <stop offset="50%" stopColor="#c084fc" stopOpacity="0.95" />
+                        <stop offset="100%" stopColor="#ff6b00" stopOpacity="0.9" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Frequency Bars reacting to bass & audio */}
+                    {Array.from({ length: 32 }).map((_, i) => {
+                      const barH = 12 + Math.sin(i * 0.4 + (bass * 5)) * 25 + (bass * 35);
+                      const clampedH = Math.max(6, Math.min(85, barH));
+                      const x = 30 + i * 17;
+                      return (
+                        <rect
+                          key={`spec-bar-${i}`}
+                          x={x}
+                          y={55 - clampedH / 2}
+                          width="10"
+                          height={clampedH}
+                          rx="3"
+                          fill="url(#spectrum-grad)"
+                          opacity={0.45 + (i % 3) * 0.2 + (bass * 0.35)}
+                        />
+                      );
+                    })}
+
+                    {/* Center Oscilloscope Beam */}
+                    <path
+                      d={`M 10 55 Q 150 ${55 - bass * 40}, 300 55 T 590 ${55 + bass * 35}`}
+                      fill="none"
+                      stroke="#39ff14"
+                      strokeWidth={isTransient ? 3.5 : 2}
                       style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: '16px 24px',
-                        background: 'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
+                        filter: 'drop-shadow(0 0 10px #39ff14)',
+                        transition: 'stroke-width 0.1s',
+                      }}
+                    />
+                  </svg>
+                </div>
+
+                {/* Screen 4 Header Bar */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 14,
+                    left: 20,
+                    right: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    zIndex: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: 'rgba(0,0,0,0.75)',
+                      padding: '5px 12px',
+                      borderRadius: 3,
+                      border: '1px solid rgba(192, 132, 252, 0.5)',
+                    }}
+                  >
+                    <span style={{ fontSize: 13 }}>📻</span>
+                    <span style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9.5, fontWeight: 800, color: '#c084fc', letterSpacing: 1.5 }}>
+                      SCREEN 4: DELCO RADIO SIMULCAST
+                    </span>
+                    <span style={{ fontSize: 8, padding: '2px 5px', borderRadius: 2, background: '#39ff14', color: '#000', fontWeight: 800 }}>
+                      ON AIR
+                    </span>
+                  </div>
+
+                  {/* UFO Clip Steppers */}
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button
+                      onClick={() =>
+                        setUfoClipIndex((prev) => (prev - 1 + VEGAS_UFO_BROLL_CLIPS.length) % VEGAS_UFO_BROLL_CLIPS.length)
+                      }
+                      style={{
+                        background: 'rgba(255,255,255,0.12)',
+                        color: '#fff',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        borderRadius: 3,
+                        padding: '3px 8px',
+                        fontSize: 8.5,
+                        cursor: 'pointer',
                       }}
                     >
-                      <div>
-                        <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9, color: '#00e5ff', letterSpacing: 2 }}>
-                          🛸 SCREEN 2: 1960s VEGAS UFO B-ROLL ARCHIVE ({ufoClipIndex + 1}/{VEGAS_UFO_BROLL_CLIPS.length})
-                        </div>
-                        <div style={{ fontSize: 13, color: '#fff', fontWeight: 700, marginTop: 2 }}>
-                          {currentUfoClip.title}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button
-                          onClick={() =>
-                            setUfoClipIndex((prev) => (prev - 1 + VEGAS_UFO_BROLL_CLIPS.length) % VEGAS_UFO_BROLL_CLIPS.length)
-                          }
-                          style={{
-                            background: 'rgba(255,255,255,0.12)',
-                            color: '#fff',
-                            border: '1px solid rgba(255,255,255,0.3)',
-                            borderRadius: 3,
-                            padding: '4px 10px',
-                            fontSize: 9,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          ◀ PREV CLIP
-                        </button>
-                        <button
-                          onClick={() => setUfoClipIndex((prev) => (prev + 1) % VEGAS_UFO_BROLL_CLIPS.length)}
-                          style={{
-                            background: '#00e5ff',
-                            color: '#000',
-                            border: 'none',
-                            borderRadius: 3,
-                            padding: '4px 12px',
-                            fontSize: 9,
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          NEXT CLIP ▶
-                        </button>
-                      </div>
+                      ◀ UFO REEL
+                    </button>
+                    <button
+                      onClick={() => setUfoClipIndex((prev) => (prev + 1) % VEGAS_UFO_BROLL_CLIPS.length)}
+                      style={{
+                        background: '#c084fc',
+                        color: '#000',
+                        border: 'none',
+                        borderRadius: 3,
+                        padding: '3px 10px',
+                        fontSize: 8.5,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      NEXT UFO ▶
+                    </button>
+                  </div>
+                </div>
+
+                {/* Screen 4 Bottom Telemetry */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 16,
+                    left: 20,
+                    right: 20,
+                    zIndex: 10,
+                    background: 'rgba(0,0,0,0.8)',
+                    padding: '8px 16px',
+                    borderRadius: 4,
+                    border: '1px solid rgba(192, 132, 252, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 9, color: '#39ff14', fontFamily: 'monospace' }}>
+                      TRANSMITTING AT {activeStation.frequency} • {activeStation.title.toUpperCase()}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>
+                      {currentTrackTitle || 'Interzone Broadcast Signal'}
                     </div>
                   </div>
-                );
-              })()
-            ) : (
-              /* Screen 1: Feature Parked at Drive-In */
-              <video
-                src="./assets-bg/drive-in/1964_Chevy_Malibu_parked_drive-in_202608202035.mp4"
-                autoPlay={videoPlaying}
-                loop
-                muted
-                playsInline
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
-              />
+
+                  <div style={{ fontSize: 9, color: '#c084fc', fontFamily: 'monospace', textAlign: 'right' }}>
+                    DJ: DOC ENOCH · 432Hz OCCULT SONGBOOK
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Floating Edge Pan Buttons (Click to Pan Camera across Horizon) */}
+            {activeScreenIndex > 0 && (
+              <button
+                onClick={() => handleSelectScreen(activeScreenIndex - 1)}
+                style={{
+                  position: 'absolute',
+                  left: 10,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 25,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  border: '1px solid #00e5ff',
+                  color: '#00e5ff',
+                  padding: '8px 12px',
+                  borderRadius: '20px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: 1,
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(0, 229, 255, 0.4)',
+                  backdropFilter: 'blur(4px)',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#00e5ff';
+                  e.currentTarget.style.color = '#000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.75)';
+                  e.currentTarget.style.color = '#00e5ff';
+                }}
+              >
+                ◀ SCREEN {activeScreenIndex}
+              </button>
             )}
 
-            {/* Drive-In Projector Beam & Film Grain Overlay */}
+            {activeScreenIndex < 3 && (
+              <button
+                onClick={() => handleSelectScreen(activeScreenIndex + 1)}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 25,
+                  background: 'rgba(0, 0, 0, 0.75)',
+                  border: '1px solid #ff6b00',
+                  color: '#ff6b00',
+                  padding: '8px 12px',
+                  borderRadius: '20px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  letterSpacing: 1,
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(255, 107, 0, 0.4)',
+                  backdropFilter: 'blur(4px)',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#ff6b00';
+                  e.currentTarget.style.color = '#000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.75)';
+                  e.currentTarget.style.color = '#ff6b00';
+                }}
+              >
+                SCREEN {activeScreenIndex + 2} ▶
+              </button>
+            )}
+
+            {/* 4. Drive-In Projector Beam & Film Grain Overlay */}
             <div
               style={{
                 position: 'absolute',
                 inset: 0,
                 pointerEvents: 'none',
-                background: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.12) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.08) 0%, transparent 70%)',
                 mixBlendMode: 'screen',
+                zIndex: 20,
               }}
             />
 
-            {/* Screen Speaker Box Overlay (Cast Metal Hanging Speaker) */}
+            {/* 5. Screen Speaker Box Overlay (Cast Metal Hanging Speaker) */}
             <div
               style={{
                 position: 'absolute',
                 bottom: 16,
                 right: 20,
-                zIndex: 20,
-                backgroundColor: 'rgba(18, 18, 26, 0.92)',
+                zIndex: 22,
+                backgroundColor: 'rgba(18, 18, 26, 0.94)',
                 padding: '8px 14px',
                 borderRadius: 5,
                 border: '1px solid #71717a',
