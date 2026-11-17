@@ -894,7 +894,11 @@ export function InterzoneDriveInTheater({
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 22 }}>⚡</span>
+                      <img 
+                        src="./assets-bg/logos/strangelet-lab-logo.jpg" 
+                        alt="Strangelet Lab Seal" 
+                        style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #fbbf24', objectFit: 'cover', boxShadow: '0 0 10px rgba(251, 191, 36, 0.45)' }} 
+                      />
                       <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
@@ -1184,7 +1188,11 @@ export function InterzoneDriveInTheater({
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 22 }}>⚡</span>
+                      <img 
+                        src="./assets-bg/logos/strangelet-lab-logo.jpg" 
+                        alt="Strangelet Lab Seal" 
+                        style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #fbbf24', objectFit: 'cover', boxShadow: '0 0 10px rgba(251, 191, 36, 0.45)' }} 
+                      />
                       <span
                         style={{
                           fontSize: 7,
