@@ -51,7 +51,7 @@ export const DEFAULT_PLAYLIST = [
     title: "Wait Till You SEE It — The Magic Static Society",
     url: './assets-bg/wait-till-you-see-it.mp3',
     lrcUrl: './assets-bg/wait-till-you-see-it.lrc',
-    duration: 356,
+    duration: 303,
     storyboardId: 'pl_wait_till_you_see_it',
     preset: {
       selectedStyle: 'timeline',
@@ -67,6 +67,7 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_high_roller',
     title: "High Roller — MonoAtomiX",
     url: './assets-bg/high-roller.mp3',
+    lrcUrl: './assets-bg/high-roller.lrc',
     duration: 210,
     storyboardId: 'pl_high_roller',
     preset: {
@@ -84,6 +85,7 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_babalon_working_blues',
     title: "Babalon Working Blues — 'O' Shibboleth",
     url: './assets-bg/babalon-working-blues.mp3',
+    lrcUrl: './assets-bg/babalon-working-blues.lrc',
     duration: 214,
     storyboardId: 'pl_babalon_working_blues',
     preset: {
@@ -100,6 +102,7 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_thelema_mountain',
     title: "Thelema Mountain — 'O' Shibboleth",
     url: './assets-bg/thelema-mountain.mp3',
+    lrcUrl: './assets-bg/thelema-mountain.lrc',
     duration: 280,
     storyboardId: 'pl_thelema_mountain',
     preset: {
@@ -116,7 +119,8 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_eighth_sphere',
     title: "The Eighth Sphere (Steiner's Moon-Demon Problem) — 'O' Shibboleth",
     url: './assets-bg/eighth-sphere.mp3',
-    duration: 303,
+    lrcUrl: './assets-bg/eighth-sphere.lrc',
+    duration: 329,
     storyboardId: 'pl_eighth_sphere',
     preset: {
       selectedStyle: 'timeline',
@@ -133,6 +137,7 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_radiator',
     title: 'Radiator Hums — The Magic Static Society',
     url: './assets-bg/radiator.mp3',
+    lrcUrl: './assets-bg/radiator.lrc',
     duration: 249,
     storyboardId: 'pl_radiator',
     preset: {

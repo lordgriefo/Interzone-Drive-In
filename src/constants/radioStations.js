@@ -269,7 +269,7 @@ export const INTERZONE_RADIO_STATIONS = [
       { id: 'aasb_12', num: '12', title: 'The Golden Dawn Is Mine', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/12 - The Golden Dawn Is Mine.mp3', duration: 306 },
       { id: 'aasb_13', num: '13', title: 'Sea Priestess', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/13 - Sea Priestess.mp3', duration: 298 },
       { id: 'aasb_14', num: '14', title: 'Chaos Magic (The Permission Slip)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/14 - Chaos Magic (The Permission Slip).mp3', duration: 246 },
-      { id: 'aasb_15', num: '15', title: "The Eighth Sphere (Steiner's Moon-Demon Problem)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/15 - The Eighth Sphere (Steiner's Moon-Demon Problem).mp3", duration: 319 },
+      { id: 'aasb_15', num: '15', title: "The Eighth Sphere (Steiner's Moon-Demon Problem)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/15 - The Eighth Sphere (Steiner's Moon-Demon Problem).mp3", duration: 329 },
       { id: 'aasb_16', num: '16', title: 'Blavatsky & the Mahatmas', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/16 - Blavatsky & the Mahatmas.mp3', duration: 292 },
       { id: 'aasb_17', num: '17', title: 'Eliphas Lévi Invokes Apollonius', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/17 - Eliphas Lévi Invokes Apollonius.mp3', duration: 316 },
       { id: 'aasb_18', num: '18', title: 'The Rosicrucian Manifestos (Nobody Knows Who Wrote Them)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/18 - The Rosicrucian Manifestos (Nobody Knows Who Wrote Them).mp3', duration: 288 },
