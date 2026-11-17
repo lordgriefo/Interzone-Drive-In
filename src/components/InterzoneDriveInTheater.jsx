@@ -97,17 +97,93 @@ export function InterzoneDriveInTheater({
   const [screenChannel, setScreenChannel] = useState('feature');
   // Panoramic 4-Screen Camera Panning: 0 (Feature/Strangelet), 1 (Indie MV/KinetoCut), 2 (Midnight Grindhouse), 3 (Live Visualizer/Radio)
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
-  const [malibuFlying, setMalibuFlying] = useState(false);
-  const [internalVideoPlaying, setInternalVideoPlaying] = useState(true);
+  const [isPanning, setIsPanning] = useState(false);
+  const panTimeoutRef = useRef(null);
+
+  // Cinematic First-Person POV Drive-In Entry sequence (~4.5s single-take camera pan)
+  const [isDrivingIn, setIsDrivingIn] = useState(true);
+  const [driveInPhase, setDriveInPhase] = useState('gate'); // 'gate' -> 'sweep' -> 'parking' -> 'idle'
+  const driveInTimerRef = useRef(null);
+  const driveInPhaseTimerRef = useRef(null);
+
+  // Periodic Collider Sky Flash pulse (~28s cycle)
+  const [colliderFlash, setColliderFlash] = useState(false);
+
+  const startDrivingInSequence = () => {
+    if (driveInTimerRef.current) clearTimeout(driveInTimerRef.current);
+    if (driveInPhaseTimerRef.current) clearTimeout(driveInPhaseTimerRef.current);
+    setIsDrivingIn(true);
+    setDriveInPhase('gate');
+    setIsPanning(true);
+    setActiveScreenIndex(0);
+
+    // 0.0s - 1.5s: Approaching Gate & Welcome Billboard (camera looking left)
+    driveInPhaseTimerRef.current = setTimeout(() => {
+      setDriveInPhase('sweep');
+      // 1.5s - 3.2s: Sweeping across sky, rotating wormholes & 4 screens (passing Screen 3 subliminal flicker)
+      driveInPhaseTimerRef.current = setTimeout(() => {
+        setDriveInPhase('parking');
+        setIsPanning(false);
+        // 3.2s - 4.5s: Rolling forward into Screen 1 stall & parking
+        driveInTimerRef.current = setTimeout(() => {
+          setIsDrivingIn(false);
+          setDriveInPhase('idle');
+        }, 1300);
+      }, 1700);
+    }, 1500);
+  };
+
+  const skipDrivingIn = () => {
+    if (driveInTimerRef.current) clearTimeout(driveInTimerRef.current);
+    if (driveInPhaseTimerRef.current) clearTimeout(driveInPhaseTimerRef.current);
+    setIsDrivingIn(false);
+    setDriveInPhase('idle');
+    setIsPanning(false);
+  };
+
+  useEffect(() => {
+    startDrivingInSequence();
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') skipDrivingIn();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      if (driveInTimerRef.current) clearTimeout(driveInTimerRef.current);
+      if (driveInPhaseTimerRef.current) clearTimeout(driveInPhaseTimerRef.current);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Periodic Collider Sky Flash pulse
+  useEffect(() => {
+    const flashInterval = setInterval(() => {
+      setColliderFlash(true);
+      setTimeout(() => {
+        setColliderFlash(false);
+      }, 1200);
+    }, 28000);
+    return () => clearInterval(flashInterval);
+  }, []);
 
   const handleSelectScreen = (idx) => {
     const clamped = Math.max(0, Math.min(3, idx));
+    if (clamped === activeScreenIndex && !isDrivingIn) return;
+    if (isDrivingIn) skipDrivingIn();
+    setIsPanning(true);
     setActiveScreenIndex(clamped);
     if (clamped === 0) setScreenChannel('feature');
     else if (clamped === 1) setScreenChannel('community_reel');
     else if (clamped === 2) setScreenChannel('hey_books');
     else if (clamped === 3) setScreenChannel('ufo_broll');
+
+    if (panTimeoutRef.current) clearTimeout(panTimeoutRef.current);
+    panTimeoutRef.current = setTimeout(() => {
+      setIsPanning(false);
+    }, 950);
   };
+
+  const [malibuFlying, setMalibuFlying] = useState(false);
+  const [internalVideoPlaying, setInternalVideoPlaying] = useState(true);
 
   useEffect(() => {
     if (screenChannel === 'feature') setActiveScreenIndex(0);
@@ -249,7 +325,7 @@ export function InterzoneDriveInTheater({
                 marginTop: 2,
               }}
             >
-              MOJAVE INTERDIMENSIONAL OUTPOST · EST. 1964
+              STRANGELET, KINETICUT • EST. 1964
             </div>
           </div>
         </div>
@@ -1532,83 +1608,170 @@ export function InterzoneDriveInTheater({
               </button>
             </div>
 
-            {/* Repo Man Flying Malibu Ignition Button */}
-            <button
-              onClick={() => setMalibuFlying((prev) => !prev)}
-              style={{
-                background: malibuFlying
-                  ? 'linear-gradient(90deg, #39ff14, #00e5ff)'
-                  : 'rgba(57, 255, 20, 0.15)',
-                color: malibuFlying ? '#000' : '#39ff14',
-                border: '1px solid #39ff14',
-                borderRadius: 4,
-                padding: '5px 14px',
-                fontFamily: "'Syncopate', sans-serif",
-                fontWeight: 800,
-                fontSize: 9.5,
-                letterSpacing: 1.5,
-                cursor: 'pointer',
-                boxShadow: malibuFlying ? '0 0 25px #39ff14' : 'none',
-                transition: 'all 0.2s',
-              }}
-            >
-              {malibuFlying ? '🚀 MALIBU FLIGHT ACTIVE' : '🛸 IGNITE FLYING MALIBU'}
-            </button>
+            {/* Drive-In Single-Take POV Replay & Flying Malibu Controls */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <button
+                onClick={() => startDrivingInSequence()}
+                style={{
+                  background: isDrivingIn
+                    ? 'linear-gradient(90deg, #ff6b00, #fbbf24)'
+                    : 'rgba(255, 107, 0, 0.15)',
+                  color: isDrivingIn ? '#000' : '#ff6b00',
+                  border: '1px solid #ff6b00',
+                  borderRadius: 4,
+                  padding: '5px 12px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 8.5,
+                  letterSpacing: 1.2,
+                  cursor: 'pointer',
+                  boxShadow: isDrivingIn ? '0 0 20px #ff6b00' : 'none',
+                  transition: 'all 0.2s',
+                }}
+                title="Re-experience the single-take POV car drive into the 4-screen lot (or press ESC to skip)"
+              >
+                🎬 REPLAY DRIVE-IN ENTRY
+              </button>
+
+              <button
+                onClick={() => setMalibuFlying((prev) => !prev)}
+                style={{
+                  background: malibuFlying
+                    ? 'linear-gradient(90deg, #39ff14, #00e5ff)'
+                    : 'rgba(57, 255, 20, 0.15)',
+                  color: malibuFlying ? '#000' : '#39ff14',
+                  border: '1px solid #39ff14',
+                  borderRadius: 4,
+                  padding: '5px 12px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  fontSize: 8.5,
+                  letterSpacing: 1.2,
+                  cursor: 'pointer',
+                  boxShadow: malibuFlying ? '0 0 20px #39ff14' : 'none',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {malibuFlying ? '🚀 MALIBU FLIGHT ACTIVE' : '🛸 IGNITE FLYING MALIBU'}
+              </button>
+            </div>
           </div>
 
-          {/* ── PANORAMIC 4-SCREEN CLASSIC MULTIPLEX HORIZON ── */}
+          {/* ── PANORAMIC 4-SCREEN 3D MULTIPLEX HORIZON & COSMIC SKY ── */}
           <div
+            onClick={isDrivingIn ? skipDrivingIn : undefined}
             style={{
               position: 'relative',
               width: '100%',
-              maxWidth: 1040,
+              maxWidth: 1080,
               aspectRatio: '16 / 9',
               borderRadius: 8,
               overflow: 'hidden',
               border: '3px solid #1a1a2e',
               boxShadow: `0 0 ${35 + bass * 45}px rgba(0, 229, 255, 0.4), 0 20px 60px rgba(0, 0, 0, 0.95)`,
               marginBottom: 20,
-              backgroundColor: '#030308',
+              backgroundColor: '#020206',
+              perspective: 1200,
+              cursor: isDrivingIn ? 'pointer' : 'default',
             }}
           >
-            {/* Embedded CSS Animations for Starfield, Glyphs, and Grindhouse Scratches */}
+            {/* Embedded CSS Animations for Starfield, Wormholes, Glyphs, Cabin Rumble, and Grindhouse Scratches */}
             <style>{`
               @keyframes star-twinkle {
-                0%, 100% { opacity: 0.2; transform: scale(0.85); }
-                50% { opacity: 0.95; transform: scale(1.3); }
+                0%, 100% { opacity: 0.25; transform: scale(0.85); }
+                50% { opacity: 1; transform: scale(1.35); }
               }
               @keyframes orbit-spin {
                 from { transform: rotate(0deg); }
                 to { transform: rotate(360deg); }
               }
               @keyframes glyph-pulse {
-                0%, 100% { opacity: 0.18; transform: scale(1); }
-                50% { opacity: 0.45; transform: scale(1.08); }
+                0%, 100% { opacity: 0.14; transform: scale(1); }
+                50% { opacity: 0.35; transform: scale(1.08); }
               }
               @keyframes molecule-float {
                 0% { transform: translateY(0px) rotate(0deg); }
                 50% { transform: translateY(-8px) rotate(4deg); }
                 100% { transform: translateY(0px) rotate(0deg); }
               }
-              @keyframes film-scratch-jitter {
-                0% { transform: translate(0, 0); opacity: 0.7; }
-                20% { transform: translate(-2px, 1px); opacity: 0.9; }
-                40% { transform: translate(3px, -1px); opacity: 0.6; }
-                60% { transform: translate(-1px, 2px); opacity: 0.85; }
-                80% { transform: translate(2px, -2px); opacity: 0.5; }
-                100% { transform: translate(0, 0); opacity: 0.7; }
+              @keyframes wormhole-spin-slow {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
               }
-              @keyframes slasher-strobe {
-                0%, 100% { opacity: 0.75; }
-                50% { opacity: 0.3; }
+              @keyframes wormhole-spin-reverse {
+                from { transform: rotate(360deg); }
+                to { transform: rotate(0deg); }
+              }
+              @keyframes wormhole-breathe {
+                0%, 100% { transform: scale(1); opacity: 0.82; }
+                50% { transform: scale(1.12); opacity: 1; }
+              }
+              @keyframes collider-sky-flash {
+                0% { opacity: 0; }
+                15% { opacity: 0.95; }
+                100% { opacity: 0; }
+              }
+              @keyframes collider-shockwave {
+                0% { transform: scale(0.05); opacity: 0.9; }
+                100% { transform: scale(3.5); opacity: 0; }
+              }
+              @keyframes meteor-streak-1 {
+                0% { transform: translate(120px, -60px) scale(0); opacity: 0; }
+                3% { transform: translate(0px, 0px) scale(1); opacity: 1; }
+                9% { transform: translate(-220px, 140px) scale(0.6); opacity: 0; }
+                100% { transform: translate(-220px, 140px) scale(0); opacity: 0; }
+              }
+              @keyframes meteor-streak-2 {
+                0% { transform: translate(60px, -40px) scale(0); opacity: 0; }
+                2.5% { transform: translate(0px, 0px) scale(1); opacity: 0.9; }
+                7% { transform: translate(-180px, 100px) scale(0.5); opacity: 0; }
+                100% { transform: translate(-180px, 100px) scale(0); opacity: 0; }
+              }
+              @keyframes aurora-wave {
+                0%, 100% { transform: scaleY(1) translateY(0); opacity: 0.22; }
+                50% { transform: scaleY(1.35) translateY(-12px); opacity: 0.45; }
+              }
+              @keyframes cabin-rumble {
+                0%, 100% { transform: translate(0, 0); }
+                20% { transform: translate(-1.2px, 1.4px) rotate(-0.15deg); }
+                40% { transform: translate(1.4px, -1px) rotate(0.12deg); }
+                60% { transform: translate(-1.8px, 0.6px); }
+                80% { transform: translate(1px, 1.2px); }
+              }
+              @keyframes mirror-sway {
+                0%, 100% { transform: rotate(-2deg); }
+                50% { transform: rotate(2deg); }
+              }
+              @keyframes subliminal-3frame {
+                0%, 33% {
+                  filter: contrast(3.5) saturate(2.5) drop-shadow(0 0 20px #ff0033);
+                }
+                34%, 66% {
+                  filter: invert(1) contrast(4) drop-shadow(0 0 25px #000);
+                }
+                67%, 100% {
+                  filter: sepia(1) hue-rotate(320deg) contrast(3.2) brightness(1.3);
+                }
+              }
+              @keyframes film-scratch-jitter {
+                0% { transform: translate(0, 0); opacity: 0.75; }
+                20% { transform: translate(-3px, 2px); opacity: 0.95; }
+                40% { transform: translate(4px, -2px); opacity: 0.65; }
+                60% { transform: translate(-2px, 3px); opacity: 0.9; }
+                80% { transform: translate(3px, -3px); opacity: 0.6; }
+                100% { transform: translate(0, 0); opacity: 0.75; }
               }
               @keyframes censor-wobble {
-                0%, 100% { transform: scale(1) rotate(-1deg); }
-                50% { transform: scale(1.025) rotate(1deg); }
+                0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(-1.5deg); }
+                50% { transform: translate(-50%, -50%) scale(1.04) rotate(1.5deg); }
+              }
+              @keyframes testcard-scanlines {
+                0% { background-position: 0 0; }
+                100% { background-position: 0 100%; }
               }
             `}</style>
 
-            {/* 1. Cosmic Starfield & Pulsing Molecular/Wingding Sky Layer */}
+            {/* 1. Full-Bleed Cosmic Starfield, Rotating Wormholes & Pulsing Sky Layer */}
             <div
               style={{
                 position: 'absolute',
@@ -1616,16 +1779,223 @@ export function InterzoneDriveInTheater({
                 pointerEvents: 'none',
                 zIndex: 1,
                 overflow: 'hidden',
-                background: 'radial-gradient(ellipse at 50% 12%, #0e0d1f 0%, #060714 55%, #020206 100%)',
+                background: 'radial-gradient(ellipse at 50% 10%, #0d091f 0%, #060512 55%, #020205 100%)',
               }}
             >
+              {/* Aurora Borealis Shimmer Curtain */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '45%',
+                  background: 'linear-gradient(180deg, rgba(0, 229, 255, 0.15) 0%, rgba(192, 132, 252, 0.12) 40%, transparent 100%)',
+                  filter: 'blur(20px)',
+                  animation: 'aurora-wave 12s ease-in-out infinite alternate',
+                }}
+              />
+
+              {/* ── 2-3 ANIMATED CELESTIAL WORMHOLES & LOGARITHMIC SPIRALS ── */}
+              {/* Wormhole 1: Left-Center Cosmic Vortex (Cyan / Violet / Magenta Accretion Disk) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '6%',
+                  left: '20%',
+                  width: 140,
+                  height: 140,
+                  borderRadius: '50%',
+                  pointerEvents: 'none',
+                  animation: 'wormhole-breathe 8s ease-in-out infinite',
+                }}
+              >
+                {/* Rotating Accretion Halo */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: -15,
+                    borderRadius: '50%',
+                    background: 'conic-gradient(from 0deg, rgba(0, 229, 255, 0.85) 0%, rgba(192, 132, 252, 0.9) 35%, rgba(255, 0, 128, 0.8) 70%, rgba(0, 229, 255, 0.85) 100%)',
+                    filter: 'blur(8px)',
+                    animation: 'wormhole-spin-slow 24s linear infinite',
+                    opacity: 0.65,
+                  }}
+                />
+                {/* Logarithmic Spiral SVG Vortex Rings */}
+                <svg
+                  viewBox="0 0 100 100"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    animation: 'wormhole-spin-slow 18s linear infinite',
+                  }}
+                >
+                  <circle cx="50" cy="50" r="46" fill="none" stroke="#00e5ff" strokeWidth="1" strokeDasharray="6 4" opacity="0.7" />
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="#c084fc" strokeWidth="1.2" strokeDasharray="5 3" opacity="0.8" />
+                  <circle cx="50" cy="50" r="26" fill="none" stroke="#ff0055" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.9" />
+                  <circle cx="50" cy="50" r="16" fill="none" stroke="#00e5ff" strokeWidth="1.8" opacity="0.95" />
+                  <ellipse cx="50" cy="50" rx="42" ry="18" fill="none" stroke="#00e5ff" strokeWidth="0.8" strokeDasharray="3 3" transform="rotate(30 50 50)" />
+                  <ellipse cx="50" cy="50" rx="42" ry="18" fill="none" stroke="#c084fc" strokeWidth="0.8" strokeDasharray="3 3" transform="rotate(110 50 50)" />
+                </svg>
+                {/* Central Singularity & Gravitational Lensing Rim */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    width: 32,
+                    height: 32,
+                    transform: 'translate(-50%, -50%)',
+                    borderRadius: '50%',
+                    backgroundColor: '#000',
+                    border: '1.5px solid #00e5ff',
+                    boxShadow: '0 0 20px #00e5ff, inset 0 0 10px rgba(0,0,0,0.95)',
+                  }}
+                />
+              </div>
+
+              {/* Wormhole 2: Upper Right Celestial Vortex (Amber / Gold / Violet Lensing) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8%',
+                  right: '18%',
+                  width: 120,
+                  height: 120,
+                  borderRadius: '50%',
+                  pointerEvents: 'none',
+                  animation: 'wormhole-breathe 10s ease-in-out infinite',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: -12,
+                    borderRadius: '50%',
+                    background: 'conic-gradient(from 180deg, rgba(251, 191, 36, 0.85) 0%, rgba(255, 107, 0, 0.9) 40%, rgba(192, 132, 252, 0.8) 75%, rgba(251, 191, 36, 0.85) 100%)',
+                    filter: 'blur(7px)',
+                    animation: 'wormhole-spin-reverse 32s linear infinite',
+                    opacity: 0.6,
+                  }}
+                />
+                <svg
+                  viewBox="0 0 100 100"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    animation: 'wormhole-spin-reverse 22s linear infinite',
+                  }}
+                >
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="6 3" opacity="0.75" />
+                  <circle cx="50" cy="50" r="32" fill="none" stroke="#ff6b00" strokeWidth="1.2" strokeDasharray="4 3" opacity="0.8" />
+                  <circle cx="50" cy="50" r="18" fill="none" stroke="#fbbf24" strokeWidth="1.6" opacity="0.9" />
+                  <ellipse cx="50" cy="50" rx="38" ry="14" fill="none" stroke="#fbbf24" strokeWidth="0.8" transform="rotate(45 50 50)" />
+                </svg>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    width: 26,
+                    height: 26,
+                    transform: 'translate(-50%, -50%)',
+                    borderRadius: '50%',
+                    backgroundColor: '#000',
+                    border: '1.5px solid #fbbf24',
+                    boxShadow: '0 0 18px #fbbf24, inset 0 0 10px rgba(0,0,0,0.95)',
+                  }}
+                />
+              </div>
+
+              {/* Wormhole 3: Distant Horizon Micro-Rift (Deep Center Sky) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '14%',
+                  left: '52%',
+                  width: 50,
+                  height: 50,
+                  borderRadius: '50%',
+                  border: '1px dashed rgba(0, 229, 255, 0.5)',
+                  boxShadow: '0 0 15px rgba(0, 229, 255, 0.4)',
+                  animation: 'wormhole-spin-slow 40s linear infinite',
+                  opacity: 0.5,
+                }}
+              />
+
+              {/* ── SHOOTING STARS / METEOR STREAKS ── */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '12%',
+                  right: '25%',
+                  width: 140,
+                  height: 2,
+                  background: 'linear-gradient(90deg, #fff, #00e5ff, transparent)',
+                  borderRadius: 2,
+                  boxShadow: '0 0 8px #00e5ff',
+                  transform: 'rotate(-32deg)',
+                  animation: 'meteor-streak-1 9s ease-in infinite',
+                  pointerEvents: 'none',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '18%',
+                  left: '30%',
+                  width: 110,
+                  height: 2,
+                  background: 'linear-gradient(90deg, #fff, #fbbf24, transparent)',
+                  borderRadius: 2,
+                  boxShadow: '0 0 8px #fbbf24',
+                  transform: 'rotate(-28deg)',
+                  animation: 'meteor-streak-2 14s ease-in infinite 4s',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* ── PERIODIC COLLIDER SKY FLASH & SHOCKWAVE ── */}
+              {colliderFlash && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    background: 'radial-gradient(circle at 25% 15%, rgba(0, 229, 255, 0.75) 0%, rgba(255, 255, 255, 0.6) 20%, rgba(192, 132, 252, 0.3) 60%, transparent 100%)',
+                    animation: 'collider-sky-flash 1.2s ease-out forwards',
+                    zIndex: 2,
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '10%',
+                      left: '25%',
+                      width: 120,
+                      height: 120,
+                      borderRadius: '50%',
+                      border: '3px solid #00e5ff',
+                      boxShadow: '0 0 35px #00e5ff',
+                      animation: 'collider-shockwave 1.2s ease-out forwards',
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* ── TWINKLING STARFIELD & 18 PULSING MOLECULAR/WINGDING GLYPHS ── */}
               <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-                {/* 65 Twinkling Desert Stars */}
-                {Array.from({ length: 65 }).map((_, i) => {
-                  const cx = (i * 37) % 100;
-                  const cy = (i * 19) % 75;
+                {/* 85 Twinkling Desert Stars */}
+                {Array.from({ length: 85 }).map((_, i) => {
+                  const cx = (i * 37 + 13) % 100;
+                  const cy = (i * 19 + 7) % 72;
                   const r = (i % 3 === 0 ? 1.6 : i % 2 === 0 ? 1.1 : 0.7);
-                  const dur = 2.2 + (i % 5) * 1.1;
+                  const dur = 2.0 + (i % 5) * 1.0;
                   const color = i % 4 === 0 ? '#00e5ff' : i % 5 === 0 ? '#fbbf24' : '#ffffff';
                   return (
                     <circle
@@ -1642,16 +2012,16 @@ export function InterzoneDriveInTheater({
                   );
                 })}
 
-                {/* Pulsing Atomic Orbital Rings (Bohr Model) */}
-                <g transform="translate(140, 75) scale(0.65)" stroke="#00e5ff" fill="none" opacity="0.28">
-                  <circle cx="0" cy="0" r="7" fill="#00e5ff" opacity="0.8" />
-                  <ellipse cx="0" cy="0" rx="70" ry="24" strokeWidth="1.2" strokeDasharray="4 3" style={{ animation: 'orbit-spin 18s linear infinite', transformOrigin: '0 0' }} />
-                  <ellipse cx="0" cy="0" rx="70" ry="24" strokeWidth="1.2" strokeDasharray="4 3" transform="rotate(60)" style={{ animation: 'orbit-spin 14s linear infinite reverse', transformOrigin: '0 0' }} />
-                  <ellipse cx="0" cy="0" rx="70" ry="24" strokeWidth="1.2" strokeDasharray="4 3" transform="rotate(120)" style={{ animation: 'orbit-spin 22s linear infinite', transformOrigin: '0 0' }} />
+                {/* 1. Bohr Atomic Orbital Rings (Cyan) */}
+                <g transform="translate(130, 65) scale(0.6)" stroke="#00e5ff" fill="none" opacity="0.28">
+                  <circle cx="0" cy="0" r="7" fill="#00e5ff" opacity="0.85" />
+                  <ellipse cx="0" cy="0" rx="72" ry="24" strokeWidth="1.2" strokeDasharray="4 3" style={{ animation: 'orbit-spin 18s linear infinite', transformOrigin: '0 0' }} />
+                  <ellipse cx="0" cy="0" rx="72" ry="24" strokeWidth="1.2" strokeDasharray="4 3" transform="rotate(60)" style={{ animation: 'orbit-spin 14s linear infinite reverse', transformOrigin: '0 0' }} />
+                  <ellipse cx="0" cy="0" rx="72" ry="24" strokeWidth="1.2" strokeDasharray="4 3" transform="rotate(120)" style={{ animation: 'orbit-spin 22s linear infinite', transformOrigin: '0 0' }} />
                 </g>
 
-                {/* Sacred Geometry Vesica Piscis & Otzt Chiim Sephirot */}
-                <g transform="translate(480, 70) scale(0.55)" stroke="#fbbf24" fill="none" opacity="0.25" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>
+                {/* 2. Vesica Piscis & Otz Chiim Sephirot Mandorla (Gold) */}
+                <g transform="translate(390, 60) scale(0.5)" stroke="#fbbf24" fill="none" opacity="0.25" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>
                   <circle cx="-35" cy="0" r="50" strokeWidth="1.2" />
                   <circle cx="35" cy="0" r="50" strokeWidth="1.2" />
                   <circle cx="0" cy="-55" r="50" strokeWidth="0.8" strokeDasharray="3 3" />
@@ -1660,8 +2030,8 @@ export function InterzoneDriveInTheater({
                   <circle cx="0" cy="0" r="4" fill="#fbbf24" />
                 </g>
 
-                {/* Chemical Molecular Benzene Rings */}
-                <g transform="translate(780, 80) scale(0.55)" stroke="#00e5ff" fill="none" opacity="0.24" style={{ animation: 'molecule-float 9s ease-in-out infinite' }}>
+                {/* 3. Benzene Aromatic Ring (Cyan) */}
+                <g transform="translate(620, 65) scale(0.5)" stroke="#00e5ff" fill="none" opacity="0.24" style={{ animation: 'molecule-float 9s ease-in-out infinite' }}>
                   <polygon points="0,-36 32,-18 32,18 0,36 -32,18 -32,-18" strokeWidth="1.4" />
                   <circle cx="0" cy="0" r="22" strokeWidth="1" strokeDasharray="4 2" />
                   <polygon points="32,18 64,36 64,72 32,90 0,72 0,36" strokeWidth="1.2" />
@@ -1670,27 +2040,157 @@ export function InterzoneDriveInTheater({
                   <text x="74" y="80" fill="#fbbf24" fontSize="12" fontFamily="monospace">CH₃</text>
                 </g>
 
-                {/* Translucent Retro Wingdings & Alchemical Glyphs */}
-                <text x="8%" y="22%" fill="#fbbf24" opacity="0.28" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>♄</text>
-                <text x="24%" y="16%" fill="#00e5ff" opacity="0.25" fontSize="20" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>♃</text>
-                <text x="42%" y="24%" fill="#ff6b00" opacity="0.28" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>🜂</text>
-                <text x="64%" y="18%" fill="#00e5ff" opacity="0.30" fontSize="22" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 9s ease-in-out infinite' }}>☢</text>
-                <text x="82%" y="24%" fill="#fbbf24" opacity="0.28" fontSize="20" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>🜄</text>
-                <text x="94%" y="16%" fill="#39ff14" opacity="0.25" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>☣</text>
+                {/* 4. Naphthalene Double Aromatic Ring (Emerald) */}
+                <g transform="translate(850, 70) scale(0.45)" stroke="#39ff14" fill="none" opacity="0.22" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>
+                  <polygon points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15" strokeWidth="1.3" />
+                  <polygon points="26,-15 52,-30 78,-15 78,15 52,30 26,15" strokeWidth="1.3" />
+                  <circle cx="0" cy="0" r="16" strokeWidth="0.9" strokeDasharray="3 2" />
+                  <circle cx="52" cy="0" r="16" strokeWidth="0.9" strokeDasharray="3 2" />
+                </g>
+
+                {/* 5. Alchemical Fire Triangle (Orange) */}
+                <g transform="translate(290, 80) scale(0.45)" stroke="#ff6b00" fill="none" opacity="0.26" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>
+                  <polygon points="0,-40 35,25 -35,25" strokeWidth="1.6" />
+                  <circle cx="0" cy="-5" r="4" fill="#ff6b00" />
+                </g>
+
+                {/* 6. Alchemical Water Triangle (Cyan) */}
+                <g transform="translate(720, 85) scale(0.45)" stroke="#00e5ff" fill="none" opacity="0.26" style={{ animation: 'glyph-pulse 7.5s ease-in-out infinite' }}>
+                  <polygon points="0,40 35,-25 -35,-25" strokeWidth="1.6" />
+                  <circle cx="0" cy="5" r="4" fill="#00e5ff" />
+                </g>
+
+                {/* 7. Alchemical Air Triangle with Crossbar (Cyan) */}
+                <g transform="translate(980, 75) scale(0.4)" stroke="#00e5ff" fill="none" opacity="0.24">
+                  <polygon points="0,-40 35,25 -35,25" strokeWidth="1.5" />
+                  <line x1="-22" y1="-5" x2="22" y2="-5" strokeWidth="1.5" />
+                </g>
+
+                {/* 8. Alchemical Earth Triangle with Crossbar (Gold) */}
+                <g transform="translate(50, 85) scale(0.4)" stroke="#fbbf24" fill="none" opacity="0.25">
+                  <polygon points="0,40 35,-25 -35,-25" strokeWidth="1.5" />
+                  <line x1="-22" y1="5" x2="22" y2="5" strokeWidth="1.5" />
+                </g>
+
+                {/* 9–18. Translucent Retro Wingdings & Esoteric Glyphs */}
+                <text x="6%" y="22%" fill="#fbbf24" opacity="0.26" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>♄</text>
+                <text x="18%" y="15%" fill="#00e5ff" opacity="0.25" fontSize="20" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>♃</text>
+                <text x="34%" y="22%" fill="#ff6b00" opacity="0.28" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>🜂</text>
+                <text x="47%" y="16%" fill="#00e5ff" opacity="0.28" fontSize="22" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 9s ease-in-out infinite' }}>☢</text>
+                <text x="68%" y="24%" fill="#fbbf24" opacity="0.26" fontSize="20" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6s ease-in-out infinite' }}>🜄</text>
+                <text x="82%" y="16%" fill="#39ff14" opacity="0.25" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8s ease-in-out infinite' }}>☣</text>
+                <text x="91%" y="24%" fill="#fbbf24" opacity="0.27" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 7s ease-in-out infinite' }}>☉</text>
+                <text x="41%" y="25%" fill="#c084fc" opacity="0.25" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 9s ease-in-out infinite' }}>☽</text>
+                <text x="56%" y="20%" fill="#00e5ff" opacity="0.26" fontSize="17" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 6.5s ease-in-out infinite' }}>🜁</text>
+                <text x="76%" y="21%" fill="#c084fc" opacity="0.25" fontSize="18" fontFamily="'Cinzel', serif" style={{ animation: 'glyph-pulse 8.5s ease-in-out infinite' }}>☿</text>
               </svg>
             </div>
 
-            {/* 2. Panoramic 4-Screen Camera Track (Wide 400% Viewport Container) */}
+            {/* 2. Mojave Desert Ground Plane with Perspective Tire Tracks (3D Depth) */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: '-15%',
+                width: '130%',
+                height: '42%',
+                background: 'linear-gradient(180deg, rgba(6,5,12,0.98) 0%, #0a0815 35%, #151120 70%, #07060d 100%)',
+                zIndex: 2,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Perspective Tire Tracks leading to the 4 Screens */}
+              <svg width="100%" height="100%" preserveAspectRatio="none">
+                <line x1="20%" y1="100%" x2="28%" y2="0" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
+                <line x1="24%" y1="100%" x2="30%" y2="0" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
+                <line x1="42%" y1="100%" x2="48%" y2="0" stroke="rgba(0,229,255,0.08)" strokeWidth="3" />
+                <line x1="46%" y1="100%" x2="50%" y2="0" stroke="rgba(0,229,255,0.08)" strokeWidth="3" />
+                <line x1="68%" y1="100%" x2="68%" y2="0" stroke="rgba(255,107,0,0.07)" strokeWidth="2.5" />
+                <line x1="72%" y1="100%" x2="70%" y2="0" stroke="rgba(255,107,0,0.07)" strokeWidth="2.5" />
+                <line x1="88%" y1="100%" x2="84%" y2="0" stroke="rgba(192,132,252,0.08)" strokeWidth="2.5" />
+                <line x1="92%" y1="100%" x2="86%" y2="0" stroke="rgba(192,132,252,0.08)" strokeWidth="2.5" />
+              </svg>
+            </div>
+
+            {/* 3. ROADSIDE ILLUMINATED BILLBOARD SIGN (Visible during "gate" entry phase) */}
+            {isDrivingIn && driveInPhase === 'gate' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '18%',
+                  left: '6%',
+                  zIndex: 8,
+                  pointerEvents: 'none',
+                  animation: 'fadeIn 0.5s ease',
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: 'rgba(8, 8, 16, 0.95)',
+                    border: '3px solid #ff6b00',
+                    borderRadius: 6,
+                    padding: '12px 18px',
+                    boxShadow: '0 0 35px rgba(255, 107, 0, 0.8), inset 0 0 15px rgba(0,0,0,0.9)',
+                    textAlign: 'center',
+                    maxWidth: 320,
+                  }}
+                >
+                  <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 8, color: '#39ff14', letterSpacing: 2, fontWeight: 700 }}>
+                    ★ MOJAVE BORDER CROSSING ★
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      fontSize: 26,
+                      color: '#fff',
+                      letterSpacing: 3,
+                      textShadow: '0 0 15px rgba(255, 107, 0, 0.9)',
+                      lineHeight: 1.1,
+                      margin: '4px 0',
+                    }}
+                  >
+                    WELCOME TO STRANGELET, KINETICUT
+                  </div>
+                  <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9, color: '#fbbf24', letterSpacing: 1.5, fontWeight: 800 }}>
+                    POPULATION: ???
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      paddingTop: 6,
+                      borderTop: '1px dashed rgba(255, 255, 255, 0.2)',
+                      fontSize: 8.5,
+                      color: '#00e5ff',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    INTERZONE DRIVE-IN • 4 SCREENS UNDER THE STARS<br />
+                    ADMISSION $1.50 • GHOSTS & GUESTS ENTER FREE
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. Panoramic 4-Screen Camera Track (Smooth 3D Perspective Panning) */}
             <div
               style={{
                 position: 'relative',
                 display: 'flex',
                 width: '400%',
                 height: '100%',
-                transform: `translateX(-${activeScreenIndex * 25}%)`,
-                transition: 'transform 900ms cubic-bezier(0.22, 1, 0.36, 1)',
+                transform: isDrivingIn
+                  ? driveInPhase === 'gate'
+                    ? 'perspective(1200px) rotateY(24deg) rotateX(3deg) scale(0.85) translateZ(-460px) translateX(240px)'
+                    : driveInPhase === 'sweep'
+                    ? 'perspective(1200px) rotateY(-10deg) rotateX(1deg) scale(0.92) translateZ(-160px) translateX(-80px)'
+                    : 'perspective(1200px) rotateY(0deg) rotateX(0deg) scale(1) translateZ(0px) translateX(0px)'
+                  : `translateX(-${activeScreenIndex * 25}%)`,
+                transition: isDrivingIn
+                  ? 'transform 1.4s cubic-bezier(0.16, 1, 0.3, 1)'
+                  : 'transform 950ms cubic-bezier(0.22, 1, 0.36, 1)',
                 willChange: 'transform',
-                zIndex: 2,
+                zIndex: 3,
               }}
             >
               {/* ─── SCREEN 1: MAIN FEATURE // STRANGELET LAB SHOWCASE ─── */}
@@ -1959,7 +2459,7 @@ export function InterzoneDriveInTheater({
                 </div>
               </div>
 
-              {/* ─── SCREEN 3: 16MM MIDNIGHT GRINDHOUSE // EXPLOITATION SIGHT GAG ─── */}
+              {/* ─── SCREEN 3: SUBLIMINAL PERIPHERAL FLASH (PANNING) VS. VINTAGE TEST CARD (SETTLED) ─── */}
               <div
                 style={{
                   position: 'relative',
@@ -1969,185 +2469,192 @@ export function InterzoneDriveInTheater({
                   overflow: 'hidden',
                 }}
               >
-                <video
-                  src="./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4"
-                  autoPlay={videoPlaying}
-                  loop
-                  muted
-                  playsInline
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    filter: 'contrast(1.4) saturate(1.4) hue-rotate(330deg)',
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src = "./assets-bg/puppet-man/Puppet_man_walking_past_bookstore_202608202034.mp4";
-                  }}
-                  ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
-                />
-
-                {/* 16mm Film Scratches & Sprocket Jitter Simulation */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    pointerEvents: 'none',
-                    zIndex: 5,
-                    background: 'repeating-linear-gradient(90deg, transparent, transparent 180px, rgba(255,255,255,0.06) 181px, transparent 183px)',
-                    animation: 'film-scratch-jitter 0.18s steps(2) infinite',
-                    mixBlendMode: 'screen',
-                  }}
-                />
-
-                {/* Dramatic Blood-Red Slasher Vignette Glow */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    pointerEvents: 'none',
-                    zIndex: 6,
-                    background: 'radial-gradient(circle at 50% 50%, rgba(220, 20, 60, 0.15) 0%, rgba(136, 8, 28, 0.6) 80%, rgba(20, 0, 5, 0.95) 100%)',
-                    animation: 'slasher-strobe 4s ease-in-out infinite',
-                    mixBlendMode: 'multiply',
-                  }}
-                />
-
-                {/* ── CHEEKY 16MM GRINDHOUSE CENSOR SIGHT GAG OVERLAY ── */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 12,
-                    pointerEvents: 'none',
-                    width: '90%',
-                    maxWidth: 580,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    animation: 'censor-wobble 2.5s ease-in-out infinite alternate',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '100%',
-                      backgroundColor: 'rgba(180, 10, 20, 0.92)',
-                      border: '3px solid #ffdd00',
-                      boxShadow: '0 0 35px rgba(220, 20, 60, 0.9), inset 0 0 15px rgba(0,0,0,0.8)',
-                      padding: '10px 16px',
-                      borderRadius: 4,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 2 }}>
-                      <span style={{ fontSize: 16 }}>⚠️</span>
-                      <span
-                        style={{
-                          fontFamily: "'Bebas Neue', sans-serif",
-                          fontSize: 'clamp(1.3rem, 2.8vw, 2rem)',
-                          letterSpacing: 4,
-                          color: '#fff',
-                          textShadow: '0 2px 4px #000, 0 0 10px #ffdd00',
-                          lineHeight: 1,
-                        }}
-                      >
-                        RESTRICTED: TOO HOT & TOO GORY FOR TV!
-                      </span>
-                      <span style={{ fontSize: 16 }}>⚠️</span>
-                    </div>
-
-                    <div
+                {isPanning ? (
+                  /* ── TRIGGERED ONLY DURING ACTIVE CAMERA PAN: RAPID 3-FRAME 16MM SLASHER/CENSOR FLASH ── */
+                  <div style={{ position: 'absolute', inset: 0, animation: 'subliminal-3frame 0.25s steps(1) infinite' }}>
+                    <video
+                      src="./assets-bg/puppet-man/Bookstore_window_at_night_202608202035.mp4"
+                      autoPlay={videoPlaying}
+                      loop
+                      muted
+                      playsInline
                       style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: 8.5,
-                        color: '#ffdd00',
-                        fontWeight: 700,
-                        letterSpacing: 2,
-                        textTransform: 'uppercase',
-                        marginTop: 2,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        filter: 'contrast(2.2) saturate(2.4) hue-rotate(330deg) blur(0.5px)',
                       }}
-                    >
-                      THE MANAGEMENT WARNS THOSE WITH WEAK HEARTS: LOOK AWAY NOW!
-                    </div>
+                      onError={(e) => {
+                        e.currentTarget.src = "./assets-bg/puppet-man/Puppet_man_walking_past_bookstore_202608202034.mp4";
+                      }}
+                      ref={(el) => { if (el) { if (videoPlaying && el.paused) el.play().catch(()=>{}); else if (!videoPlaying && !el.paused) el.pause(); } }}
+                    />
 
+                    {/* 16mm Film Scratches & Sprocket Jitter Simulation */}
                     <div
                       style={{
+                        position: 'absolute',
+                        inset: 0,
+                        pointerEvents: 'none',
+                        zIndex: 5,
+                        background: 'repeating-linear-gradient(90deg, transparent, transparent 140px, rgba(255,255,255,0.18) 141px, transparent 143px)',
+                        animation: 'film-scratch-jitter 0.15s steps(2) infinite',
+                        mixBlendMode: 'screen',
+                      }}
+                    />
+
+                    {/* Dramatic Blood-Red Slasher Splatter Vignette */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        pointerEvents: 'none',
+                        zIndex: 6,
+                        background: 'radial-gradient(circle at 50% 50%, rgba(255, 0, 50, 0.4) 0%, rgba(180, 0, 30, 0.85) 75%, rgba(40, 0, 10, 0.98) 100%)',
+                        mixBlendMode: 'multiply',
+                      }}
+                    />
+
+                    {/* Subliminal Peripheral Restricted Censor Card Flash */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 12,
+                        pointerEvents: 'none',
+                        width: '88%',
+                        maxWidth: 540,
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: 12,
-                        marginTop: 6,
-                        borderTop: '1px solid rgba(255, 221, 0, 0.4)',
-                        paddingTop: 4,
+                        animation: 'censor-wobble 0.25s steps(2) infinite',
                       }}
                     >
-                      <span
+                      <div
                         style={{
-                          fontSize: 7.5,
-                          fontFamily: "'Syncopate', sans-serif",
-                          fontWeight: 800,
-                          backgroundColor: '#000',
-                          color: '#ffdd00',
-                          padding: '2px 6px',
-                          borderRadius: 2,
-                          border: '1px solid #ffdd00',
+                          width: '100%',
+                          backgroundColor: 'rgba(210, 10, 20, 0.95)',
+                          border: '3px solid #ffdd00',
+                          boxShadow: '0 0 40px rgba(255, 0, 50, 0.95), inset 0 0 20px #000',
+                          padding: '10px 16px',
+                          borderRadius: 4,
+                          textAlign: 'center',
                         }}
                       >
-                        RATED X · UNRATED REEL
-                      </span>
-                      <span style={{ fontSize: 8, color: '#fed7aa', fontFamily: 'monospace' }}>
-                        16MM MIDNIGHT EXPLOITATION TRAILER REEL
-                      </span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 18 }}>⚠️</span>
+                          <span
+                            style={{
+                              fontFamily: "'Bebas Neue', sans-serif",
+                              fontSize: 'clamp(1.4rem, 3vw, 2.2rem)',
+                              letterSpacing: 4,
+                              color: '#fff',
+                              textShadow: '0 2px 4px #000, 0 0 12px #ffdd00',
+                              lineHeight: 1,
+                            }}
+                          >
+                            RESTRICTED: TOO HOT & TOO GORY FOR TV!
+                          </span>
+                          <span style={{ fontSize: 18 }}>⚠️</span>
+                        </div>
+                        <div
+                          style={{
+                            fontFamily: "'Syncopate', sans-serif",
+                            fontSize: 8.5,
+                            color: '#ffdd00',
+                            letterSpacing: 2,
+                            fontWeight: 800,
+                            marginTop: 4,
+                          }}
+                        >
+                          X-RATED PERIPHERAL FLASH · INTERZONE ARCHIVE
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  /* ── DEADPAN INNOCENT VINTAGE "PLEASE STAND BY" TEST CARD (WHEN CAMERA IS SETTLED) ── */
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundColor: '#111218',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 20,
+                      boxShadow: 'inset 0 0 40px rgba(0,0,0,0.95)',
+                    }}
+                  >
+                    {/* Vintage CRT Scanlines Overlay */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        pointerEvents: 'none',
+                        background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0px, rgba(0,0,0,0.35) 2px, transparent 2px, transparent 4px)',
+                        zIndex: 5,
+                      }}
+                    />
 
-                {/* Screen 3 Top Marquee Header */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 14,
-                    left: 20,
-                    right: 20,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    zIndex: 10,
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "'Syncopate', sans-serif",
-                      fontSize: 9.5,
-                      letterSpacing: 2,
-                      color: '#f43f5e',
-                      fontWeight: 800,
-                      background: 'rgba(0,0,0,0.75)',
-                      padding: '5px 12px',
-                      borderRadius: 3,
-                      border: '1px solid rgba(244, 63, 94, 0.5)',
-                      textShadow: '0 0 10px #f43f5e',
-                    }}
-                  >
-                    SCREEN 3: 16MM MIDNIGHT GRINDHOUSE
+                    {/* Concentric Test Pattern SVG Target */}
+                    <svg width="120" height="120" viewBox="0 0 100 100" style={{ opacity: 0.35, marginBottom: 12 }}>
+                      <circle cx="50" cy="50" r="46" fill="none" stroke="#fff" strokeWidth="1.5" />
+                      <circle cx="50" cy="50" r="34" fill="none" stroke="#fff" strokeWidth="1" strokeDasharray="3 3" />
+                      <circle cx="50" cy="50" r="20" fill="none" stroke="#fff" strokeWidth="1.2" />
+                      <line x1="50" y1="0" x2="50" y2="100" stroke="#fff" strokeWidth="1" />
+                      <line x1="0" y1="50" x2="100" y2="50" stroke="#fff" strokeWidth="1" />
+                    </svg>
+
+                    <div
+                      style={{
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        fontSize: 'clamp(2rem, 4.5vw, 3.4rem)',
+                        letterSpacing: 6,
+                        color: '#f4f4f5',
+                        textShadow: '0 0 14px rgba(255, 255, 255, 0.4), 0 2px 4px #000',
+                        lineHeight: 1,
+                        marginBottom: 6,
+                        zIndex: 6,
+                      }}
+                    >
+                      PLEASE STAND BY
+                    </div>
+
+                    <div
+                      style={{
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontSize: 9.5,
+                        color: '#fbbf24',
+                        letterSpacing: 2,
+                        fontWeight: 800,
+                        marginBottom: 10,
+                        zIndex: 6,
+                      }}
+                    >
+                      TEMPORARY TECHNICAL DIFFICULTIES
+                    </div>
+
+                    <div
+                      style={{
+                        fontFamily: 'monospace',
+                        fontSize: 9,
+                        color: '#a1a1aa',
+                        textAlign: 'center',
+                        maxWidth: 420,
+                        lineHeight: 1.5,
+                        zIndex: 6,
+                      }}
+                    >
+                      TRANSMISSION TEMPORARILY INTERRUPTED • PLEASE DO NOT ADJUST YOUR RECEIVER<br />
+                      STRANGELET BROADCAST SYSTEM · KINETICUT CHANNEL 3
+                    </div>
                   </div>
-                  <div
-                    style={{
-                      fontSize: 8.5,
-                      fontFamily: 'monospace',
-                      color: '#ffd',
-                      background: 'rgba(0,0,0,0.6)',
-                      padding: '3px 8px',
-                      borderRadius: 2,
-                    }}
-                  >
-                    SAN DIEGO · NORTH PARK VAULT
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* ─── SCREEN 4: LIVE AUDIO VISUALIZER & DELCO RADIO SIMULCAST ─── */}
@@ -2344,8 +2851,8 @@ export function InterzoneDriveInTheater({
               </div>
             </div>
 
-            {/* 3. Floating Edge Pan Buttons (Click to Pan Camera across Horizon) */}
-            {activeScreenIndex > 0 && (
+            {/* 5. Floating Edge Pan Buttons (Click to Pan Camera across Horizon) */}
+            {activeScreenIndex > 0 && !isDrivingIn && (
               <button
                 onClick={() => handleSelectScreen(activeScreenIndex - 1)}
                 style={{
@@ -2381,7 +2888,7 @@ export function InterzoneDriveInTheater({
               </button>
             )}
 
-            {activeScreenIndex < 3 && (
+            {activeScreenIndex < 3 && !isDrivingIn && (
               <button
                 onClick={() => handleSelectScreen(activeScreenIndex + 1)}
                 style={{
@@ -2417,7 +2924,7 @@ export function InterzoneDriveInTheater({
               </button>
             )}
 
-            {/* 4. Drive-In Projector Beam & Film Grain Overlay */}
+            {/* 6. Drive-In Projector Beam Overlay */}
             <div
               style={{
                 position: 'absolute',
@@ -2429,13 +2936,133 @@ export function InterzoneDriveInTheater({
               }}
             />
 
-            {/* 5. Screen Speaker Box Overlay (Cast Metal Hanging Speaker) */}
+            {/* 7. FIRST-PERSON 1964 CHEVY MALIBU CABIN FRAMING OVERLAY */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                zIndex: 22,
+                animation: isDrivingIn ? 'cabin-rumble 0.22s infinite' : 'none',
+              }}
+            >
+              {/* Upper Windshield Frame & A-Pillars (Retracts/fades on parked mode) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  opacity: isDrivingIn ? 1 : 0,
+                  transform: isDrivingIn ? 'translateY(0)' : 'translateY(-30px)',
+                  transition: 'opacity 0.8s ease, transform 0.8s ease',
+                  pointerEvents: 'none',
+                }}
+              >
+                {/* Windshield Header */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 28,
+                    background: 'linear-gradient(180deg, #050508 0%, rgba(10,10,16,0.9) 75%, transparent 100%)',
+                    borderBottom: '2px solid rgba(255,255,255,0.08)',
+                  }}
+                />
+                {/* Left A-Pillar */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: 38,
+                    bottom: 0,
+                    background: 'linear-gradient(90deg, #050508 0%, rgba(14,14,22,0.95) 75%, transparent 100%)',
+                    transform: 'skewX(-14deg)',
+                    transformOrigin: 'top left',
+                  }}
+                />
+                {/* Right A-Pillar */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: 38,
+                    bottom: 0,
+                    background: 'linear-gradient(-90deg, #050508 0%, rgba(14,14,22,0.95) 75%, transparent 100%)',
+                    transform: 'skewX(14deg)',
+                    transformOrigin: 'top right',
+                  }}
+                />
+                {/* Hanging Rearview Mirror with Gentle Sway */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 14,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    animation: 'mirror-sway 3.5s ease-in-out infinite',
+                    transformOrigin: 'top center',
+                  }}
+                >
+                  <div style={{ width: 3, height: 16, backgroundColor: '#71717a' }} />
+                  <div
+                    style={{
+                      width: 90,
+                      height: 22,
+                      backgroundColor: 'rgba(20, 20, 30, 0.95)',
+                      borderRadius: 4,
+                      border: '1.5px solid #a1a1aa',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.85)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: 7.5, color: '#00e5ff', fontFamily: 'monospace', letterSpacing: 1 }}>
+                      432Hz DELCO
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 1964 Chevy Malibu Hood Silhouette in Bottom Foreground */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: -2,
+                  left: 0,
+                  right: 0,
+                  height: '18%',
+                  background: 'linear-gradient(180deg, transparent 0%, rgba(10,10,18,0.7) 40%, rgba(5,5,10,0.98) 100%)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                }}
+              >
+                {/* Malibu Hood Center Chrome Spear */}
+                <div
+                  style={{
+                    width: 3,
+                    height: '100%',
+                    background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, #a1a1aa 50%, #3f3f46 100%)',
+                    boxShadow: '0 0 10px rgba(0, 229, 255, 0.4)',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 8. Drive-In Window Speaker Box */}
             <div
               style={{
                 position: 'absolute',
                 bottom: 16,
                 right: 20,
-                zIndex: 22,
+                zIndex: 26,
                 backgroundColor: 'rgba(18, 18, 26, 0.94)',
                 padding: '8px 14px',
                 borderRadius: 5,
@@ -2465,6 +3092,32 @@ export function InterzoneDriveInTheater({
                 </div>
               </div>
             </div>
+
+            {/* 9. Skip Drive-In Entry Hint Pill */}
+            {isDrivingIn && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 24,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 30,
+                  background: 'rgba(0, 0, 0, 0.85)',
+                  border: '1px solid rgba(255, 107, 0, 0.6)',
+                  borderRadius: 20,
+                  padding: '6px 16px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  color: '#fbbf24',
+                  letterSpacing: 1.5,
+                  boxShadow: '0 0 15px rgba(255, 107, 0, 0.5)',
+                  pointerEvents: 'none',
+                }}
+              >
+                CLICK ANYWHERE OR PRESS [ESC] TO SKIP ENTRY
+              </div>
+            )}
           </div>
 
           {/* ── DRIVER PERSPECTIVE: DASHBOARD OF THE 1964 CHEVY MALIBU ── */}
