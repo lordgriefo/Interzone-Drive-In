@@ -2329,8 +2329,8 @@ export function InterzoneDriveInTheater({
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: 9, color: '#39ff14', fontFamily: 'monospace' }}>
-                      TRANSMITTING AT {activeStation.frequency} • {activeStation.title.toUpperCase()}
+                    <div style={{ fontSize: 9, color: activeStation?.color || '#39ff14', fontFamily: 'monospace' }}>
+                      TRANSMITTING AT {activeStation?.dial || '99.3 FM'} • {(activeStation?.name || activeStation?.callSign || 'INTERZONE RADIO').toUpperCase()}
                     </div>
                     <div style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>
                       {currentTrackTitle || 'Interzone Broadcast Signal'}
@@ -2338,7 +2338,7 @@ export function InterzoneDriveInTheater({
                   </div>
 
                   <div style={{ fontSize: 9, color: '#c084fc', fontFamily: 'monospace', textAlign: 'right' }}>
-                    DJ: DOC ENOCH · 432Hz OCCULT SONGBOOK
+                    DJ: {(activeStation?.host || 'DOC ENOCH · 432Hz OCCULT SONGBOOK').toUpperCase()}
                   </div>
                 </div>
               </div>
@@ -2830,7 +2830,7 @@ export function InterzoneDriveInTheater({
                         return true;
                       }).map((d) => (
                         <option key={d.id} value={d.id}>
-                          [{d.type.toUpperCase()}] {d.track_title} ({d.duration}s)
+                          [{d.type ? d.type.toUpperCase() : 'AUDIO'}] {d.track_title} ({d.duration}s)
                         </option>
                       ))}
                     </select>
