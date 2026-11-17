@@ -31,11 +31,11 @@ export function resolveRadioAudioUrl(item) {
   const raw = typeof item === 'string' ? item : (item.url || item.mp3_file || item.wav_file || item.file || '');
   if (!raw) return '';
   if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('blob:')) {
-    return raw;
+    return encodeURI(raw);
   }
   if (r2) {
     const clean = raw.replace(/^\.?\/+/, '');
-    return `${r2}/${clean}`;
+    return encodeURI(`${r2}/${clean}`);
   }
   return raw;
 }

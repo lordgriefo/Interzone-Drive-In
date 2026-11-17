@@ -446,7 +446,7 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
   }, [toggleMute]);
 
   // ── loadAudioTrack ─────────────────────────────────────────────────────
-  const loadAudioTrack = useCallback((fileOrUrl) => {
+  const loadAudioTrack = useCallback((fileOrUrl, autoPlay = false) => {
     isPurgedRef.current = false;
     const el = audioRef.current;
     if (!el) return;
@@ -458,7 +458,7 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
 
     const url = typeof fileOrUrl === 'string' ? fileOrUrl : URL.createObjectURL(fileOrUrl);
     el.src = url;
-    el.preload = 'metadata';
+    el.preload = 'auto';
     el.muted = isMuted;
     el.volume = volume;
     el.load();
@@ -466,11 +466,18 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
     setWaveformPeaks([]);
     setTransientMarkers([]);
 
+    if (autoPlay) {
+      ensureAudioGraph();
+      unlockAudio().then(() => {
+        el.play().then(() => setIsPlaying(true)).catch((err) => console.warn('[AudioEngine] Autoplay failed:', err));
+      });
+    }
+
     // Defer waveform peak decode so browser finishes DOM paint and layout first
     setTimeout(() => {
       decodeWaveformPeaks(fileOrUrl).then(setWaveformPeaks);
     }, 150);
-  }, []);
+  }, [isMuted, volume, unlockAudio, ensureAudioGraph]);
 
   // ── togglePlay ─────────────────────────────────────────────────────────
   const togglePlay = useCallback(async () => {

@@ -25,6 +25,7 @@ import { evaluateCssEffect }     from './constants/cssEffectLibrary';
 import { DEFAULT_MEDIA_ITEMS, createProceduralAudioTrack, createProceduralAudioDataUri } from './constants/initialMedia';
 import { parseLrcString } from './utils/lrcParser';
 import { STORYBOARD_PRESETS } from './constants/storyboardPresets';
+import { resolveRadioAudioUrl } from './constants/radioStations';
 
 export const DEFAULT_PLAYLIST = [
   {
@@ -746,11 +747,12 @@ export default function App() {
   ]);
 
   // Load a playlist entry: load audio + apply its preset + (optionally) restore asset bin
-  const handlePlayTrack = useCallback((entry, idx) => {
+  const handlePlayTrack = useCallback((entry, idx, autoPlay = true) => {
     setPlaylistIndex(idx);
     setTrackTitle(entry.title);
-    lastAudioFileRef.current = entry.file || entry.url;
-    loadAudioTrack(entry.file || entry.url);
+    const resolvedUrl = resolveRadioAudioUrl(entry.file || entry.url);
+    lastAudioFileRef.current = resolvedUrl;
+    loadAudioTrack(resolvedUrl, autoPlay);
     // Apply the entry's saved preset
     if (entry.preset) {
       applyPreset(entry.preset);
@@ -762,8 +764,9 @@ export default function App() {
       setFxMarkers([]);
     }
     setLyricSegments([]);
-    if (entry.lrcUrl) {
-      fetch(entry.lrcUrl)
+    const resolvedLrc = entry.lrcUrl ? resolveRadioAudioUrl(entry.lrcUrl) : null;
+    if (resolvedLrc) {
+      fetch(resolvedLrc)
         .then((res) => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.text();

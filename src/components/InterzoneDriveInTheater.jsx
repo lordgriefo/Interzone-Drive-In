@@ -143,7 +143,14 @@ export function InterzoneDriveInTheater({
     setActiveStationId(stationId);
     const station = INTERZONE_RADIO_STATIONS.find((s) => s.id === stationId);
     if (station && station.tracks.length > 0 && onSelectTrack) {
-      onSelectTrack(station.tracks[0]);
+      const track = station.tracks[0];
+      onSelectTrack({
+        ...track,
+        url: resolveRadioAudioUrl(track.url),
+      });
+      if (!isPlaying && onTogglePlay) {
+        onTogglePlay();
+      }
     }
   };
 
@@ -2074,6 +2081,52 @@ export function InterzoneDriveInTheater({
                 <div style={{ fontSize: 9, color: '#a1a1aa', fontStyle: 'italic', marginTop: 3 }}>
                   "{activeStation.slogan}"
                 </div>
+
+                {/* Delco Tactile Broadcast Power Switch & On-Air Lamp */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                  <button
+                    onClick={onTogglePlay}
+                    style={{
+                      background: isPlaying
+                        ? 'linear-gradient(135deg, #ff6b00, #ff8800)'
+                        : 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+                      color: isPlaying ? '#000' : '#fff',
+                      border: `2px solid ${isPlaying ? '#ffaa00' : 'rgba(255,255,255,0.3)'}`,
+                      borderRadius: 4,
+                      padding: '5px 12px',
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontSize: 8.5,
+                      fontWeight: 800,
+                      letterSpacing: 1,
+                      cursor: 'pointer',
+                      boxShadow: isPlaying ? '0 0 16px rgba(255, 107, 0, 0.8)' : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      transition: 'all 0.15s',
+                    }}
+                    title={isPlaying ? "Pause Radio Broadcast" : "Turn Delco Radio ON & Broadcast"}
+                  >
+                    <span>{isPlaying ? '⏸' : '▶'}</span>
+                    <span>{isPlaying ? 'ON AIR' : 'POWER ON'}</span>
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        backgroundColor: isPlaying ? '#39ff14' : '#ef4444',
+                        boxShadow: isPlaying ? '0 0 10px #39ff14' : 'none',
+                        display: 'inline-block',
+                      }}
+                    />
+                    <span style={{ fontSize: 8.5, fontFamily: "'Space Mono', monospace", color: isPlaying ? '#39ff14' : '#a1a1aa' }}>
+                      {isPlaying ? `TRANSMITTING: ${currentTrackTitle || activeStation.name}` : 'STANDBY · CLICK POWER ON TO TRANSMIT'}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Station Audio Dispatch & Track Picker Cluster */}
@@ -2139,7 +2192,15 @@ export function InterzoneDriveInTheater({
                     value={activeStation.tracks.find((t) => t.title === currentTrackTitle)?.id || ''}
                     onChange={(e) => {
                       const sel = activeStation.tracks.find((t) => t.id === e.target.value);
-                      if (sel && onSelectTrack) onSelectTrack(sel);
+                      if (sel && onSelectTrack) {
+                        onSelectTrack({
+                          ...sel,
+                          url: resolveRadioAudioUrl(sel.url),
+                        });
+                        if (!isPlaying && onTogglePlay) {
+                          onTogglePlay();
+                        }
+                      }
                     }}
                     style={{
                       backgroundColor: '#0a0a14',
@@ -2198,6 +2259,9 @@ export function InterzoneDriveInTheater({
                             duration: drop.duration,
                             script: drop.script,
                           });
+                          if (!isPlaying && onTogglePlay) {
+                            onTogglePlay();
+                          }
                         }
                       }}
                       style={{
@@ -2244,6 +2308,9 @@ export function InterzoneDriveInTheater({
                           duration: ad.duration,
                           script: ad.text,
                         });
+                        if (!isPlaying && onTogglePlay) {
+                          onTogglePlay();
+                        }
                       }
                     }}
                     style={{
