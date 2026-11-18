@@ -82,12 +82,21 @@ export function DriveIn3DStage({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const screenMeshesRef = useRef<THREE.Mesh[]>([]);
 
-  // Panning & Angular Velocity tracking
-  const currentPosRef = useRef(new THREE.Vector3(0, 4, 40));
-  const currentLookAtRef = useRef(new THREE.Vector3(-35, 6, -40));
-  const prevLookAtRef = useRef(new THREE.Vector3(-35, 6, -40));
+  // Panning & Angular Velocity tracking (Starts on dark entrance road at z = +95, x = -25)
+  const currentPosRef = useRef(new THREE.Vector3(-25, 4, 95));
+  const currentLookAtRef = useRef(new THREE.Vector3(-55, 9, -35));
+  const prevLookAtRef = useRef(new THREE.Vector3(-55, 9, -35));
   const angularVelocityRef = useRef(0);
   const driveInStartRef = useRef<number | null>(null);
+
+  // Reset drive-in timer whenever isDrivingIn becomes true (enables REPLAY DRIVE-IN)
+  useEffect(() => {
+    if (isDrivingIn) {
+      driveInStartRef.current = null;
+      currentPosRef.current.set(-25, 4, 95);
+      currentLookAtRef.current.set(-55, 9, -35);
+    }
+  }, [isDrivingIn]);
 
   // Create Roadside Sign Canvas Texture
   const getSignTexture = useCallback(() => {
@@ -162,10 +171,10 @@ export function DriveIn3DStage({
     scene.fog = new THREE.FogExp2(0x050510, 0.0018);
     sceneRef.current = scene;
 
-    // 2. Camera
+    // 2. Camera (Starts at entrance road looking sharply left out window at sign)
     const camera = new THREE.PerspectiveCamera(54, width / height, 0.1, 1500);
-    camera.position.set(0, 4, 40);
-    camera.lookAt(-35, 6, -40);
+    camera.position.set(-25, 4, 95);
+    camera.lookAt(-55, 9, -35);
     cameraRef.current = camera;
 
     // 3. WebGL Renderer
@@ -267,77 +276,17 @@ export function DriveIn3DStage({
     const starField = new THREE.Points(starGeo, starMat);
     scene.add(starField);
 
-    // 7. Rotating Celestial Wormholes in Upper Atmosphere
-    const wormholes: THREE.Mesh[] = [];
-    const createWormhole = (x: number, y: number, z: number, color1: string, color2: string, size: number) => {
-      const wCanvas = document.createElement('canvas');
-      wCanvas.width = 512;
-      wCanvas.height = 512;
-      const wCtx = wCanvas.getContext('2d');
-      if (wCtx) {
-        const radGrad = wCtx.createRadialGradient(256, 256, 10, 256, 256, 250);
-        radGrad.addColorStop(0, '#000000');
-        radGrad.addColorStop(0.25, color1);
-        radGrad.addColorStop(0.65, color2);
-        radGrad.addColorStop(1, 'rgba(0,0,0,0)');
-        wCtx.fillStyle = radGrad;
-        wCtx.fillRect(0, 0, 512, 512);
+    // 7. Malibu Headlights (SpotLights on the Car illuminating the gravel field)
+    const headlightL = new THREE.SpotLight(0xfff5d0, 6.0, 260, Math.PI / 6.5, 0.45, 1.2);
+    const headlightR = new THREE.SpotLight(0xfff5d0, 6.0, 260, Math.PI / 6.5, 0.45, 1.2);
+    const headlightTarget = new THREE.Object3D();
+    scene.add(headlightTarget);
+    headlightL.target = headlightTarget;
+    headlightR.target = headlightTarget;
+    scene.add(headlightL);
+    scene.add(headlightR);
 
-        // Spiral vortex arcs
-        wCtx.strokeStyle = '#ffffff';
-        wCtx.lineWidth = 3;
-        for (let a = 0; a < Math.PI * 4; a += 0.2) {
-          const r = 20 + a * 18;
-          const px = 256 + Math.cos(a) * r;
-          const py = 256 + Math.sin(a) * r;
-          if (a === 0) wCtx.beginPath();
-          wCtx.lineTo(px, py);
-        }
-        wCtx.stroke();
-      }
-      const wTex = new THREE.CanvasTexture(wCanvas);
-      const wGeo = new THREE.PlaneGeometry(size, size);
-      const wMat = new THREE.MeshBasicMaterial({
-        map: wTex,
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      });
-      const mesh = new THREE.Mesh(wGeo, wMat);
-      mesh.position.set(x, y, z);
-      scene.add(mesh);
-      wormholes.push(mesh);
-    };
-
-    createWormhole(-80, 115, -340, '#00e5ff', '#a855f7', 120);
-    createWormhole(85, 125, -350, '#fbbf24', '#ff0055', 110);
-    createWormhole(0, 85, -390, '#39ff14', '#00e5ff', 80);
-
-    // 8. Pulsing Wireframe Sacred Geometry / Molecular Glyphs in Upper Sky
-    const glyphs: THREE.LineSegments[] = [];
-    const glyphGeo1 = new THREE.OctahedronGeometry(12, 1);
-    const glyphMat1 = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.35 });
-    const glyph1 = new THREE.LineSegments(new THREE.WireframeGeometry(glyphGeo1), glyphMat1);
-    glyph1.position.set(-110, 85, -280);
-    scene.add(glyph1);
-    glyphs.push(glyph1);
-
-    const glyphGeo2 = new THREE.IcosahedronGeometry(15, 1);
-    const glyphMat2 = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.3 });
-    const glyph2 = new THREE.LineSegments(new THREE.WireframeGeometry(glyphGeo2), glyphMat2);
-    glyph2.position.set(110, 95, -290);
-    scene.add(glyph2);
-    glyphs.push(glyph2);
-
-    const glyphGeo3 = new THREE.TorusGeometry(14, 2, 8, 24);
-    const glyphMat3 = new THREE.LineBasicMaterial({ color: 0xc084fc, transparent: true, opacity: 0.35 });
-    const glyph3 = new THREE.LineSegments(new THREE.WireframeGeometry(glyphGeo3), glyphMat3);
-    glyph3.position.set(0, 75, -310);
-    scene.add(glyph3);
-    glyphs.push(glyph3);
-
-    // 9. Entrance Neon Roadside Billboard Sign at (-35, 6, -40)
+    // 8. Entrance Neon Roadside Billboard Sign at (-35, 9, -40)
     const signTex = getSignTexture();
     const signGeo = new THREE.PlaneGeometry(28, 14);
     const signMat = new THREE.MeshBasicMaterial({
@@ -505,40 +454,74 @@ export function DriveIn3DStage({
       animId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      // Rotate Wormholes & Glyphs
-      wormholes.forEach((w, i) => {
-        w.rotation.z = (i % 2 === 0 ? 1 : -1) * elapsed * (0.05 + i * 0.02);
-      });
-      glyphs.forEach((g, i) => {
-        g.rotation.x = elapsed * (0.1 + i * 0.05);
-        g.rotation.y = elapsed * (0.15 + i * 0.04);
-      });
+      // Project Malibu Headlights onto gravel field ahead
+      headlightL.position.set(currentPosRef.current.x - 2.8, currentPosRef.current.y - 0.5, currentPosRef.current.z - 2);
+      headlightR.position.set(currentPosRef.current.x + 2.8, currentPosRef.current.y - 0.5, currentPosRef.current.z - 2);
+      headlightTarget.position.set(
+        currentPosRef.current.x + (currentLookAtRef.current.x - currentPosRef.current.x) * 0.7,
+        0,
+        currentPosRef.current.z + (currentLookAtRef.current.z - currentPosRef.current.z) * 0.7
+      );
 
-      // ── DRIVE-IN CAMERA PATH OR INTERACTIVE SCREEN PANNING ──
+      // ── CHILDREN OF MEN SINGLE-TAKE POV HEAD-TURNING CAMERA CHOREOGRAPHY (5.0s) ──
       if (isDrivingIn) {
         if (driveInStartRef.current === null) driveInStartRef.current = elapsed;
         const driveElapsed = elapsed - driveInStartRef.current;
-        const DURATION = 4.5;
+        const DURATION = 5.0; // 5.0 seconds
         const progress = Math.min(1, driveElapsed / DURATION);
 
-        // Smooth easeInOutCubic
-        const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-        if (progress < 0.35) {
-          // 0.0s - 1.5s: Approaching Gate & Sign
-          const subT = progress / 0.35;
-          currentPosRef.current.set(0, 4, 40 - subT * 35);
-          currentLookAtRef.current.set(-35 + subT * 5, 6 + subT * 2, -40 - subT * 30);
-        } else if (progress < 0.75) {
-          // 1.5s - 3.4s: Sweeping view across sky and 4 screens
-          const subT = (progress - 0.35) / 0.4;
-          currentPosRef.current.set(0, 4, 5 - subT * 50);
-          currentLookAtRef.current.set(-30 + subT * 80, 25 - subT * 10, -220);
+        if (progress < 0.36) {
+          // 0.0s – 1.8s (subT: 0 -> 1):
+          // Starting back on the dark entrance road (z = +95, x = -25) turning onto the lot.
+          // Head turned sharply left out the driver's side window looking at the neon sign passing by.
+          const subT = progress / 0.36;
+          const ease = subT * subT * (3 - 2 * subT);
+          
+          currentPosRef.current.set(
+            -25 + ease * 7, // x: -25 -> -18
+            4,
+            95 - ease * 70  // z: +95 -> +25
+          );
+          
+          currentLookAtRef.current.set(
+            -55 + ease * 15,
+            9 - ease * 1.5,
+            -35 + (1 - ease) * 15
+          );
+        } else if (progress < 0.72) {
+          // 1.8s – 3.6s (subT: 0 -> 1):
+          // Smoothly rotate the POV head-turn right across the windshield, sweeping across starry sky & all 4 screens.
+          const subT = (progress - 0.36) / 0.36;
+          const ease = subT * subT * (3 - 2 * subT);
+          
+          currentPosRef.current.set(
+            -18 + ease * 12, // x: -18 -> -6
+            4,
+            25 - ease * 70   // z: +25 -> -45
+          );
+          
+          currentLookAtRef.current.set(
+            -40 + ease * 95,
+            7.5 + Math.sin(ease * Math.PI) * 10,
+            -35 - ease * 175
+          );
         } else {
-          // 3.4s - 4.5s: Settling parked in front of Screen 1
-          const subT = (progress - 0.75) / 0.25;
-          currentPosRef.current.lerp(CAMERA_TARGETS[0].pos, 0.08);
-          currentLookAtRef.current.lerp(CAMERA_TARGETS[0].lookAt, 0.08);
+          // 3.6s – 5.0s (subT: 0 -> 1):
+          // Pulling into final parking spot at (0, 4, -75), facing the screens as suspension settles.
+          const subT = (progress - 0.72) / 0.28;
+          const ease = subT * subT * (3 - 2 * subT);
+          
+          currentPosRef.current.set(
+            -6 + ease * 6,   // x: -6 -> 0
+            4,
+            -45 - ease * 30  // z: -45 -> -75
+          );
+          
+          currentLookAtRef.current.set(
+            55 - ease * 150, // x: 55 -> -95
+            17.5 - ease * 0.5,
+            -210 + ease * 30 // z: -210 -> -180
+          );
         }
 
         camera.position.copy(currentPosRef.current);
@@ -790,120 +773,328 @@ export function DriveIn3DStage({
         />
       </div>
 
-      {/* ── 2D FIRST-PERSON 1964 CHEVY MALIBU CABIN & WINDSHIELD OVERLAY ── */}
+      {/* Inline Keyframe Styles for Road Vibration & Mirror Sway */}
+      <style>{`
+        @keyframes road-vibe {
+          0% { transform: translate(0, 0); }
+          20% { transform: translate(-0.8px, 0.6px); }
+          40% { transform: translate(0.7px, -0.5px); }
+          60% { transform: translate(-0.5px, -0.4px); }
+          80% { transform: translate(0.6px, 0.5px); }
+          100% { transform: translate(0, 0); }
+        }
+        @keyframes engine-idle {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(0, -0.35px); }
+        }
+        @keyframes mirror-sway {
+          0%, 100% { transform: translateX(-50%) rotate(-1.6deg); }
+          50% { transform: translateX(-50%) rotate(1.6deg); }
+        }
+        @keyframes dial-glow {
+          0%, 100% { opacity: 0.88; text-shadow: 0 0 6px rgba(255, 170, 0, 0.6); }
+          50% { opacity: 1; text-shadow: 0 0 12px rgba(255, 170, 0, 0.95); }
+        }
+      `}</style>
+
+      {/* ── CHILDREN OF MEN 1964 CHEVY MALIBU FIRST-PERSON INSIDE-CABIN OVERLAY ── */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           pointerEvents: 'none',
           zIndex: 10,
+          animation: isDrivingIn ? 'road-vibe 0.11s infinite linear' : 'engine-idle 2.4s infinite ease-in-out',
         }}
       >
-        {/* Upper Windshield Frame & A-Pillars (Retracts/fades on parked mode) */}
+        {/* Upper Windshield Frame, A-Pillars & Roofline (Fades/slides out over 0.8s when parked) */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             opacity: isDrivingIn ? 1 : 0,
-            transform: isDrivingIn ? 'translateY(0)' : 'translateY(-30px)',
-            transition: 'opacity 0.8s ease, transform 0.8s ease',
+            transform: isDrivingIn ? 'translateY(0)' : 'translateY(-40px)',
+            transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
             pointerEvents: 'none',
           }}
         >
-          {/* Windshield Header */}
+          {/* Roof Headliner Bar with Sun Visors */}
           <div
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
-              height: 28,
-              background: 'linear-gradient(180deg, #050508 0%, rgba(10,10,16,0.9) 75%, transparent 100%)',
-              borderBottom: '2px solid rgba(255,255,255,0.08)',
+              height: 38,
+              background: 'linear-gradient(180deg, #030306 0%, #0c0c14 80%, transparent 100%)',
+              borderBottom: '2px solid rgba(255,255,255,0.06)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '0 80px',
             }}
-          />
-          {/* Left A-Pillar */}
+          >
+            {/* Left Sun Visor */}
+            <div
+              style={{
+                width: 220,
+                height: 14,
+                backgroundColor: '#11111a',
+                border: '1px solid #27273a',
+                borderRadius: '0 0 8px 8px',
+                opacity: 0.85,
+              }}
+            />
+            {/* Right Sun Visor */}
+            <div
+              style={{
+                width: 220,
+                height: 14,
+                backgroundColor: '#11111a',
+                border: '1px solid #27273a',
+                borderRadius: '0 0 8px 8px',
+                opacity: 0.85,
+              }}
+            />
+          </div>
+
+          {/* Left A-Pillar + Quarter/Vent Window Frame (Driver's Side) */}
           <div
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              width: 38,
+              width: 58,
               bottom: 0,
-              background: 'linear-gradient(90deg, #050508 0%, rgba(14,14,22,0.95) 75%, transparent 100%)',
-              transform: 'skewX(-14deg)',
+              background: 'linear-gradient(90deg, #020205 0%, #0e0e18 80%, transparent 100%)',
+              transform: 'skewX(-15deg)',
               transformOrigin: 'top left',
+              borderRight: '1px solid rgba(255,255,255,0.08)',
             }}
-          />
-          {/* Right A-Pillar */}
+          >
+            {/* Vent Window Chrome Divider Bar */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '32%',
+                left: 14,
+                width: 2,
+                height: '45%',
+                backgroundColor: 'rgba(255,255,255,0.25)',
+                transform: 'rotate(-4deg)',
+              }}
+            />
+          </div>
+
+          {/* Right A-Pillar (Passenger's Side) */}
           <div
             style={{
               position: 'absolute',
               top: 0,
               right: 0,
-              width: 38,
+              width: 58,
               bottom: 0,
-              background: 'linear-gradient(-90deg, #050508 0%, rgba(14,14,22,0.95) 75%, transparent 100%)',
-              transform: 'skewX(14deg)',
+              background: 'linear-gradient(-90deg, #020205 0%, #0e0e18 80%, transparent 100%)',
+              transform: 'skewX(15deg)',
               transformOrigin: 'top right',
+              borderLeft: '1px solid rgba(255,255,255,0.08)',
             }}
           />
-          {/* Hanging Rearview Mirror with Gentle Sway */}
+
+          {/* Hanging Chrome Rearview Mirror with Gentle Road Sway */}
           <div
             style={{
               position: 'absolute',
-              top: 14,
+              top: 18,
               left: '50%',
-              transform: 'translateX(-50%)',
+              animation: 'mirror-sway 3.2s infinite ease-in-out',
+              transformOrigin: 'top center',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
             }}
           >
-            <div style={{ width: 3, height: 16, backgroundColor: '#71717a' }} />
+            {/* Mirror Ball-Joint Mounting Bracket */}
+            <div style={{ width: 4, height: 20, backgroundColor: '#71717a', borderRadius: 2 }} />
+            {/* Beveled Mirror Housing */}
             <div
               style={{
-                width: 90,
-                height: 22,
-                backgroundColor: 'rgba(20, 20, 30, 0.95)',
-                borderRadius: 4,
+                width: 120,
+                height: 30,
+                backgroundColor: 'rgba(14, 14, 22, 0.95)',
+                borderRadius: 5,
                 border: '1.5px solid #a1a1aa',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.85)',
+                boxShadow: '0 6px 18px rgba(0,0,0,0.9), inset 0 1px 2px rgba(255,255,255,0.2)',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                backdropFilter: 'blur(3px)',
               }}
             >
-              <span style={{ fontSize: 7.5, color: '#00e5ff', fontFamily: 'monospace', letterSpacing: 1 }}>
-                432Hz WSTR
-              </span>
+              <div style={{ fontSize: 7, color: '#a1a1aa', fontFamily: 'monospace', letterSpacing: 1 }}>
+                REAR ROAD VIEW
+              </div>
+              <div style={{ fontSize: 8.5, color: '#00e5ff', fontFamily: 'monospace', fontWeight: 800, letterSpacing: 1 }}>
+                WSTR 99.3 FM
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 1964 Chevy Malibu Hood in Bottom Foreground */}
+        {/* 1964 Chevy Malibu Dashboard & Steering Wheel Top along the Bottom */}
         <div
           style={{
             position: 'absolute',
-            bottom: -2,
+            bottom: 0,
             left: 0,
             right: 0,
-            height: '18%',
-            background: 'linear-gradient(180deg, transparent 0%, rgba(10,10,18,0.7) 40%, rgba(5,5,10,0.98) 100%)',
+            height: '24%',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(8,8,14,0.7) 25%, #05050a 65%, #020204 100%)',
             display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-end',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            pointerEvents: 'none',
           }}
         >
-          {/* Malibu Hood Center Chrome Spear */}
+          {/* Malibu Hood Center Chrome Spear projecting into Headlight Beams */}
           <div
             style={{
               width: 3,
-              height: '100%',
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, #a1a1aa 50%, #3f3f46 100%)',
-              boxShadow: '0 0 10px rgba(0, 229, 255, 0.4)',
+              height: '55%',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, #a1a1aa 40%, #27272a 100%)',
+              boxShadow: '0 0 12px rgba(0, 229, 255, 0.5), 0 0 25px rgba(255, 240, 200, 0.3)',
+              marginBottom: 4,
             }}
           />
+
+          {/* Detailed Dashboard Edge & Instrument Pods */}
+          <div
+            style={{
+              width: '100%',
+              height: 48,
+              backgroundColor: '#0a0a12',
+              borderTop: '2px solid #27273a',
+              boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), 0 -4px 20px rgba(0,0,0,0.95)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0 24px',
+              opacity: isDrivingIn ? 1 : 0.45,
+              transition: 'opacity 0.8s ease',
+            }}
+          >
+            {/* Speedometer Cluster (Left Driver Pod) */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '4px 10px',
+                borderRadius: 4,
+                backgroundColor: '#050509',
+                border: '1px solid #1f1f2e',
+              }}
+            >
+              <div style={{ fontSize: 7.5, color: '#71717a', fontFamily: 'monospace' }}>SPEED</div>
+              <div style={{ width: 60, height: 6, backgroundColor: '#111', borderRadius: 3, position: 'relative', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: isDrivingIn ? '35%' : '0%',
+                    backgroundColor: '#ff6b00',
+                    transition: 'width 0.8s ease',
+                    boxShadow: '0 0 8px #ff6b00',
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace', fontWeight: 800 }}>
+                {isDrivingIn ? '25 MPH' : 'PARKED'}
+              </span>
+            </div>
+
+            {/* Steering Wheel Top Chrome Arc (Driver Center-Left) */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '22%',
+                bottom: 8,
+                width: 140,
+                height: 45,
+                borderTop: '4.5px solid #d4d4d8',
+                borderRadius: '70px 70px 0 0',
+                boxShadow: '0 -2px 10px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.4)',
+                opacity: isDrivingIn ? 0.95 : 0,
+                transform: isDrivingIn ? 'translateY(0)' : 'translateY(30px)',
+                transition: 'opacity 0.8s ease, transform 0.8s ease',
+              }}
+            >
+              {/* Inner Horn Ring */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  left: 20,
+                  right: 20,
+                  height: 30,
+                  borderTop: '2px solid #71717a',
+                  borderRadius: '50px 50px 0 0',
+                }}
+              />
+            </div>
+
+            {/* Glowing Retro Delco WSTR Radio Dial (Center Dashboard) */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '4px 14px',
+                borderRadius: 4,
+                backgroundColor: '#030306',
+                border: '1px solid rgba(255, 107, 0, 0.4)',
+                boxShadow: '0 0 12px rgba(255, 107, 0, 0.25)',
+              }}
+            >
+              <span style={{ fontSize: 9, color: '#a1a1aa', fontFamily: 'monospace' }}>DELCO</span>
+              <div
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: 9,
+                  fontWeight: 800,
+                  color: '#fbbf24',
+                  animation: 'dial-glow 2.5s infinite ease-in-out',
+                }}
+              >
+                99.3 FM • WSTR RADIO
+              </div>
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  backgroundColor: '#39ff14',
+                  boxShadow: '0 0 8px #39ff14',
+                }}
+              />
+            </div>
+
+            {/* Right Glovebox Chrome Badge */}
+            <div
+              style={{
+                fontSize: 8,
+                fontFamily: "'Syncopate', sans-serif",
+                color: '#71717a',
+                letterSpacing: 2,
+                fontWeight: 800,
+              }}
+            >
+              MALIBU SS
+            </div>
+          </div>
         </div>
       </div>
 
