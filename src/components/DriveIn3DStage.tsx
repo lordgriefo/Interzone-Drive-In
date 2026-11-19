@@ -40,12 +40,20 @@ const SCREEN_CONFIGS = [
   { id: 3, title: 'Screen 4: Visualizer & WSTR Simulcast', x: 95, y: 17, z: -180, rotY: -0.38 },
 ];
 
-// Target Camera Positions & LookAts for Each Screen View
+// Target Camera Positions & LookAts for Each Screen View (Parked Car in Lot)
 const CAMERA_TARGETS = [
   { pos: new THREE.Vector3(-45, 6, -115), lookAt: new THREE.Vector3(-95, 17, -180) },
   { pos: new THREE.Vector3(-15, 6, -135), lookAt: new THREE.Vector3(-32, 17, -215) },
   { pos: new THREE.Vector3(15, 6, -135), lookAt: new THREE.Vector3(32, 17, -215) },
   { pos: new THREE.Vector3(45, 6, -115), lookAt: new THREE.Vector3(95, 17, -180) },
+];
+
+// Target Camera Positions & LookAts for Full Viewport Zoom (Perpendicular to each screen at D = 26.8)
+const CAMERA_ZOOM_TARGETS = [
+  { pos: new THREE.Vector3(-85.06, 17, -155.11), lookAt: new THREE.Vector3(-95, 17, -180) },
+  { pos: new THREE.Vector3(-28.26, 17, -188.46), lookAt: new THREE.Vector3(-32, 17, -215) },
+  { pos: new THREE.Vector3(28.26, 17, -188.46), lookAt: new THREE.Vector3(32, 17, -215) },
+  { pos: new THREE.Vector3(85.06, 17, -155.11), lookAt: new THREE.Vector3(95, 17, -180) },
 ];
 
 export function DriveIn3DStage({
@@ -65,6 +73,14 @@ export function DriveIn3DStage({
 }: DriveIn3DStageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredScreen, setHoveredScreen] = useState<number | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const isZoomedRef = useRef(false);
+  isZoomedRef.current = isZoomed;
+
+  const activeScreenIndexRef = useRef(activeScreenIndex);
+  useEffect(() => {
+    activeScreenIndexRef.current = activeScreenIndex;
+  }, [activeScreenIndex]);
 
   // Hidden HTML5 Video Elements used as live Three.js textures
   const video1Ref = useRef<HTMLVideoElement>(null);
@@ -439,12 +455,46 @@ export function DriveIn3DStage({
       const intersects = raycaster.intersectObjects(screenMeshes);
       if (intersects.length > 0) {
         const idx = intersects[0].object.userData.screenIndex;
-        onSelectScreen(idx);
+        if (!isZoomedRef.current) {
+          onSelectScreen(idx);
+          setIsZoomed(true);
+        } else {
+          // If already zoomed in: clicking another screen switches to it; clicking current toggles back to lot
+          if (idx !== activeScreenIndexRef.current) {
+            onSelectScreen(idx);
+          } else {
+            setIsZoomed(false);
+          }
+        }
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) {
+        return;
+      }
+      if (e.key === 'Escape') {
+        if (isZoomedRef.current) {
+          setIsZoomed(false);
+        }
+      } else if (e.key === 'z' || e.key === 'Z') {
+        if (!isDrivingIn) {
+          setIsZoomed((prev) => !prev);
+        }
+      } else if (e.key === '1') {
+        onSelectScreen(0);
+      } else if (e.key === '2') {
+        onSelectScreen(1);
+      } else if (e.key === '3') {
+        onSelectScreen(2);
+      } else if (e.key === '4') {
+        onSelectScreen(3);
       }
     };
 
     renderer.domElement.addEventListener('mousemove', handlePointerMove);
     renderer.domElement.addEventListener('click', handleClick);
+    window.addEventListener('keydown', handleKeyDown);
 
     // 12. Animation Loop (Drive-in path + Camera Panning + Dynamic Screen Canvases)
     const clock = new THREE.Clock();
@@ -531,10 +581,14 @@ export function DriveIn3DStage({
           onFinishDrivingIn();
         }
       } else {
-        // Interactive Panning to Selected Screen
-        const target = CAMERA_TARGETS[activeScreenIndex] || CAMERA_TARGETS[0];
-        currentPosRef.current.lerp(target.pos, 0.045);
-        currentLookAtRef.current.lerp(target.lookAt, 0.045);
+        // Interactive Panning to Selected Screen (Parked Lot vs Zoomed Viewport)
+        const currentActive = activeScreenIndexRef.current;
+        const targetList = isZoomedRef.current ? CAMERA_ZOOM_TARGETS : CAMERA_TARGETS;
+        const target = targetList[currentActive] || targetList[0];
+        const lerpFactor = isZoomedRef.current ? 0.06 : 0.045;
+
+        currentPosRef.current.lerp(target.pos, lerpFactor);
+        currentLookAtRef.current.lerp(target.lookAt, lerpFactor);
 
         camera.position.copy(currentPosRef.current);
         camera.lookAt(currentLookAtRef.current);
@@ -700,6 +754,7 @@ export function DriveIn3DStage({
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
       renderer.domElement.removeEventListener('mousemove', handlePointerMove);
       renderer.domElement.removeEventListener('click', handleClick);
       cancelAnimationFrame(animId);
@@ -734,7 +789,7 @@ export function DriveIn3DStage({
         boxShadow: `0 0 ${35 + bass * 45}px rgba(0, 229, 255, 0.4), 0 20px 60px rgba(0, 0, 0, 0.95)`,
         marginBottom: 20,
         backgroundColor: '#020206',
-        cursor: isDrivingIn ? 'pointer' : 'default',
+        cursor: isDrivingIn ? 'pointer' : (hoveredScreen !== null ? 'pointer' : 'default'),
       }}
       onClick={isDrivingIn ? onFinishDrivingIn : undefined}
     >
@@ -955,6 +1010,9 @@ export function DriveIn3DStage({
             justifyContent: 'flex-end',
             alignItems: 'center',
             pointerEvents: 'none',
+            opacity: isZoomed ? 0 : 1,
+            transform: isZoomed ? 'translateY(60px)' : 'translateY(0)',
+            transition: 'opacity 0.6s ease, transform 0.6s ease',
           }}
         >
           {/* Malibu Hood Center Chrome Spear projecting into Headlight Beams */}
@@ -965,6 +1023,8 @@ export function DriveIn3DStage({
               background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, #a1a1aa 40%, #27272a 100%)',
               boxShadow: '0 0 12px rgba(0, 229, 255, 0.5), 0 0 25px rgba(255, 240, 200, 0.3)',
               marginBottom: 4,
+              opacity: isZoomed ? 0 : 1,
+              transition: 'opacity 0.4s ease',
             }}
           />
 
@@ -1099,32 +1159,182 @@ export function DriveIn3DStage({
       </div>
 
       {/* ── INTERACTIVE 3D OVERLAYS & CONTROLS ── */}
-      {/* Current Screen Floating HUD Badge */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 14,
-          left: 18,
-          zIndex: 15,
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          background: 'rgba(5, 5, 12, 0.8)',
-          backdropFilter: 'blur(6px)',
-          padding: '6px 14px',
-          borderRadius: 4,
-          border: '1px solid rgba(0, 229, 255, 0.4)',
-        }}
-      >
-        <span style={{ fontSize: 13 }}>🎬</span>
-        <span style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9.5, fontWeight: 800, color: '#00e5ff', letterSpacing: 1.5 }}>
-          {SCREEN_CONFIGS[activeScreenIndex]?.title || 'INTERZONE FIELD'}
-        </span>
-      </div>
+      {/* Current Screen Floating HUD Badge (Lot View) */}
+      {!isZoomed && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 14,
+            left: 18,
+            zIndex: 15,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            background: 'rgba(5, 5, 12, 0.85)',
+            backdropFilter: 'blur(6px)',
+            padding: '6px 14px',
+            borderRadius: 4,
+            border: '1px solid rgba(0, 229, 255, 0.4)',
+            boxShadow: '0 4px 18px rgba(0,0,0,0.7)',
+          }}
+        >
+          <span style={{ fontSize: 13 }}>🎬</span>
+          <span style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 9.5, fontWeight: 800, color: '#00e5ff', letterSpacing: 1.5 }}>
+            {SCREEN_CONFIGS[activeScreenIndex]?.title || 'INTERZONE FIELD'}
+          </span>
+          {!isDrivingIn && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsZoomed(true);
+              }}
+              style={{
+                pointerEvents: 'auto',
+                background: 'rgba(0, 229, 255, 0.15)',
+                border: '1px solid #00e5ff',
+                color: '#00e5ff',
+                padding: '3px 10px',
+                borderRadius: 3,
+                fontFamily: "'Syncopate', sans-serif",
+                fontSize: 8,
+                fontWeight: 800,
+                cursor: 'pointer',
+                letterSpacing: 1,
+                boxShadow: '0 0 10px rgba(0, 229, 255, 0.3)',
+                marginLeft: 4,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+              title="Zoom camera directly to this screen [Key: Z]"
+            >
+              <span>🔍</span> VIEWPORT MODE [Z]
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── FULL VIEWPORT HUD (ACTIVE WHEN ZOOMED) ── */}
+      {isZoomed && !isDrivingIn && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 40,
+            background: 'linear-gradient(180deg, rgba(2, 2, 6, 0.95) 0%, rgba(6, 6, 14, 0.85) 75%, transparent 100%)',
+            padding: '12px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(0, 229, 255, 0.25)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 6px 25px rgba(0,0,0,0.9)',
+          }}
+        >
+          {/* Left: Active Screen Indicator & Tag */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 16 }}>🎬</span>
+            <div>
+              <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#00e5ff', letterSpacing: 1.5 }}>
+                {SCREEN_CONFIGS[activeScreenIndex]?.title || 'SCREEN VIEWPORT'}
+              </div>
+              <div style={{ fontSize: 8, color: '#fbbf24', fontFamily: 'monospace', letterSpacing: 1 }}>
+                FULL VIEWPORT ACTIVE • CLICK SCREEN OR [ESC] TO RETURN TO LOT
+              </div>
+            </div>
+          </div>
+
+          {/* Center: Screen Quick Switchers [1] [2] [3] [4] */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {SCREEN_CONFIGS.map((s, idx) => (
+              <button
+                key={s.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectScreen(idx);
+                }}
+                style={{
+                  background: activeScreenIndex === idx ? 'linear-gradient(90deg, #00e5ff, #c084fc)' : 'rgba(20, 20, 30, 0.8)',
+                  color: activeScreenIndex === idx ? '#000' : '#a1a1aa',
+                  border: activeScreenIndex === idx ? '1px solid #00e5ff' : '1px solid #33334d',
+                  borderRadius: 4,
+                  padding: '5px 12px',
+                  fontFamily: 'monospace',
+                  fontSize: 9,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: activeScreenIndex === idx ? '0 0 12px rgba(0, 229, 255, 0.6)' : 'none',
+                }}
+                title={s.title}
+              >
+                [{idx + 1}] {idx === 0 ? 'SHOWCASE' : idx === 1 ? 'INDIE MV' : idx === 2 ? 'GRINDHOUSE' : 'WSTR SIGNAL'}
+              </button>
+            ))}
+          </div>
+
+          {/* Right: Return to Lot Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsZoomed(false);
+              }}
+              style={{
+                background: 'rgba(255, 107, 0, 0.18)',
+                border: '1.5px solid #ff6b00',
+                color: '#ff6b00',
+                padding: '6px 16px',
+                borderRadius: 4,
+                fontFamily: "'Syncopate', sans-serif",
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                cursor: 'pointer',
+                boxShadow: '0 0 15px rgba(255, 107, 0, 0.4)',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <span>◀</span> RETURN TO LOT / CAR (ESC)
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Screen Hover Tooltip in Lot View */}
+      {hoveredScreen !== null && !isZoomed && !isDrivingIn && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 65,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 30,
+            background: 'rgba(5, 5, 12, 0.92)',
+            border: '1px solid #00e5ff',
+            borderRadius: 20,
+            padding: '6px 18px',
+            fontFamily: "'Syncopate', sans-serif",
+            fontSize: 8.5,
+            fontWeight: 800,
+            color: '#00e5ff',
+            letterSpacing: 1.5,
+            boxShadow: '0 0 20px rgba(0, 229, 255, 0.6)',
+            pointerEvents: 'none',
+          }}
+        >
+          🔍 CLICK TO ZOOM INTO SCREEN {hoveredScreen + 1}
+        </div>
+      )}
 
       {/* Floating Edge Pan Buttons (Click to pan across the 4 screens in 3D) */}
-      {activeScreenIndex > 0 && !isDrivingIn && (
+      {activeScreenIndex > 0 && !isDrivingIn && !isZoomed && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -1154,7 +1364,7 @@ export function DriveIn3DStage({
         </button>
       )}
 
-      {activeScreenIndex < 3 && !isDrivingIn && (
+      {activeScreenIndex < 3 && !isDrivingIn && !isZoomed && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -1185,7 +1395,7 @@ export function DriveIn3DStage({
       )}
 
       {/* Screen 2 Submit Cut Button Quick Access */}
-      {activeScreenIndex === 1 && !isDrivingIn && onOpenSubmitModal && (
+      {activeScreenIndex === 1 && !isDrivingIn && !isZoomed && onOpenSubmitModal && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -1229,6 +1439,9 @@ export function DriveIn3DStage({
           alignItems: 'center',
           gap: 12,
           pointerEvents: 'none',
+          opacity: isZoomed ? 0 : 1,
+          transform: isZoomed ? 'translateY(25px)' : 'translateY(0)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
         }}
       >
         <div style={{ fontSize: 18 }}>📢</div>
