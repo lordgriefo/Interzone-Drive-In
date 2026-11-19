@@ -18,11 +18,12 @@ export const PERCHANCE_FACE_FOR_RADIO_URL = 'https://perchance.org/face-for-radi
 export const PERCHANCE_PHASE_4_PICTURES_URL = 'https://perchance.org/phase-4-pictures';
 export const PERCHANCE_THE_LSC_URL = 'https://perchance.org/thelsc';
 export const PERCHANCE_AUDIO_ARC_URL = 'https://perchance.org/audioarc';
+export const POLLINATIONS_AUDIO_ARC_URL = 'https://audioarc.pollinations.app';
 export const PERCHANCE_CINE_SAMPLER_URL = 'https://perchance.org/strangelet-cine-sampler';
 
 // Sister Roadside Attractions & Suite Tools (backwards compatible aliases)
 export const KINETO_CUT_URL = 'https://strangelet-kineto-cut.vercel.app/';
-export const AUDIO_ARC_URL = PERCHANCE_AUDIO_ARC_URL;
+export const AUDIO_ARC_URL = POLLINATIONS_AUDIO_ARC_URL;
 export const WUNDERBAR_URL = PERCHANCE_WUNDERBAR_URL;
 export const CINE_SAMPLER_URL = PERCHANCE_CINE_SAMPLER_URL;
 
@@ -100,11 +101,12 @@ export const STRANGELET_SUITE_APPS = [
   {
     id: 'audioarc',
     title: 'AudioArc',
-    tagline: 'Storyboards · Screenwriting · Music Videos · Short Films',
+    subtitle: 'Pollinations Edition',
+    tagline: 'Storyboards · Screenwriting · Production Bible · Animatic',
     badge: 'FILM & MUSIC VIDEO SUITE',
     icon: '🎚️',
-    url: PERCHANCE_AUDIO_ARC_URL,
-    desc: 'Full-spectrum storytelling app for storyboarding, screenwriting, music video directing & short film production.',
+    url: POLLINATIONS_AUDIO_ARC_URL,
+    desc: 'Full-spectrum storytelling app for storyboarding, screenwriting, 19-page Master Production Bible PDFs & multi-track animatics powered by Pollinations.',
     color: '#38bdf8',
     glow: 'rgba(56, 189, 248, 0.45)',
   },
