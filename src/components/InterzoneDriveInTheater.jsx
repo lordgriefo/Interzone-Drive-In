@@ -91,6 +91,7 @@ export function InterzoneDriveInTheater({
   audioSignals,
   playlist = [],
   onSelectTrack,
+  onUpdateStationPlaylist,
 }) {
   // 'lot' (parked in the desert watching screen) or 'gate' (roadside box office)
   const [driveInView, setDriveInView] = useState('lot');
@@ -237,12 +238,19 @@ export function InterzoneDriveInTheater({
     playTunerStatic(0.35);
     setActiveStationId(stationId);
     const station = INTERZONE_RADIO_STATIONS.find((s) => s.id === stationId);
-    if (station && station.tracks.length > 0 && onSelectTrack) {
-      const track = station.tracks[0];
-      onSelectTrack({
-        ...track,
-        url: resolveRadioAudioUrl(track.url),
-      });
+    if (radioSubTab === 'album' && !station?.albumTracks) {
+      setRadioSubTab('tracks');
+    }
+    if (station && station.tracks.length > 0) {
+      if (onUpdateStationPlaylist) {
+        onUpdateStationPlaylist(station.tracks, 0);
+      } else if (onSelectTrack) {
+        const track = station.tracks[0];
+        onSelectTrack({
+          ...track,
+          url: resolveRadioAudioUrl(track.url),
+        });
+      }
       if (!isPlaying && onTogglePlay) {
         onTogglePlay();
       }
@@ -1899,8 +1907,27 @@ export function InterzoneDriveInTheater({
                       transition: 'all 0.15s',
                     }}
                   >
-                    🎵 MUSIC ({activeStation.tracks.length})
+                    {activeStation.albumTracks ? `📻 BROADCAST (${activeStation.tracks.length})` : `🎵 MUSIC (${activeStation.tracks.length})`}
                   </button>
+                  {activeStation.albumTracks && (
+                    <button
+                      onClick={() => setRadioSubTab('album')}
+                      style={{
+                        background: radioSubTab === 'album' ? '#9945ff' : 'rgba(255,255,255,0.06)',
+                        color: radioSubTab === 'album' ? '#fff' : '#d8b4fe',
+                        border: `1px solid ${radioSubTab === 'album' ? '#c084fc' : 'rgba(192,132,252,0.3)'}`,
+                        borderRadius: 3,
+                        padding: '2px 7px',
+                        fontSize: 8,
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      💽 AASB ALBUM ({activeStation.albumTracks.length})
+                    </button>
+                  )}
                   <button
                     onClick={() => setRadioSubTab('enoch')}
                     style={{
@@ -1937,17 +1964,22 @@ export function InterzoneDriveInTheater({
                   </button>
                 </div>
 
-                {/* SubTab 1: Standard Station Music Cuts */}
+                {/* SubTab 1: Standard Station Music / Broadcast Cuts */}
                 {radioSubTab === 'tracks' && (
                   <select
                     value={activeStation.tracks.find((t) => t.title === currentTrackTitle)?.id || ''}
                     onChange={(e) => {
                       const sel = activeStation.tracks.find((t) => t.id === e.target.value);
-                      if (sel && onSelectTrack) {
-                        onSelectTrack({
-                          ...sel,
-                          url: resolveRadioAudioUrl(sel.url),
-                        });
+                      if (sel) {
+                        if (onUpdateStationPlaylist) {
+                          const selIdx = activeStation.tracks.findIndex((t) => t.id === sel.id);
+                          onUpdateStationPlaylist(activeStation.tracks, selIdx >= 0 ? selIdx : 0);
+                        } else if (onSelectTrack) {
+                          onSelectTrack({
+                            ...sel,
+                            url: resolveRadioAudioUrl(sel.url),
+                          });
+                        }
                         if (!isPlaying && onTogglePlay) {
                           onTogglePlay();
                         }
@@ -1967,6 +1999,48 @@ export function InterzoneDriveInTheater({
                     }}
                   >
                     {activeStation.tracks.map((t, idx) => (
+                      <option key={t.id || idx} value={t.id}>
+                        {t.num ? `${t.num}. ` : `${idx + 1}. `}{t.title} ({Math.floor(t.duration / 60)}:{(t.duration % 60).toString().padStart(2, '0')})
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                {/* SubTab 1b: Full 30-Track Master Album */}
+                {radioSubTab === 'album' && activeStation.albumTracks && (
+                  <select
+                    value={activeStation.albumTracks.find((t) => t.title === currentTrackTitle)?.id || ''}
+                    onChange={(e) => {
+                      const sel = activeStation.albumTracks.find((t) => t.id === e.target.value);
+                      if (sel) {
+                        if (onUpdateStationPlaylist) {
+                          const selIdx = activeStation.albumTracks.findIndex((t) => t.id === sel.id);
+                          onUpdateStationPlaylist(activeStation.albumTracks, selIdx >= 0 ? selIdx : 0);
+                        } else if (onSelectTrack) {
+                          onSelectTrack({
+                            ...sel,
+                            url: resolveRadioAudioUrl(sel.url),
+                          });
+                        }
+                        if (!isPlaying && onTogglePlay) {
+                          onTogglePlay();
+                        }
+                      }
+                    }}
+                    style={{
+                      backgroundColor: '#0a0a14',
+                      color: '#fff',
+                      border: '1px solid #c084fc',
+                      borderRadius: 4,
+                      padding: '6px 10px',
+                      fontFamily: 'monospace',
+                      fontSize: 9.5,
+                      cursor: 'pointer',
+                      boxShadow: '0 0 8px rgba(192,132,252,0.5)',
+                      width: '100%',
+                    }}
+                  >
+                    {activeStation.albumTracks.map((t, idx) => (
                       <option key={t.id || idx} value={t.id}>
                         {t.num ? `${t.num}. ` : `${idx + 1}. `}{t.title} ({Math.floor(t.duration / 60)}:{(t.duration % 60).toString().padStart(2, '0')})
                       </option>

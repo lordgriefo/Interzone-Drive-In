@@ -1,6 +1,7 @@
 // src/constants/radioStations.js
 // Interzone Drive-In Multi-Channel Pirate Radio Network
 import docEnochManifest from './docEnochManifest.json';
+import occultManifest from './occultBroadcastManifest.json';
 
 // Configurable Cloudflare R2 bucket base URL.
 // Default points to live Interzone Drive-In R2 bucket.
@@ -24,20 +25,48 @@ export function setR2BaseUrl(url) {
   }
 }
 
-// Resolve any radio audio URL (prepends R2 base URL if relative or local)
+// Local bundled audio files that are served directly by Vercel/Vite
+const LOCAL_ASSET_PATHS = new Set([
+  'assets-bg/archon.mp3',
+  'assets-bg/babalon-jato.mp3',
+  'assets-bg/babalon-working-blues.mp3',
+  'assets-bg/eighth-sphere.mp3',
+  'assets-bg/excavating-neverland.mp3',
+  'assets-bg/high-roller.mp3',
+  'assets-bg/plush.mp3',
+  'assets-bg/radiator.mp3',
+  'assets-bg/the-breach.mp3',
+  'assets-bg/thelema-mountain.mp3',
+  'assets-bg/wait-till-you-see-it.mp3',
+  'assets-bg/excavating-neverland.lrc',
+  'assets-bg/high-roller.lrc',
+  'assets-bg/the-breach.lrc',
+  'assets-bg/thelema-mountain.lrc',
+  'assets-bg/babalon-working-blues.lrc',
+  'assets-bg/eighth-sphere.lrc',
+  'assets-bg/wait-till-you-see-it.lrc',
+  'assets-bg/radiator.lrc',
+]);
+
+// Resolve any radio audio URL (properly handles local Vercel assets vs. Cloudflare R2 bucket streaming)
 export function resolveRadioAudioUrl(item) {
   if (!item) return '';
   const r2 = getR2BaseUrl();
   const raw = typeof item === 'string' ? item : (item.url || item.mp3_file || item.wav_file || item.file || '');
   if (!raw) return '';
   if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('blob:')) {
-    return encodeURI(raw);
+    return encodeURI(raw).replace(/'/g, '%27');
   }
+  const clean = raw.replace(/^\.?\/+/, '');
+  // If it's a locally bundled asset (or in trashorama), serve locally from the Vercel deployment
+  if (LOCAL_ASSET_PATHS.has(clean) || clean.startsWith('assets-bg/trashorama/')) {
+    return `./${clean}`;
+  }
+  // Otherwise resolve via Cloudflare R2 bucket with single quotes escaped to %27
   if (r2) {
-    const clean = raw.replace(/^\.?\/+/, '');
-    return encodeURI(`${r2}/${clean}`);
+    return encodeURI(`${r2}/${clean}`).replace(/'/g, '%27');
   }
-  return raw;
+  return `./${clean}`;
 }
 
 // ── SLICED AUTHENTIC 1960s VINTAGE ADS & CONCESSION SPOTS ──
@@ -251,40 +280,38 @@ export const INTERZONE_RADIO_STATIONS = [
     color: '#ff6b00',
     glow: 'rgba(255, 107, 0, 0.7)',
     icon: '🔮',
-    featuredAlbum: 'As Above, So Below: An Occult Songbook (30 Master Tracks)',
+    featuredAlbum: 'As Above, So Below: An Occult Songbook (30 Master Tracks + Vault Marathon)',
     djVoice: 'Doc Enoch',
     enochDrops: DOC_ENOCH_MANIFEST,
+    albumTracks: occultManifest.masterAlbum,
+    extraTracks: occultManifest.extraTracks,
+    tracks: occultManifest.broadcastRotation,
+  },
+  {
+    id: 'w_beat',
+    dial: '91.1 FM',
+    freqNumber: 91.1,
+    callSign: 'W-BEAT',
+    name: 'W-BEAT 91.1 FM (RAP & ELECTRONIC)',
+    shortName: 'W-BEAT FM',
+    genre: 'Mojave Rap, MPC Boom-Bap, Cyber-Trap & Analog Electronics',
+    host: 'The MPC Alchemist & Strangelet Sound System',
+    vibe: 'Heavy 808 Sub-Bass, Saturated MPC Chops, Cyber-Glitch & Modular Electronics',
+    slogan: 'Excavating Neverland · Desert Hip-Hop, Electronic Breaks & Sub-Bass Overdrive',
+    color: '#fbbf24',
+    glow: 'rgba(251, 191, 36, 0.7)',
+    icon: '🎛️',
+    featuredAlbum: 'Excavating Neverland & The Strangelet MPC Vault',
     tracks: [
-      { id: 'aasb_01', num: '01', title: 'Babalon Working Blues', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/01 - Babalon Working Blues.mp3', duration: 214 },
-      { id: 'aasb_02', num: '02', title: 'Do What Thou Wilt (Hillbilly Hadit)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/02 - Do What Thou Wilt (Hillbilly Hadit).mp3', duration: 236 },
-      { id: 'aasb_03', num: '03', title: 'The Lam and the Grey', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/03 - The Lam and the Grey.mp3', duration: 206 },
-      { id: 'aasb_04', num: '04', title: 'Thelema Mountain', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/04 - Thelema Mountain.mp3', duration: 211 },
-      { id: 'aasb_05', num: '05', title: "The Con Man Sails Away (L. Ron's Excellent Adventure)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/05 - The Con Man Sails Away (L. Ron's Excellent Adventure).mp3", duration: 188 },
-      { id: 'aasb_06', num: '06', title: 'Cameron (The Scarlet Woman of Pasadena)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/06 - Cameron (The Scarlet Woman of Pasadena).mp3', duration: 259 },
-      { id: 'aasb_07', num: '07', title: 'Kenneth Grant & the Typhonian Transmission', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/07 - Kenneth Grant & the Typhonian Transmission.mp3', duration: 282 },
-      { id: 'aasb_08', num: '08', title: 'Six Months in the Desert (Abramelin Boogie)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/08 - Six Months in the Desert (Abramelin Boogie).mp3', duration: 239 },
-      { id: 'aasb_09', num: '09', title: 'The Beast in His Boarding House', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/09 - The Beast in His Boarding House.mp3', duration: 252 },
-      { id: 'aasb_10', num: '10', title: 'Doctor Dee & the Angel Table', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/10 - Doctor Dee & the Angel Table.mp3', duration: 277 },
-      { id: 'aasb_11', num: '11', title: "Zos Kia (Austin Osman Spare's Alphabet of Desire)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/11 - Zos Kia (Austin Osman Spare's Alphabet of Desire).mp3", duration: 292 },
-      { id: 'aasb_12', num: '12', title: 'The Golden Dawn Is Mine', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/12 - The Golden Dawn Is Mine.mp3', duration: 306 },
-      { id: 'aasb_13', num: '13', title: 'Sea Priestess', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/13 - Sea Priestess.mp3', duration: 298 },
-      { id: 'aasb_14', num: '14', title: 'Chaos Magic (The Permission Slip)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/14 - Chaos Magic (The Permission Slip).mp3', duration: 246 },
-      { id: 'aasb_15', num: '15', title: "The Eighth Sphere (Steiner's Moon-Demon Problem)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/15 - The Eighth Sphere (Steiner's Moon-Demon Problem).mp3", duration: 329 },
-      { id: 'aasb_16', num: '16', title: 'Blavatsky & the Mahatmas', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/16 - Blavatsky & the Mahatmas.mp3', duration: 292 },
-      { id: 'aasb_17', num: '17', title: 'Eliphas Lévi Invokes Apollonius', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/17 - Eliphas Lévi Invokes Apollonius.mp3', duration: 316 },
-      { id: 'aasb_18', num: '18', title: 'The Rosicrucian Manifestos (Nobody Knows Who Wrote Them)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/18 - The Rosicrucian Manifestos (Nobody Knows Who Wrote Them).mp3', duration: 288 },
-      { id: 'aasb_19', num: '19', title: 'The Aldebaran Transmission', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/19 - The Aldebaran Transmission.mp3', duration: 282 },
-      { id: 'aasb_20', num: '20', title: 'Carcosa (The Lake of Hali)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/20 - Carcosa (The Lake of Hali).mp3', duration: 284 },
-      { id: 'aasb_21', num: '21', title: 'The Yellow Sign (Transmission from the Hyades)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/21 - The Yellow Sign (Transmission from the Hyades).mp3', duration: 287 },
-      { id: 'aasb_22', num: '22', title: 'Niemand Bleibt Hier', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/22 - Niemand Bleibt Hier.mp3', duration: 253 },
-      { id: 'aasb_23', num: '23', title: "The Voynich Manuscript (Nobody's Read It)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/23 - The Voynich Manuscript (Nobody's Read It).mp3", duration: 250 },
-      { id: 'aasb_24', num: '24', title: "The Comte de Saint-Germain (The Man Who Wouldn't Die)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/24 - The Comte de Saint-Germain (The Man Who Wouldn't Die).mp3", duration: 256 },
-      { id: 'aasb_25', num: '25', title: "Bruno's Fire (The Campo de' Fiori, 1600)", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/25 - Bruno's Fire (The Campo de' Fiori, 1600).mp3", duration: 308 },
-      { id: 'aasb_26', num: '26', title: "Nicolas Flamel's Empty Grave", artist: "'O' Shibboleth", url: "./assets-bg/occult-songbook/26 - Nicolas Flamel's Empty Grave.mp3", duration: 346 },
-      { id: 'aasb_27', num: '27', title: 'The Priory of Sion', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/27 - The Priory of Sion.mp3', duration: 284 },
-      { id: 'aasb_28', num: '28', title: 'As Above, So Below (The Emerald Tablet Closer)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/28 - As Above, So Below (The Emerald Tablet Closer).mp3', duration: 317 },
-      { id: 'aasb_29', num: '29', title: 'Welcome to the Parsonage', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/29 - Welcome to the Parsonage.mp3', duration: 212 },
-      { id: 'aasb_30', num: '30', title: 'The Breach (Chasing Shadows)', artist: "'O' Shibboleth", url: './assets-bg/occult-songbook/30 - The Breach (Chasing Shadows).mp3', duration: 337 }
+      { id: 'rap_01', title: 'Excavating Neverland', artist: 'The Magic Static Society', url: './assets-bg/excavating-neverland.mp3', lrcUrl: './assets-bg/excavating-neverland.lrc', duration: 195, genre: 'Mojave Rap' },
+      { id: 'rap_02', title: 'High Roller (MonoAtomic Gold Rap Chop)', artist: 'The Magic Static Society', url: './assets-bg/high-roller.mp3', lrcUrl: './assets-bg/high-roller.lrc', duration: 216, genre: 'MPC Boom-Bap' },
+      { id: 'rap_03', title: 'Archon (Electronic Breakbeat & Synthesizer Glitch)', artist: 'Strangelet Electronic', url: './assets-bg/archon.mp3', duration: 219, genre: 'Electronic Breaks' },
+      { id: 'rap_04', title: 'Plush (Mojave Trap Sub-Bass)', artist: 'Strangelet Sound System', url: './assets-bg/plush.mp3', duration: 246, genre: 'Cyber-Trap' },
+      { id: 'rap_05', title: 'Cut The Feed (Transmission MPC Mashup)', artist: '4D Attack Radio', url: './assets-bg/high-roller.mp3', duration: 216, genre: 'Hip-Hop Mashup' },
+      { id: 'rap_06', title: 'Wait Till You See It (Electronic Bass Overdrive)', artist: 'The Magic Static Society', url: './assets-bg/wait-till-you-see-it.mp3', lrcUrl: './assets-bg/wait-till-you-see-it.lrc', duration: 234, genre: 'Electronic / Bass' },
+      { id: 'rap_07', title: 'Radiator Hums (Analog Drone & Modular Synth)', artist: 'Strangelet Electronic', url: './assets-bg/radiator.mp3', duration: 320, genre: 'Modular Synth' },
+      { id: 'rap_08', title: 'The Breach (Cyber-Breaks Remix)', artist: "'O' Shibboleth", url: './assets-bg/the-breach.mp3', lrcUrl: './assets-bg/the-breach.lrc', duration: 337, genre: 'Electronic Breaks' },
+      { id: 'rap_09', title: 'Babalon JATO (Early Electronic Dub)', artist: "'O' Shibboleth", url: './assets-bg/babalon-jato.mp3', duration: 219, genre: 'Electronic Dub' }
     ]
   },
   {
@@ -305,16 +332,14 @@ export const INTERZONE_RADIO_STATIONS = [
     tracks: [
       { id: 'g2g_01', title: 'Cut The Feed (Transmission Mashup)', artist: '4D Attack Radio', url: './assets-bg/high-roller.mp3', duration: 216 },
       { id: 'g2g_02', title: 'Astral Mafia', artist: '4D Attack Radio', url: './assets-bg/the-breach.mp3', duration: 228 },
-      { id: 'g2g_03', title: 'Astral X-Men', artist: '4D Attack Radio', url: './assets-bg/the-eighth-sphere.mp3', duration: 211 },
+      { id: 'g2g_03', title: 'Astral X-Men', artist: '4D Attack Radio', url: './assets-bg/eighth-sphere.mp3', duration: 211 },
       { id: 'g2g_04', title: 'Architects of the Cerebral', artist: '4D Attack Radio', url: './assets-bg/thelema-mountain.mp3', duration: 217 },
       { id: 'g2g_05', title: 'The Architect is Watching', artist: '4D Attack Radio', url: './assets-bg/wait-till-you-see-it.mp3', duration: 234 },
-      { id: 'g2g_06', title: 'Cellar of the Astral', artist: '4D Attack Radio', url: './assets-bg/excavating-neverland.mp3', duration: 195 },
-      { id: 'g2g_07', title: 'Cold Iron Ritual', artist: '4D Attack Radio', url: './assets-bg/babalon-working-blues.mp3', duration: 210 },
-      { id: 'g2g_08', title: 'Peripheral Static', artist: '4D Attack Radio', url: './assets-bg/the-eighth-sphere.mp3', duration: 185 },
-      { id: 'g2g_09', title: 'Clean Air, Cold Stone', artist: '4D Attack Radio', url: './assets-bg/the-breach.mp3', duration: 240 },
-      { id: 'g2g_10', title: 'Vestibule of Death', artist: '4D Attack Radio', url: './assets-bg/thelema-mountain.mp3', duration: 293 },
-      { id: 'g2g_11', title: 'Friction of the Feast', artist: '4D Attack Radio', url: './assets-bg/high-roller.mp3', duration: 314 },
-      { id: 'g2g_12', title: 'Shatter the Feet', artist: '4D Attack Radio', url: './assets-bg/excavating-neverland.mp3', duration: 220 }
+      { id: 'g2g_06', title: 'Cold Iron Ritual', artist: '4D Attack Radio', url: './assets-bg/babalon-working-blues.mp3', duration: 210 },
+      { id: 'g2g_07', title: 'Peripheral Static', artist: '4D Attack Radio', url: './assets-bg/radiator.mp3', duration: 185 },
+      { id: 'g2g_08', title: 'Clean Air, Cold Stone', artist: '4D Attack Radio', url: './assets-bg/the-breach.mp3', duration: 240 },
+      { id: 'g2g_09', title: 'Vestibule of Death', artist: '4D Attack Radio', url: './assets-bg/thelema-mountain.mp3', duration: 293 },
+      { id: 'g2g_10', title: 'Friction of the Feast', artist: '4D Attack Radio', url: './assets-bg/high-roller.mp3', duration: 314 }
     ]
   },
   {
@@ -337,29 +362,7 @@ export const INTERZONE_RADIO_STATIONS = [
       { id: 'ec_02', title: 'Ordinary Fucking People', artist: 'Edge City Outlaws', url: './assets-bg/babalon-working-blues.mp3', duration: 215 },
       { id: 'ec_03', title: "Otto's Malibu Ignition", artist: 'Edge City Outlaws', url: './assets-bg/thelema-mountain.mp3', duration: 184 },
       { id: 'ec_04', title: 'Flying Chevy in the Sunset', artist: 'Edge City Outlaws', url: './assets-bg/high-roller.mp3', duration: 232 },
-      { id: 'ec_05', title: 'Speed of Chrome', artist: 'Edge City Outlaws', url: './assets-bg/excavating-neverland.mp3', duration: 205 }
-    ]
-  },
-  {
-    id: 'interzone_cassette',
-    dial: '91.1 FM',
-    freqNumber: 91.1,
-    callSign: 'IZ-TAPE',
-    name: 'INTERZONE CASSETTE UNDERGROUND 91.1 FM',
-    shortName: 'IZ CASSETTE',
-    genre: 'Lo-Fi Hip-Hop, Underground Beats & Community Tapes',
-    host: 'The Tape Archivist',
-    vibe: 'Saturated Analog Cassette Hiss, MPC Drum Chops & Late-Night Strobe',
-    slogan: 'Community Tapes, Friend Submissions & Strangelet Beats',
-    color: '#fbbf24',
-    glow: 'rgba(251, 191, 36, 0.65)',
-    icon: '📼',
-    featuredAlbum: 'Strangelet Community Tapes Vol. 1',
-    tracks: [
-      { id: 'izc_01', title: 'High Roller (Cassette MPC Mix)', artist: 'Strangelet Beats', url: './assets-bg/high-roller.mp3', duration: 216 },
-      { id: 'izc_02', title: 'Excavating Neverland (Dusty Chop)', artist: 'Strangelet Beats', url: './assets-bg/excavating-neverland.mp3', duration: 195 },
-      { id: 'izc_03', title: 'Wait Till You See It (Tape Saturation)', artist: 'Strangelet Beats', url: './assets-bg/wait-till-you-see-it.mp3', duration: 234 },
-      { id: 'izc_04', title: 'Underground Frequency 04', artist: 'Strangelet Beats', url: './assets-bg/the-breach.mp3', duration: 210 }
+      { id: 'ec_05', title: 'Babalon JATO Drag Race', artist: 'Edge City Outlaws', url: './assets-bg/babalon-jato.mp3', duration: 219 }
     ]
   },
   {
@@ -379,7 +382,7 @@ export const INTERZONE_RADIO_STATIONS = [
     featuredAlbum: 'Phase 4 Mystery Plays Series',
     tracks: [
       { id: 'p4_01', title: 'The Parsonage Incident (Act 1)', artist: 'Phase 4 Players', url: './assets-bg/babalon-working-blues.mp3', duration: 320 },
-      { id: 'p4_02', title: 'The Obsidian Mirror Transmission', artist: 'Phase 4 Players', url: './assets-bg/the-eighth-sphere.mp3', duration: 285 },
+      { id: 'p4_02', title: 'The Obsidian Mirror Transmission', artist: 'Phase 4 Players', url: './assets-bg/eighth-sphere.mp3', duration: 285 },
       { id: 'p4_03', title: 'The Shadow in the Desert Screen', artist: 'Phase 4 Players', url: './assets-bg/thelema-mountain.mp3', duration: 298 }
     ]
   }

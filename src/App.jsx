@@ -29,23 +29,31 @@ import { resolveRadioAudioUrl } from './constants/radioStations';
 
 export const DEFAULT_PLAYLIST = [
   {
-    id: 'pl_excavating_neverland',
-    title: "Excavating Neverland — The Magic Static Society",
-    url: './assets-bg/excavating-neverland.mp3',
-    lrcUrl: './assets-bg/excavating-neverland.lrc',
-    duration: 310,
-    storyboardId: 'pl_excavating_neverland',
+    id: 'pl_babalon_working_blues',
+    num: '01',
+    title: "Babalon Working Blues — 'O' Shibboleth",
+    url: './assets-bg/occult-songbook/01 - Babalon Working Blues.mp3',
+    lrcUrl: './assets-bg/babalon-working-blues.lrc',
+    artist: "'O' Shibboleth",
+    duration: 214,
+    storyboardId: 'pl_babalon_working_blues',
     preset: {
       selectedStyle: 'timeline',
-      selectedEra: 'default',
-      selectedRube: 'none',
-      bpm: 120,
-      chaosLevel: 0,
-      chaosEnabled: false,
-      sensitivity: 1.1,
-      reverbWet: 0.25,
-      autoDJEnabled: false,
+      selectedEra: '1940_noir',
+      bpm: 116,
+      chaosLevel: 0.12,
+      chaosEnabled: true,
+      sensitivity: 1.2,
+      reverbWet: 0.30,
     },
+  },
+  {
+    id: 'pl_do_what_thou_wilt',
+    num: '02',
+    title: "Do What Thou Wilt (Hillbilly Hadit) — 'O' Shibboleth",
+    url: './assets-bg/occult-songbook/02 - Do What Thou Wilt (Hillbilly Hadit).mp3',
+    artist: "'O' Shibboleth",
+    duration: 236,
   },
   {
     id: 'pl_wait_till_you_see_it',
@@ -65,11 +73,32 @@ export const DEFAULT_PLAYLIST = [
     },
   },
   {
+    id: 'pl_excavating_neverland',
+    title: "Excavating Neverland — The Magic Static Society",
+    url: './assets-bg/excavating-neverland.mp3',
+    lrcUrl: './assets-bg/excavating-neverland.lrc',
+    duration: 310,
+    artist: "The Magic Static Society",
+    storyboardId: 'pl_excavating_neverland',
+    preset: {
+      selectedStyle: 'timeline',
+      selectedEra: 'default',
+      selectedRube: 'none',
+      bpm: 120,
+      chaosLevel: 0,
+      chaosEnabled: false,
+      sensitivity: 1.1,
+      reverbWet: 0.25,
+      autoDJEnabled: false,
+    },
+  },
+  {
     id: 'pl_high_roller',
     title: "High Roller — MonoAtomiX",
     url: './assets-bg/high-roller.mp3',
     lrcUrl: './assets-bg/high-roller.lrc',
     duration: 210,
+    artist: "The Magic Static Society",
     storyboardId: 'pl_high_roller',
     preset: {
       selectedStyle: 'timeline',
@@ -80,23 +109,6 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.25,
       reverbWet: 0.28,
-    },
-  },
-  {
-    id: 'pl_babalon_working_blues',
-    title: "Babalon Working Blues — 'O' Shibboleth",
-    url: './assets-bg/babalon-working-blues.mp3',
-    lrcUrl: './assets-bg/babalon-working-blues.lrc',
-    duration: 214,
-    storyboardId: 'pl_babalon_working_blues',
-    preset: {
-      selectedStyle: 'timeline',
-      selectedEra: '1940_noir',
-      bpm: 116,
-      chaosLevel: 0.12,
-      chaosEnabled: true,
-      sensitivity: 1.2,
-      reverbWet: 0.30,
     },
   },
   {
@@ -1478,7 +1490,21 @@ export default function App() {
             onToggleVideo={toggleVideo}
             audioSignals={audioSignals}
             playlist={playlist}
-            onSelectTrack={(entry) => handlePlayTrack(entry, playlist.findIndex((p) => p.id === entry.id))}
+            onSelectTrack={(entry) => {
+              const existingIdx = playlist.findIndex((p) => p.id === entry.id || p.title === entry.title);
+              if (existingIdx !== -1) {
+                handlePlayTrack(playlist[existingIdx], existingIdx);
+              } else {
+                setPlaylist((prev) => [entry, ...prev]);
+                handlePlayTrack(entry, 0);
+              }
+            }}
+            onUpdateStationPlaylist={(stationTracks, startIdx = 0) => {
+              setPlaylist(stationTracks);
+              if (stationTracks && stationTracks[startIdx]) {
+                handlePlayTrack(stationTracks[startIdx], startIdx);
+              }
+            }}
           />
         ) : (
           <>
