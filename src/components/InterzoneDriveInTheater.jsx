@@ -93,8 +93,17 @@ export function InterzoneDriveInTheater({
   onSelectTrack,
   onUpdateStationPlaylist,
 }) {
-  // 'lot' (parked in the desert watching screen) or 'gate' (roadside box office)
-  const [driveInView, setDriveInView] = useState('lot');
+  // 'lot' (parked in the desert watching screen) or 'gate' (roadside box office & links page)
+  const [driveInView, setDriveInView] = useState(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const v = params.get('view');
+        if (v === 'lot' || v === 'gate') return v;
+      }
+    } catch (_) {}
+    return 'gate';
+  });
   // 'feature' | 'ufo_broll' | 'hey_books' | 'community_reel'
   const [screenChannel, setScreenChannel] = useState('feature');
   // Panoramic 4-Screen Camera Panning: 0 (Feature/Strangelet), 1 (Indie MV/KinetoCut), 2 (Midnight Grindhouse), 3 (Live Visualizer/Radio)
@@ -1144,7 +1153,7 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 6. AudioArc */}
+                {/* 6A. audioArc (perchance) */}
                 <a
                   href="https://perchance.org/audioarc"
                   target="_blank"
@@ -1179,13 +1188,13 @@ export function InterzoneDriveInTheater({
                       <span style={{ fontSize: 8.5, color: '#38bdf8', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#38bdf8' }}>
-                      AUDIOARC
+                      AUDIOARC (PERCHANCE)
                     </div>
                     <div style={{ fontSize: 7.5, color: '#bae6fd', fontFamily: 'monospace', marginTop: 1 }}>
                       STORYBOARDS · SCRIPTS · SHORT FILMS
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Storyboard, screenwriting, music video & short film creator app with narrative pacing.
+                      Original Perchance edition: prompt-driven storyboards, screenwriting, narrative pacing & character visualizer.
                     </div>
                   </div>
                   <div
@@ -1198,7 +1207,65 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    OPEN AUDIOARC ➔
+                    OPEN AUDIOARC (PERCHANCE) ➔
+                  </div>
+                </a>
+
+                {/* 6B. audioArc (pollinations) */}
+                <a
+                  href="https://audioarc.pollinations.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(10, 25, 45, 0.88)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(14, 165, 233, 0.65)',
+                    boxShadow: '0 0 16px rgba(14, 165, 233, 0.25)',
+                    textAlign: 'left',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#00e5ff';
+                    e.currentTarget.style.boxShadow = '0 0 24px rgba(0, 229, 255, 0.45)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(14, 165, 233, 0.65)';
+                    e.currentTarget.style.boxShadow = '0 0 16px rgba(14, 165, 233, 0.25)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 22 }}>🎬</span>
+                      <span style={{ fontSize: 8.5, color: '#00e5ff', fontFamily: 'monospace' }}>pollinations.app ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#00e5ff' }}>
+                      AUDIOARC (POLLINATIONS)
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#7dd3fc', fontFamily: 'monospace', marginTop: 1 }}>
+                      AI SCREENPLAY · 19-PAGE PRODUCTION BIBLE · ANIMATIC
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
+                      Full-spectrum storytelling app: AI screenplay generator, multi-track animatics, and 19-page Master Production Bible PDFs powered by Pollinations.
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontSize: 8,
+                      fontFamily: "'Syncopate', sans-serif",
+                      color: '#00e5ff',
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    OPEN AUDIOARC (POLLINATIONS) ➔
                   </div>
                 </a>
 
@@ -1391,57 +1458,6 @@ export function InterzoneDriveInTheater({
                     EXPLORE STRANGELET STITCH ➔
                   </div>
                 </a>
-
-                {/* 10. Hey Books Scene Card */}
-                <div
-                  onClick={() => {
-                    setDriveInView('lot');
-                    setScreenChannel('hey_books');
-                  }}
-                  style={{
-                    padding: 16,
-                    backgroundColor: 'rgba(25, 15, 30, 0.85)',
-                    borderRadius: 6,
-                    border: '1px solid rgba(244, 63, 94, 0.5)',
-                    boxShadow: '0 0 12px rgba(244, 63, 94, 0.25)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    transition: 'border-color 0.2s, transform 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = '#f43f5e';
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(244, 63, 94, 0.5)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: 22, marginBottom: 6 }}>📚</div>
-                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#f43f5e' }}>
-                      HEY BOOKS · SAN DIEGO
-                    </div>
-                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Matthew's neighborhood bookstore in North Park. Watch the late-night storefront scene on Screen 3.
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 12,
-                      fontSize: 8,
-                      fontFamily: "'Syncopate', sans-serif",
-                      color: '#f43f5e',
-                      fontWeight: 700,
-                      letterSpacing: 1,
-                    }}
-                  >
-                    WATCH ON SCREEN 3 ➔
-                  </div>
-                </div>
 
                 {/* 8. Community Reel Card */}
                 <div

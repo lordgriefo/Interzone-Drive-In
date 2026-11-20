@@ -290,20 +290,16 @@ export default function App() {
   const studioIframeRef = useRef(null);
 
   // ── Deep-linkable Tab Router (URL search param ?tab=drivein|studio|editor or hash) ──
-  // If domain is interzone-drive-in, defaults to 'drivein'. Otherwise defaults to 'editor'.
+  // Defaults to 'drivein' (Roadside Entrance & Links splash page) as the main page.
   const [activeTab, setActiveTab] = useState(() => {
     try {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
         if (tab === 'studio' || tab === 'drivein' || tab === 'editor') return tab;
-        // Default to 'drivein' if accessed via interzone-drive-in domain or drive-in path
-        if (window.location.hostname.includes('drive-in') || window.location.pathname.includes('drivein')) {
-          return 'drivein';
-        }
       }
     } catch (_) {}
-    return 'editor';
+    return 'drivein';
   });
 
   const handleTabChange = useCallback((nextTab) => {
