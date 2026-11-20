@@ -2721,6 +2721,8 @@ export function CanvasWorkspace({
           black_ops:       "'Black Ops One', sans-serif",     // military stencil
           russo_one:       "'Russo One', sans-serif",         // tech bold
           syncopate:       "'Syncopate', sans-serif",         // geometric condensed
+          cinzel:          "'Cinzel', serif",                 // classical arcane serif
+          righteous:       "'Righteous', cursive",            // retro rounded display
           // ── System fallbacks ──
           courier:         "'Courier New', Courier, monospace",
           impact:          "Impact, 'Arial Narrow', sans-serif",
@@ -2787,7 +2789,7 @@ export function CanvasWorkspace({
             color: '#fff',
             fontFamily,
             fontSize: `${lyricSize}rem`,
-            letterSpacing: (lyricFont === 'space_mono' || lyricFont === 'major_mono') ? '2px' : '0.5px',
+            letterSpacing: (lyricFont === 'space_mono' || lyricFont === 'major_mono') ? '2px' : (lyricFont === 'cinzel' || lyricFont === 'syncopate' ? '3px' : (lyricFont === 'bebas_neue' ? '1.5px' : '0.5px')),
             textAlign: lyricAlign,
             textShadow: animTextShadow,
             maxWidth: '85%',

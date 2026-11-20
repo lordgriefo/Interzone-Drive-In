@@ -16,7 +16,10 @@ export const STORYBOARD_PRESETS = {
       "bpm": 120,
       "chaosLevel": 0,
       "chaosEnabled": false,
-      "autoDJEnabled": false
+      "autoDJEnabled": false,
+      "lyricFont": "bebas_neue",
+      "lyricSize": 1.8,
+      "lyricAnim": "karaoke_glow"
     },
     "fxMarkers": [
       {

@@ -45,6 +45,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.2,
       reverbWet: 0.30,
+      lyricFont: 'special_elite',
+      lyricSize: 1.35,
+      lyricAnim: 'floating_drift',
     },
   },
   {
@@ -54,6 +57,18 @@ export const DEFAULT_PLAYLIST = [
     url: './assets-bg/occult-songbook/02 - Do What Thou Wilt (Hillbilly Hadit).mp3',
     artist: "'O' Shibboleth",
     duration: 236,
+    preset: {
+      selectedStyle: 'timeline',
+      selectedEra: '1970_grindhouse',
+      bpm: 122,
+      chaosLevel: 0.10,
+      chaosEnabled: true,
+      sensitivity: 1.2,
+      reverbWet: 0.28,
+      lyricFont: 'permanent_marker',
+      lyricSize: 1.5,
+      lyricAnim: 'pulse_slam',
+    },
   },
   {
     id: 'pl_wait_till_you_see_it',
@@ -70,6 +85,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.2,
       reverbWet: 0.30,
+      lyricFont: 'vt323',
+      lyricSize: 1.65,
+      lyricAnim: 'glitch_pop',
     },
   },
   {
@@ -90,6 +108,9 @@ export const DEFAULT_PLAYLIST = [
       sensitivity: 1.1,
       reverbWet: 0.25,
       autoDJEnabled: false,
+      lyricFont: 'bebas_neue',
+      lyricSize: 1.8,
+      lyricAnim: 'karaoke_glow',
     },
   },
   {
@@ -109,6 +130,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.25,
       reverbWet: 0.28,
+      lyricFont: 'black_ops',
+      lyricSize: 1.45,
+      lyricAnim: 'pulse_slam',
     },
   },
   {
@@ -126,6 +150,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: false,
       sensitivity: 1.05,
       reverbWet: 0.25,
+      lyricFont: 'cinzel',
+      lyricSize: 1.3,
+      lyricAnim: 'floating_drift',
     },
   },
   {
@@ -144,6 +171,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.25,
       reverbWet: 0.35,
+      lyricFont: 'orbitron',
+      lyricSize: 1.4,
+      lyricAnim: 'glitch_pop',
     },
   },
   {
@@ -161,6 +191,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.1,
       reverbWet: 0.35,
+      lyricFont: 'press_start',
+      lyricSize: 1.15,
+      lyricAnim: 'pulse_slam',
     },
   },
   {
@@ -179,6 +212,9 @@ export const DEFAULT_PLAYLIST = [
       chaosEnabled: true,
       sensitivity: 1.15,
       reverbWet: 0.38,
+      lyricFont: 'space_mono',
+      lyricSize: 1.45,
+      lyricAnim: 'karaoke_glow',
     },
   },
 ];
@@ -443,6 +479,14 @@ export default function App() {
     setSelectedRube(rube);
   }, []);
 
+  // ── Lyrics typography & beat-reactive animation state ──
+  const [moonVariant, setMoonVariant] = useState('classic_halo');
+  const [moonFilter,  setMoonFilter]  = useState('silent_silver');
+  const [lyricAlign,  setLyricAlign]  = useState('center');
+  const [lyricSize,   setLyricSize]   = useState(DEFAULT_PLAYLIST[0]?.preset?.lyricSize || 1.35);
+  const [lyricFont,   setLyricFont]   = useState(DEFAULT_PLAYLIST[0]?.preset?.lyricFont || 'special_elite');
+  const [lyricAnim,   setLyricAnim]   = useState(DEFAULT_PLAYLIST[0]?.preset?.lyricAnim || 'floating_drift');
+
   const applyPreset = useCallback((preset) => {
     if (!preset) return;
     if (preset.selectedStyle !== undefined) setSelectedStyle(preset.selectedStyle);
@@ -456,6 +500,10 @@ export default function App() {
     if (preset.autoDJEnabled !== undefined) setAutoDJEnabled(preset.autoDJEnabled);
     if (preset.autoDJMode    !== undefined) setAutoDJMode(preset.autoDJMode);
     if (preset.autoDJInterval !== undefined) setAutoDJInterval(preset.autoDJInterval);
+    if (preset.lyricFont     !== undefined) setLyricFont(preset.lyricFont);
+    if (preset.lyricSize     !== undefined) setLyricSize(preset.lyricSize);
+    if (preset.lyricAnim     !== undefined) setLyricAnim(preset.lyricAnim);
+    if (preset.lyricAlign    !== undefined) setLyricAlign(preset.lyricAlign);
     basePresetRef.current = {
       era: preset.selectedEra || 'default',
       rube: preset.selectedRube || 'none',
@@ -483,12 +531,6 @@ export default function App() {
     setRube: setSelectedRube,
     bpm,
   });
-
-  const [moonVariant, setMoonVariant] = useState('classic_halo');
-  const [moonFilter,  setMoonFilter]  = useState('silent_silver');
-  const [lyricAlign,  setLyricAlign]  = useState('center');
-  const [lyricSize,   setLyricSize]   = useState(1.4);
-  const [lyricFont,   setLyricFont]   = useState('space_mono');
 
   // ── Chaos Mode ──
   const [chaosEnabled,    setChaosEnabled]    = useState(false);
@@ -545,7 +587,11 @@ export default function App() {
     sensitivity,
     bpm,
     reverbWet,
-  }), [selectedStyle, selectedEra, selectedRube, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet]);
+    lyricFont,
+    lyricSize,
+    lyricAnim,
+    lyricAlign,
+  }), [selectedStyle, selectedEra, selectedRube, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet, lyricFont, lyricSize, lyricAnim, lyricAlign]);
 
   // ── Perchance Iframe postMessage Bridge ──
   useEffect(() => {
@@ -838,7 +884,6 @@ export default function App() {
   const [fractalMode, setFractalMode]                 = useState('none'); // 'none' | 'spiral' | 'tunnel'
   const [alienBeam, setAlienBeam]                     = useState(false);
   const [warpDrive, setWarpDrive]                     = useState(false);
-  const [lyricAnim, setLyricAnim]                     = useState('pulse_slam');
 
   useEffect(() => {
     depthLoader.syncPlayback(isPlaying);
@@ -1596,6 +1641,10 @@ export default function App() {
                 bpm,
                 chaosLevel,
                 chaosEnabled,
+                lyricFont,
+                lyricSize,
+                lyricAnim,
+                lyricAlign,
               }}
               onApplyPreset={applyPreset}
               onAddFxMarker={handleAddFxMarker}

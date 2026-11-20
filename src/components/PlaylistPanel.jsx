@@ -437,6 +437,12 @@ export function PlaylistPanel({
                       {entry.preset?.bpm && (
                         <Badge text={`${entry.preset.bpm} BPM`} color="#22d3ee" />
                       )}
+                      {entry.preset?.lyricFont && (
+                        <Badge text={`🔤 ${entry.preset.lyricFont.replace(/_/g, ' ')}`} color="#ec4899" />
+                      )}
+                      {entry.preset?.lyricAnim && (
+                        <Badge text={`⚡ ${entry.preset.lyricAnim.replace(/_/g, ' ')}`} color="#f59e0b" />
+                      )}
                       {entry.assets?.length > 0 && (
                         <Badge text={`📷 ${entry.assets.length} imgs`} color="#10b981" />
                       )}

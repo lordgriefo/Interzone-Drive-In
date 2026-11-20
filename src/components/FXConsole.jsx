@@ -644,6 +644,8 @@ export function FXConsole({
             <option value="black_ops">Black Ops One — military stencil</option>
             <option value="russo_one">Russo One — tech bold</option>
             <option value="syncopate">Syncopate — geometric condensed</option>
+            <option value="cinzel">Cinzel — classical arcane serif</option>
+            <option value="righteous">Righteous — retro display</option>
           </optgroup>
           <optgroup label="── Classic ──">
             <option value="impact">Impact — bold title card</option>
