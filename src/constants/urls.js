@@ -118,7 +118,7 @@ export const STRANGELET_SUITE_APPS = [
     badge: 'POLLINATIONS EDITION',
     icon: '🎬',
     url: POLLINATIONS_AUDIO_ARC_URL,
-    desc: 'Full-spectrum storytelling app: AI screenplay generator, multi-track animatics, and 19-page Master Production Bible PDFs powered by Pollinations.',
+    desc: 'Full-spectrum storytelling app: AI screenplay generator, multi-track animatics, and comprehensive Master Production Bible PDFs powered by Pollinations.',
     color: '#0284c7',
     glow: 'rgba(2, 132, 199, 0.55)',
   },

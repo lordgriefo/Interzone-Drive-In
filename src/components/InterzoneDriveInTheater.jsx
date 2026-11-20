@@ -1249,10 +1249,10 @@ export function InterzoneDriveInTheater({
                       AUDIOARC (POLLINATIONS)
                     </div>
                     <div style={{ fontSize: 7.5, color: '#7dd3fc', fontFamily: 'monospace', marginTop: 1 }}>
-                      AI SCREENPLAY · 19-PAGE PRODUCTION BIBLE · ANIMATIC
+                      AI SCREENPLAY · MASTER PRODUCTION BIBLE · ANIMATIC
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Full-spectrum storytelling app: AI screenplay generator, multi-track animatics, and 19-page Master Production Bible PDFs powered by Pollinations.
+                      Full-spectrum storytelling app: AI screenplay generator, multi-track animatics, and comprehensive Master Production Bible PDFs powered by Pollinations.
                     </div>
                   </div>
                   <div
