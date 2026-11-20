@@ -32,7 +32,7 @@ export const DEFAULT_PLAYLIST = [
     id: 'pl_babalon_working_blues',
     num: '01',
     title: "Babalon Working Blues — 'O' Shibboleth",
-    url: './assets-bg/occult-songbook/01 - Babalon Working Blues.mp3',
+    url: './assets-bg/babalon-working-blues.mp3',
     lrcUrl: './assets-bg/babalon-working-blues.lrc',
     artist: "'O' Shibboleth",
     duration: 214,
@@ -864,12 +864,13 @@ export default function App() {
   const lastAudioFileRef = useRef(DEFAULT_TRACK_URL);
   const hasAudioLoaded   = Boolean(lastAudioFileRef.current);
 
-  // Auto-load Excavating Neverland track + synced LRC lyrics on startup
+  // Auto-load initial track + synced LRC lyrics on startup
   useEffect(() => {
     try {
-      loadAudioTrack(DEFAULT_TRACK_URL);
+      const resolvedTrackUrl = resolveRadioAudioUrl(DEFAULT_TRACK_URL);
+      loadAudioTrack(resolvedTrackUrl);
       setTrackTitle(DEFAULT_TRACK_TITLE);
-      lastAudioFileRef.current = DEFAULT_TRACK_URL;
+      lastAudioFileRef.current = resolvedTrackUrl;
       const p = DEFAULT_PLAYLIST[0]?.preset;
       if (p) {
         applyPreset(p);

@@ -64,9 +64,9 @@ export function useTimelineState(assets, duration = 60, externalBpm, setExternal
   const setBpm = setExternalBpm || setInternalBpm;
 
   const [automationKeyframes, setAutomationKeyframes] = useState([
-    { id: 'auto-0', time: 0,  chaosLevel: 0, filterMix: 0.5 },
-    { id: 'auto-1', time: 15, chaosLevel: 2, filterMix: 0.8 },
-    { id: 'auto-2', time: 30, chaosLevel: 0, filterMix: 0.5 },
+    { id: 'auto-0', time: 0,  chaosLevel: 0, filterMix: 0.5, value: 0.5 },
+    { id: 'auto-1', time: 15, chaosLevel: 2, filterMix: 0.8, value: 0.8 },
+    { id: 'auto-2', time: 30, chaosLevel: 0, filterMix: 0.5, value: 0.5 },
   ]);
 
   // ── Sync clips when asset list changes ──

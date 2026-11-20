@@ -123,21 +123,31 @@ export function TimelineAutomationLane({
   // Generate SVG polyline path string
   const pathD = useMemo(() => {
     if (sortedKeyframes.length === 0) return '';
+    const getKeyVal = (kf) => {
+      if (kf.value !== undefined && !isNaN(kf.value)) return Number(kf.value);
+      if (kf.filterMix !== undefined && !isNaN(kf.filterMix)) return Number(kf.filterMix);
+      return 0.5;
+    };
+
     const points = sortedKeyframes.map((kf) => {
-      const x = kf.time * pixelsPerSecond;
-      const y = (1 - kf.value) * (LANE_H - 12) + 6;
-      return `${x},${y}`;
+      const x = (kf.time || 0) * pixelsPerSecond;
+      const val = getKeyVal(kf);
+      const y = (1 - val) * (LANE_H - 12) + 6;
+      return `${isNaN(x) ? 0 : x},${isNaN(y) ? 0 : y}`;
     });
 
     // Lead in from left edge
-    const firstX = sortedKeyframes[0].time * pixelsPerSecond;
-    const firstY = (1 - sortedKeyframes[0].value) * (LANE_H - 12) + 6;
-    const prefix = firstX > 0 ? `0,${firstY} ` : '';
+    const firstVal = getKeyVal(sortedKeyframes[0]);
+    const firstX = (sortedKeyframes[0].time || 0) * pixelsPerSecond;
+    const firstY = (1 - firstVal) * (LANE_H - 12) + 6;
+    const prefix = firstX > 0 ? `0,${isNaN(firstY) ? 0 : firstY} ` : '';
 
     // Lead out to right edge
-    const lastX = sortedKeyframes[sortedKeyframes.length - 1].time * pixelsPerSecond;
-    const lastY = (1 - sortedKeyframes[sortedKeyframes.length - 1].value) * (LANE_H - 12) + 6;
-    const suffix = lastX < contentWidth ? ` ${contentWidth},${lastY}` : '';
+    const lastKey = sortedKeyframes[sortedKeyframes.length - 1];
+    const lastVal = getKeyVal(lastKey);
+    const lastX = (lastKey.time || 0) * pixelsPerSecond;
+    const lastY = (1 - lastVal) * (LANE_H - 12) + 6;
+    const suffix = lastX < contentWidth ? ` ${contentWidth},${isNaN(lastY) ? 0 : lastY}` : '';
 
     return `${prefix}${points.join(' ')}${suffix}`;
   }, [sortedKeyframes, pixelsPerSecond, contentWidth]);
@@ -310,8 +320,11 @@ export function TimelineAutomationLane({
 
         {/* Draggable Keyframe Handle Nodes */}
         {sortedKeyframes.map((kf) => {
-          const x = kf.time * pixelsPerSecond;
-          const y = (1 - kf.value) * (LANE_H - 12) + 6;
+          const x = (kf.time || 0) * pixelsPerSecond;
+          const val = kf.value !== undefined && !isNaN(kf.value)
+            ? Number(kf.value)
+            : (kf.filterMix !== undefined && !isNaN(kf.filterMix) ? Number(kf.filterMix) : 0.5);
+          const y = (1 - val) * (LANE_H - 12) + 6;
           const isHovered = hoveredKeyframeId === kf.id;
 
           return (

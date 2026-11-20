@@ -521,6 +521,20 @@ export function useAudioEngine(sensitivity = 1.0, bpm = 120) {
         startClockAndAnalysis();
       } catch (err) {
         console.error('[useAudioEngine] Audio playback error:', err);
+        // Fallback: If track fails (404/decode), load guaranteed local track so engine never hangs
+        if (el.src && !el.src.includes('excavating-neverland')) {
+          console.warn('[useAudioEngine] Falling back to default track excavating-neverland.mp3');
+          el.src = './assets-bg/excavating-neverland.mp3';
+          el.load();
+          try {
+            await el.play();
+            setIsPlaying(true);
+            if (meydaAnalyzerRef.current) try { meydaAnalyzerRef.current.start(); } catch (_) {}
+            startClockAndAnalysis();
+          } catch (retryErr) {
+            console.error('[useAudioEngine] Fallback play error:', retryErr);
+          }
+        }
       }
     }
   }, [ensureAudioGraph, unlockAudio, startClockAndAnalysis, bpm]);

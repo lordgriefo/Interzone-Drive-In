@@ -1813,12 +1813,12 @@ export function MultiTrackTimeline({
                   waveformPeaks.map((peak, i) => {
                     const barW = contentWidth / waveformPeaks.length;
                     const x = i * barW;
-                    const h = peak * (ROW_H - 16);
+                    const h = Math.max(0, Math.abs(peak || 0) * (ROW_H - 16));
                     return (
                       <rect
                         key={i}
                         x={x}
-                        y={(ROW_H - h) / 2}
+                        y={Math.max(0, (ROW_H - h) / 2)}
                         width={Math.max(barW - 0.5, 1)}
                         height={h}
                         fill="var(--waveform-color)"
