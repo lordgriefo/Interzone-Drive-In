@@ -1191,10 +1191,10 @@ export function InterzoneDriveInTheater({
                       AUDIOARC (PERCHANCE)
                     </div>
                     <div style={{ fontSize: 7.5, color: '#bae6fd', fontFamily: 'monospace', marginTop: 1 }}>
-                      STORYBOARDS · SCRIPTS · SHORT FILMS
+                      AI FILMMAKING STUDIO · TIMED STORYBOARDS
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Original Perchance edition: prompt-driven storyboards, screenwriting, narrative pacing & character visualizer.
+                      Free AI filmmaking studio: turn lyrics & MP3s into timed music video storyboards with master keyframe prompts, 3 motion takes, Sora video directives & cast continuity.
                     </div>
                   </div>
                   <div
@@ -1249,10 +1249,10 @@ export function InterzoneDriveInTheater({
                       AUDIOARC (POLLINATIONS)
                     </div>
                     <div style={{ fontSize: 7.5, color: '#7dd3fc', fontFamily: 'monospace', marginTop: 1 }}>
-                      AI SCREENPLAY · MASTER PRODUCTION BIBLE · ANIMATIC
+                      PRE-PRO SUITE · PRODUCTION BIBLE · LIVE ANIMATIC
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Full-spectrum storytelling app: AI screenplay generator, multi-track animatics, and comprehensive Master Production Bible PDFs powered by Pollinations.
+                      Full-spectrum pre-pro studio: Audio Intelligence beat analysis, multi-track animatic timeline, client-ready Master Production Bible PDFs & multi-model AI screenplay engine.
                     </div>
                   </div>
                   <div
