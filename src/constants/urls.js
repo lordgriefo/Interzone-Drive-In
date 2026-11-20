@@ -13,7 +13,8 @@ export const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/magicstatic/';
 
 // ── THE 7 ACTIVE PERCHANCE SITES IN THE STRANGELET SUITE ──
 export const PERCHANCE_KENETICUT_URL = 'https://perchance.org/keneticut';
-export const PERCHANCE_WUNDERBAR_URL = 'https://perchance.org/the-wunderbar';
+export const PERCHANCE_WUNDERBAR_URL = 'https://perchance.org/the-wunder-bar';
+export const PERCHANCE_WUNDERBAR_MIRROR_URL = 'https://perchance.org/the-wunderbar';
 export const PERCHANCE_FACE_FOR_RADIO_URL = 'https://perchance.org/face-for-radio';
 export const PERCHANCE_PHASE_4_PICTURES_URL = 'https://perchance.org/phase-4-pictures';
 export const PERCHANCE_THE_LSC_URL = 'https://perchance.org/the-lsc';
@@ -55,12 +56,14 @@ export const STRANGELET_SUITE_APPS = [
   },
   {
     id: 'the-wunderbar',
-    title: 'The Wunderbar',
-    tagline: 'Music Videos · Characters · Prompts · Storyboards',
-    badge: 'DOES PRETTY MUCH EVERYTHING',
+    title: 'Wunderbar!',
+    subtitle: '(The Wunderbar)',
+    tagline: 'Song → Storyboard → Music Video → Screenplay',
+    badge: 'AI MOVIE SUITE & 4-WAY PREVIZ',
     icon: '⚡',
     url: PERCHANCE_WUNDERBAR_URL,
-    desc: 'The all-in-one creative engine: music video crafting, character creation, alchemical prompt physics & scene-by-scene storyboards.',
+    mirrorUrl: PERCHANCE_WUNDERBAR_MIRROR_URL,
+    desc: 'In-browser AI movie suite: 4-way visual storyboard previz, massive film lens & stock library, audio-reactive music video exporter with karaoke lyrics, lip-sync studio & full Fountain screenplay co-writer.',
     color: '#fbbf24',
     glow: 'rgba(251, 191, 36, 0.45)',
   },

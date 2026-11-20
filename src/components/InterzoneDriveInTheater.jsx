@@ -975,11 +975,12 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 3. The Wunderbar */}
+                {/* 3. Wunderbar! */}
                 <a
-                  href="https://perchance.org/the-wunderbar"
+                  href="https://perchance.org/the-wunder-bar"
                   target="_blank"
                   rel="noopener noreferrer"
+                  title="Open Wunderbar! (Mirror: perchance.org/the-wunderbar)"
                   style={{
                     padding: 16,
                     backgroundColor: 'rgba(25, 22, 15, 0.85)',
@@ -1014,13 +1015,13 @@ export function InterzoneDriveInTheater({
                       <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
-                      THE WUNDERBAR
+                      WUNDERBAR!
                     </div>
                     <div style={{ fontSize: 7.5, color: '#fde047', fontFamily: 'monospace', marginTop: 1 }}>
-                      DOES PRETTY MUCH EVERYTHING
+                      SONG → STORYBOARD → MUSIC VIDEO → SCREENPLAY
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      The all-in-one creative catalyst: music video crafting, character dossiers, alchemical prompt physics & scene-by-scene storyboards.
+                      In-browser AI movie suite: 4-way visual storyboard previz, massive film lens & stock library, audio-reactive music video exporter with karaoke lyrics, lip-sync studio & full Fountain screenplay co-writer.
                     </div>
                   </div>
                   <div
@@ -1033,7 +1034,7 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    ENTER WUNDERBAR ➔
+                    ENTER WUNDERBAR! ➔
                   </div>
                 </a>
 
