@@ -443,6 +443,9 @@ export function PlaylistPanel({
                       {entry.preset?.lyricAnim && (
                         <Badge text={`⚡ ${entry.preset.lyricAnim.replace(/_/g, ' ')}`} color="#f59e0b" />
                       )}
+                      {entry.preset?.noFlashing && (
+                        <Badge text="🚫 No Flash" color="#10b981" />
+                      )}
                       {entry.assets?.length > 0 && (
                         <Badge text={`📷 ${entry.assets.length} imgs`} color="#10b981" />
                       )}

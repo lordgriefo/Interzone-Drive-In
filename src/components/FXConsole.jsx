@@ -321,6 +321,8 @@ export function FXConsole({
   setWarpDrive = () => {},
   lyricAnim = 'pulse_slam',
   setLyricAnim = () => {},
+  noFlashing = false,
+  setNoFlashing = () => {},
 }) {
   const [isVibesOpen, setIsVibesOpen] = useState(false);
   const [activeVibeId, setActiveVibeId] = useState(null);
@@ -740,7 +742,27 @@ export function FXConsole({
 
       {/* ── 4. EDITING BEHAVIOR ── */}
       <div style={panelSection}>
-        <label style={sectionLabel('var(--text-track)')}>4 · EDITING BEHAVIOR</label>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <label style={sectionLabel('var(--text-track)')}>4 · EDITING BEHAVIOR</label>
+          <button
+            type="button"
+            onClick={() => setNoFlashing(!noFlashing)}
+            style={{
+              padding: '2px 8px',
+              fontSize: 9,
+              fontWeight: 700,
+              borderRadius: 3,
+              cursor: 'pointer',
+              border: `1px solid ${noFlashing ? '#10b981' : '#f59e0b'}`,
+              backgroundColor: noFlashing ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+              color: noFlashing ? '#10b981' : '#f59e0b',
+              transition: 'all 0.15s ease',
+            }}
+            title="Toggle between Strobe Flashes and Pure Clean Cuts (No Flashing)"
+          >
+            {noFlashing ? '🚫 NO FLASH (CLEAN)' : '⚡ STROBE FLASH: ON'}
+          </button>
+        </div>
         <select value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value)} style={selectStyle}>
           {EDIT_PROFILES.map((profile) => (
             <option key={profile.id} value={profile.id}>
@@ -891,6 +913,100 @@ export function FXConsole({
         <div style={{ marginTop: 8, paddingTop: 6, borderTop: '1px solid var(--border-dim)', position: 'relative' }}>
           {(() => {
             const VIBE_PRESETS = [
+              // ── NO FLASH & PURE FLOW (CLEAN EDITS) ──
+              {
+                id: 'pure_kinetic_vibe',
+                category: '🕊️ No Flash & Pure Flow',
+                name: 'Pure Kinetic Cut',
+                badge: 'NO STROBE',
+                subtitle: 'Classic fast-cut montage on beat kicks with zero blinding flash',
+                color: '#10b981',
+                glowColor: 'rgba(16, 185, 129, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(false);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedStyle('pure_kinetic');
+                  setSelectedEra('default');
+                  setSelectedRube('none');
+                  setNoFlashing(true);
+                  setLyricAnim('pulse_slam');
+                },
+              },
+              {
+                id: 'film_flow_vibe',
+                category: '🕊️ No Flash & Pure Flow',
+                name: 'Film Flow Noir',
+                badge: 'CLEAN 1940s',
+                subtitle: 'Atmospheric 1940s shadows, typewriter lyrics & smooth narrative cuts',
+                color: '#f59e0b',
+                glowColor: 'rgba(245, 158, 11, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(false);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedStyle('film_flow');
+                  setSelectedEra('1940_noir');
+                  setSelectedRube('soft_pulse');
+                  setNoFlashing(true);
+                  setLyricAnim('floating_drift');
+                },
+              },
+              {
+                id: 'analog_velvet_vibe',
+                category: '🕊️ No Flash & Pure Flow',
+                name: 'Analog Velvet',
+                badge: '16MM CLEAN',
+                subtitle: 'Warm 70s analog tone with downbeat cuts & zero strobe',
+                color: '#ec4899',
+                glowColor: 'rgba(236, 72, 153, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(false);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedStyle('analog_groove');
+                  setSelectedEra('1970_grindhouse');
+                  setSelectedRube('none');
+                  setNoFlashing(true);
+                  setLyricAnim('pulse_slam');
+                },
+              },
+              {
+                id: 'hypnotic_cosmic_vibe',
+                category: '🕊️ No Flash & Pure Flow',
+                name: 'Hypnotic Cosmic',
+                badge: 'SMOOTH DRIFT',
+                subtitle: 'Celestial slow hue drift, neon glow wave & flicker-free tempo cuts',
+                color: '#06b6d4',
+                glowColor: 'rgba(6, 182, 212, 0.45)',
+                apply: () => {
+                  setLiquidWarpEnabled(false);
+                  setKaleidoscopeMode('none');
+                  setFractalMode('none');
+                  setPhosphorTrails(false);
+                  setChromaticPunch(false);
+                  setAlienBeam(false);
+                  setWarpDrive(false);
+                  setSelectedStyle('hypnotic_clean');
+                  setSelectedEra('1902_melies');
+                  setSelectedRube('soft_pulse');
+                  setNoFlashing(true);
+                  setLyricAnim('karaoke_glow');
+                },
+              },
+
               // ── PSYCHONAUT & ENTHEOGEN ──
               {
                 id: 'dmt_breakthrough',

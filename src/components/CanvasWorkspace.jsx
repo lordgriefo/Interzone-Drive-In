@@ -348,6 +348,7 @@ export function CanvasWorkspace({
   warpDrive = false,
   lyricAnim = 'pulse_slam',
   fxEnvelopeDepth = 1.0,
+  noFlashing = false,
 }) {
   const contextState = useAppState() || {};
 
@@ -728,7 +729,7 @@ export function CanvasWorkspace({
     if (rubeVisuals.colorInvert || (rubeStage === 7 && !GENTLE_RUBES.has(selectedRube))) {
       parts.push('invert(1)');
     }
-    if (rubeVisuals.flashInvert) {
+    if (rubeVisuals.flashInvert && !noFlashing && selectedStyle !== 'pure_kinetic' && selectedStyle !== 'film_flow') {
       parts.push('invert(0.85) brightness(1.4)');
     }
     // Signal dropout: desaturate + high contrast (VHS noise look)
@@ -773,6 +774,54 @@ export function CanvasWorkspace({
           transform: `scale(${scaleVal.toFixed(4)})`,
           filter: 'none',
           transition: 'transform 0.08s ease-out',
+        };
+      }
+
+      // ── PURE KINETIC: The classic original KinetiCut montage — clean cuts, downbeat pop, ZERO strobe flashing ──
+      case 'pure_kinetic': {
+        const beatFrac = (currentTime * (bpm / 60)) % 1;
+        const beatSnap = Math.exp(-beatFrac * 6.5);
+        const bassKick = (bass > 0.25) ? (bass - 0.25) * 0.08 : 0;
+        const popScale = 1.0 + beatSnap * 0.035 + bassKick;
+        return {
+          transform: `scale(${popScale.toFixed(4)})`,
+          filter: 'none',
+          transition: 'transform 0.06s ease-out',
+        };
+      }
+
+      // ── FILM FLOW: Smooth cinematic cuts with gentle horizontal momentum — no flash ──
+      case 'film_flow': {
+        const panPhase = (currentTime / (4 * secPerBeat)) * Math.PI;
+        const panX = Math.sin(panPhase) * 3.5;
+        const zoom = 1.03 + bass * 0.05;
+        return {
+          transform: `scale(${zoom.toFixed(4)}) translateX(${panX.toFixed(2)}%)`,
+          filter: 'contrast(1.1) saturate(1.15)',
+          transition: 'transform 0.15s ease-out',
+        };
+      }
+
+      // ── ANALOG GROOVE: Warm 16mm celluloid roll — gentle breathing, zero strobe ──
+      case 'analog_groove': {
+        const warmPulse = Math.sin(currentTime * 0.6) * 0.06;
+        const zoom = 1.02 + bass * 0.04;
+        return {
+          transform: `scale(${zoom.toFixed(4)})`,
+          filter: `sepia(0.2) contrast(1.15) saturate(${(1.1 + warmPulse).toFixed(2)})`,
+          transition: 'transform 0.12s ease-out',
+        };
+      }
+
+      // ── HYPNOTIC CLEAN: Harmonic slow hue breathing & downbeat flow — flicker-free ──
+      case 'hypnotic_clean': {
+        const breath = Math.sin(currentTime * 0.8) * 0.025;
+        const scale = 1.02 + breath + bass * 0.04;
+        const hueShift = Math.sin(currentTime * 0.1) * 16;
+        return {
+          transform: `scale(${scale.toFixed(4)})`,
+          filter: `hue-rotate(${hueShift.toFixed(1)}deg)`,
+          transition: 'transform 0.2s ease-out, filter 0.3s ease-out',
         };
       }
 
@@ -1336,6 +1385,7 @@ export function CanvasWorkspace({
       const CHILL_MIN_HOLD_MS = {
         // High-energy / Kinetic styles (fast beat chop)
         montage:          Math.max(260, Math.round(beatMs * 0.75)), // ~375ms at 120bpm — kinetic Eisenstein cuts on downbeats
+        pure_kinetic:     Math.max(260, Math.round(beatMs * 0.75)), // ~375ms — clean cuts on beat downbeats (ZERO flash)
         apple_kinetic:    Math.max(300, Math.round(beatMs)),        // ~500ms — 1 beat pop
         third_mind:       Math.max(240, Math.round(beatMs * 0.6)),  // ~300ms — rapid Burroughs splicing
         strobe:           Math.max(200, Math.round(beatMs * 0.5)),  // ~250ms — strobe-cut
@@ -1354,6 +1404,9 @@ export function CanvasWorkspace({
         mv_flash_cut:     Math.max(700, beatMs * 2),                // 2 beats feel (~1.0s)
 
         // Mid-tempo / narrative styles
+        film_flow:        Math.max(600, Math.round(beatMs * 1.5)),  // ~1.2s — smooth photographic glide (ZERO flash)
+        analog_groove:    Math.max(500, Math.round(beatMs * 1.25)), // ~1.0s — warm 16mm celluloid roll (ZERO flash)
+        hypnotic_clean:   Math.max(700, Math.round(beatMs * 2)),    // ~1.5s — harmonic drift (ZERO flash)
         fiona_voyeur:     1800,
         narrative:        2200,
         ken_burns:        3000,
@@ -1378,6 +1431,11 @@ export function CanvasWorkspace({
         warhol_screen:    10000,
       };
 
+      const NO_FLASH_STYLES = new Set([
+        'pure_kinetic', 'film_flow', 'analog_groove', 'hypnotic_clean',
+        'ken_burns', 'fiona_voyeur', 'narrative'
+      ]);
+
       const currentStyle = (selectedStyle || selectedEra || '').toLowerCase();
       // Default fallback hold: snappy ~375ms for kinetic editing
       const minHold = CHILL_MIN_HOLD_MS[currentStyle] ?? Math.max(320, Math.round(beatMs * 0.75));
@@ -1391,8 +1449,9 @@ export function CanvasWorkspace({
         lastSlideAdvanceRef.current = now;
       }
 
-      // ── 2. Beat flash: punchy strobe on EVERY transient kick ──
-      if (!isOfflineRendering && !CHILL_STYLES.has(currentStyle) && beatFlashRef.current) {
+      // ── 2. Beat flash: punchy strobe on EVERY transient kick (bypassed if noFlashing or clean style) ──
+      const isFlashSuppressed = noFlashing || CHILL_STYLES.has(currentStyle) || NO_FLASH_STYLES.has(currentStyle);
+      if (!isOfflineRendering && !isFlashSuppressed && beatFlashRef.current) {
         if (beatFlashRafRef.current) cancelAnimationFrame(beatFlashRafRef.current);
         const peakOpacity = (currentStyle === 'strobe' || currentStyle === 'mv_flash_cut') ? 0.88 : 0.75;
         beatFlashRef.current.style.opacity = String(peakOpacity);
@@ -1513,6 +1572,7 @@ export function CanvasWorkspace({
     // Styles that need a per-frame RAF tick for smooth animation
     // NOTE: 'montage' must be here so Eisenstein snap transforms are actually painted
     const ANIMATED_STYLES = new Set([
+      'pure_kinetic', 'film_flow', 'analog_groove', 'hypnotic_clean',
       'ken_burns', 'fiona_voyeur', 'strobe', 'brakhage_emulsion',
       'apple_kinetic', 'narrative', 'surreal', 'jitter', 'venetian',
       'montage', 'seance_dissolve', 'magnetic_tape', 'liquid_gate',

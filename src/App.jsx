@@ -48,6 +48,7 @@ export const DEFAULT_PLAYLIST = [
       lyricFont: 'special_elite',
       lyricSize: 1.35,
       lyricAnim: 'floating_drift',
+      noFlashing: true,
     },
   },
   {
@@ -111,6 +112,7 @@ export const DEFAULT_PLAYLIST = [
       lyricFont: 'bebas_neue',
       lyricSize: 1.8,
       lyricAnim: 'karaoke_glow',
+      noFlashing: true,
     },
   },
   {
@@ -153,6 +155,7 @@ export const DEFAULT_PLAYLIST = [
       lyricFont: 'cinzel',
       lyricSize: 1.3,
       lyricAnim: 'floating_drift',
+      noFlashing: true,
     },
   },
   {
@@ -215,6 +218,29 @@ export const DEFAULT_PLAYLIST = [
       lyricFont: 'space_mono',
       lyricSize: 1.45,
       lyricAnim: 'karaoke_glow',
+    },
+  },
+  {
+    id: 'pl_pure_kinetic_flow',
+    num: '10',
+    title: "Pure Kinetic Cut (Clean Flow — No Flashing)",
+    url: './assets-bg/excavating-neverland.mp3',
+    lrcUrl: './assets-bg/excavating-neverland.lrc',
+    artist: "The Magic Static Society",
+    duration: 310,
+    preset: {
+      selectedStyle: 'pure_kinetic',
+      selectedEra: 'default',
+      selectedRube: 'none',
+      bpm: 120,
+      chaosLevel: 0,
+      chaosEnabled: false,
+      sensitivity: 1.1,
+      reverbWet: 0.20,
+      lyricFont: 'bebas_neue',
+      lyricSize: 1.75,
+      lyricAnim: 'pulse_slam',
+      noFlashing: true,
     },
   },
 ];
@@ -486,6 +512,7 @@ export default function App() {
   const [lyricSize,   setLyricSize]   = useState(DEFAULT_PLAYLIST[0]?.preset?.lyricSize || 1.35);
   const [lyricFont,   setLyricFont]   = useState(DEFAULT_PLAYLIST[0]?.preset?.lyricFont || 'special_elite');
   const [lyricAnim,   setLyricAnim]   = useState(DEFAULT_PLAYLIST[0]?.preset?.lyricAnim || 'floating_drift');
+  const [noFlashing,  setNoFlashing]  = useState(Boolean(DEFAULT_PLAYLIST[0]?.preset?.noFlashing));
 
   const applyPreset = useCallback((preset) => {
     if (!preset) return;
@@ -504,6 +531,7 @@ export default function App() {
     if (preset.lyricSize     !== undefined) setLyricSize(preset.lyricSize);
     if (preset.lyricAnim     !== undefined) setLyricAnim(preset.lyricAnim);
     if (preset.lyricAlign    !== undefined) setLyricAlign(preset.lyricAlign);
+    if (preset.noFlashing    !== undefined) setNoFlashing(Boolean(preset.noFlashing));
     basePresetRef.current = {
       era: preset.selectedEra || 'default',
       rube: preset.selectedRube || 'none',
@@ -591,7 +619,8 @@ export default function App() {
     lyricSize,
     lyricAnim,
     lyricAlign,
-  }), [selectedStyle, selectedEra, selectedRube, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet, lyricFont, lyricSize, lyricAnim, lyricAlign]);
+    noFlashing,
+  }), [selectedStyle, selectedEra, selectedRube, chaosLevel, chaosEnabled, sensitivity, bpm, reverbWet, lyricFont, lyricSize, lyricAnim, lyricAlign, noFlashing]);
 
   // ── Perchance Iframe postMessage Bridge ──
   useEffect(() => {
@@ -1645,6 +1674,7 @@ export default function App() {
                 lyricSize,
                 lyricAnim,
                 lyricAlign,
+                noFlashing,
               }}
               onApplyPreset={applyPreset}
               onAddFxMarker={handleAddFxMarker}
@@ -1755,6 +1785,7 @@ export default function App() {
               warpDrive={warpDrive}
               lyricAnim={lyricAnim}
               fxEnvelopeDepth={fxEnvelopeDepth}
+              noFlashing={noFlashing}
             />
           </div>
 
@@ -1879,6 +1910,8 @@ export default function App() {
           setWarpDrive={setWarpDrive}
           lyricAnim={lyricAnim}
           setLyricAnim={setLyricAnim}
+          noFlashing={noFlashing}
+          setNoFlashing={setNoFlashing}
         />
         )}
           </>

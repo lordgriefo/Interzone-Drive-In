@@ -8,6 +8,31 @@ export const EDIT_PROFILES = [
     description: 'The viewport plays exactly what is on the timeline: clip order, trims, reverse, mirror, crossfade overlaps. Edit with the timeline tools; the audio-reactive FX still apply on top.',
     category: 'Your Edit',
   },
+  // ── NO-FLASH / CLEAN EDITS (Classic KinetiCut Flow) ──────────────────────
+  {
+    id: 'pure_kinetic',
+    label: '★ Pure Kinetic Cut (No Strobe / Clean Cuts)',
+    description: 'The classic fast-paced KinetiCut montage rhythm on downbeats and kicks, with zero white strobe or blinding flash. Pure clean cuts, subtle scale bounces, and fluid visual tempo.',
+    category: 'No-Flash / Clean Edits',
+  },
+  {
+    id: 'film_flow',
+    label: '★ Film Flow (Smooth Narrative Cut)',
+    description: '1–2 beat rhythmic cinematic cuts with gentle horizontal momentum and soft analog contrast. No strobes, no flicker — pure photographic storytelling.',
+    category: 'No-Flash / Clean Edits',
+  },
+  {
+    id: 'analog_groove',
+    label: '★ Analog Velvet (Flicker-Free 16mm)',
+    description: 'Warm analog tone with rhythmic downbeat switches and gentle gate breathing, completely free of stroboscopic flashes.',
+    category: 'No-Flash / Clean Edits',
+  },
+  {
+    id: 'hypnotic_clean',
+    label: '★ Hypnotic Rhythm (Zero Strobe Drift)',
+    description: 'Tempo-synced downbeat cuts with smooth harmonic color transitions and zero flashing. Clean, hypnotic, and easy on the eyes.',
+    category: 'No-Flash / Clean Edits',
+  },
   {
     id: 'third_mind',
     label: '1. Burroughs Cut-Up (Third Mind)',

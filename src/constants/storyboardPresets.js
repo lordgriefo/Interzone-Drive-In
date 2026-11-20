@@ -19,7 +19,8 @@ export const STORYBOARD_PRESETS = {
       "autoDJEnabled": false,
       "lyricFont": "bebas_neue",
       "lyricSize": 1.8,
-      "lyricAnim": "karaoke_glow"
+      "lyricAnim": "karaoke_glow",
+      "noFlashing": true
     },
     "fxMarkers": [
       {
