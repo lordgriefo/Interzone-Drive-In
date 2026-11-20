@@ -345,10 +345,10 @@ export function InterzoneFrame({
             {/* Strangelet Suite Launcher Dropdown */}
             <StrangeletSuiteMenu currentAppId="keneticut" align="right" />
 
-            {/* Direct Link / Tab to Interzone Drive-In Theater */}
+            {/* Direct Link / Tab to Interzone Drive-In */}
             <button
               onClick={() => onTabChange && onTabChange('drivein')}
-              title="Open the Interzone Drive-In Theater"
+              title="Open the Interzone Drive-In"
               style={{
                 background: 'linear-gradient(90deg, #ff6b00, #ff8800)',
                 color: '#000',

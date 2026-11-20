@@ -159,7 +159,7 @@ export function DriveIn3DStage({
     // Drive-In Marquee Notice
     ctx.fillStyle = '#00e5ff';
     ctx.font = 'bold 32px monospace';
-    ctx.fillText('INTERZONE DRIVE-IN THEATER • 4 HUGE SCREENS', canvas.width / 2, 330);
+    ctx.fillText('INTERZONE DRIVE-IN • 4 HUGE SCREENS', canvas.width / 2, 330);
 
     ctx.fillStyle = '#a1a1aa';
     ctx.font = '24px monospace';

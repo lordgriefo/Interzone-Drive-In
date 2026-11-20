@@ -16,7 +16,7 @@ export const PERCHANCE_KENETICUT_URL = 'https://perchance.org/keneticut';
 export const PERCHANCE_WUNDERBAR_URL = 'https://perchance.org/the-wunderbar';
 export const PERCHANCE_FACE_FOR_RADIO_URL = 'https://perchance.org/face-for-radio';
 export const PERCHANCE_PHASE_4_PICTURES_URL = 'https://perchance.org/phase-4-pictures';
-export const PERCHANCE_THE_LSC_URL = 'https://perchance.org/thelsc';
+export const PERCHANCE_THE_LSC_URL = 'https://perchance.org/the-lsc';
 export const PERCHANCE_AUDIO_ARC_URL = 'https://perchance.org/audioarc';
 export const POLLINATIONS_AUDIO_ARC_URL = 'https://audioarc.pollinations.app';
 export const PERCHANCE_CINE_SAMPLER_URL = 'https://perchance.org/strangelet-cine-sampler';
@@ -44,12 +44,12 @@ export const GOOGLE_FLOW_SYNCRO_VOX_URL = 'https://flow.google.com/shared/tool/2
 export const STRANGELET_SUITE_APPS = [
   {
     id: 'keneticut',
-    title: 'KenetiCut',
+    title: 'Strangelet KenetiCut',
     tagline: 'Audio-Reactive Montage & Living Reel Studio',
     badge: 'CHOREOGRAPHY & LIVING REEL',
     icon: '🎞️',
     url: PERCHANCE_KENETICUT_URL,
-    desc: 'Audio-reactive video montage, beat-synced pacing, living reel choreography & VJ cut-up lab.',
+    desc: 'Audio-reactive montage editor & living reel lab: beat-synced pacing, kinetic typography, multi-camera live switching & seamless visual cut-ups.',
     color: '#00e5ff',
     glow: 'rgba(0, 229, 255, 0.45)',
   },
@@ -60,7 +60,7 @@ export const STRANGELET_SUITE_APPS = [
     badge: 'DOES PRETTY MUCH EVERYTHING',
     icon: '⚡',
     url: PERCHANCE_WUNDERBAR_URL,
-    desc: 'The all-in-one creative engine: music video crafting, character creation, prompt physics & storyboards.',
+    desc: 'The all-in-one creative engine: music video crafting, character creation, alchemical prompt physics & scene-by-scene storyboards.',
     color: '#fbbf24',
     glow: 'rgba(251, 191, 36, 0.45)',
   },
@@ -71,7 +71,7 @@ export const STRANGELET_SUITE_APPS = [
     badge: 'SCREENPLAY & CINEMATIC AI',
     icon: '🎬',
     url: PERCHANCE_PHASE_4_PICTURES_URL,
-    desc: 'Screenplay generator: blend any amount of influences and AI will write the screenplay for you, or co-write it together.',
+    desc: 'Screenplay generator: blend any amount of influences and AI will write the screenplay for you, or co-write it together scene by scene.',
     color: '#f43f5e',
     glow: 'rgba(244, 63, 94, 0.45)',
   },
@@ -83,18 +83,19 @@ export const STRANGELET_SUITE_APPS = [
     badge: 'OLD-FASHIONED RADIO PLAYS',
     icon: '🎙️',
     url: PERCHANCE_FACE_FOR_RADIO_URL,
-    desc: 'Audio play & vintage broadcast tool for writing classic, old-fashioned radio plays and episodic voice theater.',
+    desc: 'Audio drama & vintage broadcast tool for writing classic, old-fashioned radio plays, multi-character dialogue & episodic voice theater.',
     color: '#39ff14',
     glow: 'rgba(57, 255, 20, 0.45)',
   },
   {
     id: 'thelsc',
-    title: 'The LSC',
-    tagline: "Musician's Swiss-Army Knife & Prompt Engine",
-    badge: 'LYRICS · MASTERING · AUDIO-TO-MIDI',
+    title: 'The Large Sonic Collider',
+    subtitle: '(The LSC)',
+    tagline: "1000+ Particle Prompt Lab · 14-Stage Mastering · Audio-to-MIDI",
+    badge: 'PROMPT COLLIDER & AUDIO MATRIX',
     icon: '⚛️',
     url: PERCHANCE_THE_LSC_URL,
-    desc: "Prompt builder & general musician's use tool: lyric writing, track mastering, audio-to-MIDI & song deconstruction.",
+    desc: "Free in-browser prompt lab & audio toolkit: collide 1000+ sonic particles for Suno, YuE2 & Udio, 14-stage mastering matrix with Matchering, and audio-to-MIDI conversion.",
     color: '#c084fc',
     glow: 'rgba(192, 132, 252, 0.45)',
   },

@@ -330,7 +330,7 @@ export function InterzoneDriveInTheater({
                 lineHeight: 1,
               }}
             >
-              INTERZONE DRIVE-IN THEATER
+              INTERZONE DRIVE-IN
             </div>
             <div
               style={{
@@ -805,7 +805,7 @@ export function InterzoneDriveInTheater({
                 e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 107, 0, 0.8)';
               }}
             >
-              DRIVE IN: ENTER THEATER LOT ➔
+              DRIVE IN: ENTER LOT ➔
             </button>
 
             {/* ── TICKET BOOTH SUITE LAUNCHERS & ROADSIDE NETWORK ── */}
@@ -870,10 +870,10 @@ export function InterzoneDriveInTheater({
                       </span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#00e5ff' }}>
-                      KENETICUT
+                      STRANGELET KENETICUT
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Audio-reactive video montage, beat-synced pacing, living reel choreography & VJ cut-up lab.
+                      Audio-reactive montage editor & living reel lab: beat-synced pacing, kinetic typography, multi-camera live switching & seamless visual cut-ups.
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
@@ -899,7 +899,7 @@ export function InterzoneDriveInTheater({
                       href="https://perchance.org/keneticut"
                       target="_blank"
                       rel="noopener noreferrer"
-                      title="Open KenetiCut on Perchance"
+                      title="Open Strangelet KenetiCut on Perchance"
                       style={{
                         background: 'rgba(255,255,255,0.08)',
                         color: '#00e5ff',
@@ -958,7 +958,7 @@ export function InterzoneDriveInTheater({
                       (FACE FOR RADIO)
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Vintage & modern radio plays: write old-fashioned radio dramas, episodic voice plays & character dialogue.
+                      Vintage broadcast & audio drama studio: craft classic old-fashioned radio plays, multi-character dialogue, sound-FX cues & episodic voice theater.
                     </div>
                   </div>
                   <div
@@ -1020,7 +1020,7 @@ export function InterzoneDriveInTheater({
                       DOES PRETTY MUCH EVERYTHING
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Music videos, character creation, alchemical prompts & storyboards. The all-in-one creative catalyst.
+                      The all-in-one creative catalyst: music video crafting, character dossiers, alchemical prompt physics & scene-by-scene storyboards.
                     </div>
                   </div>
                   <div
@@ -1078,7 +1078,7 @@ export function InterzoneDriveInTheater({
                       AI SCREENPLAY GENERATOR
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Take any amount of influences and an AI will write a screenplay for you, or you can co-write it together.
+                      Cinematic screenplay engine: blend any combination of directors, writers, and aesthetics to auto-generate full screenplays or co-write scene by scene.
                     </div>
                   </div>
                   <div
@@ -1095,9 +1095,9 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 5. The LSC */}
+                {/* 5. The Large Sonic Collider */}
                 <a
-                  href="https://perchance.org/thelsc"
+                  href="https://perchance.org/the-lsc"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -1130,13 +1130,13 @@ export function InterzoneDriveInTheater({
                       <span style={{ fontSize: 8.5, color: '#c084fc', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#c084fc' }}>
-                      THE LSC
+                      THE LARGE SONIC COLLIDER
                     </div>
                     <div style={{ fontSize: 7.5, color: '#e9d5ff', fontFamily: 'monospace', marginTop: 1 }}>
-                      MUSICIAN'S TOOLKIT & PROMPTS
+                      PROMPT COLLIDER · MASTERING · MIDI
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Prompt builder, lyric writing, track mastering, audio-to-MIDI conversions & taking songs apart.
+                      Free AI-music prompt lab & audio toolkit: collide 1000+ sonic particles for Suno, YuE2 & Udio, 14-stage mastering matrix with Matchering, audio-to-MIDI stem isolation & lyric laboratory.
                     </div>
                   </div>
                   <div
@@ -1149,7 +1149,7 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    OPEN MUSICIAN'S TOOLKIT ➔
+                    COLLIDE SOUNDS & PROMPTS ➔
                   </div>
                 </a>
 
@@ -1310,7 +1310,7 @@ export function InterzoneDriveInTheater({
                       SHOT LIBRARY v2.0
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Cinematographic shot library, lens angles, visual framing compositions & reference catalog v2.0.
+                      Visual framing encyclopedia: camera angles, anamorphic lenses, lighting ratios, cinematic compositions & reference library for filmmakers.
                     </div>
                   </div>
                   <div
