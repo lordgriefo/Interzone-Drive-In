@@ -1518,6 +1518,40 @@ export function InterzoneDriveInTheater({
                       >
                         🌐 DEDICATED SITE
                       </a>
+                      <a
+                        href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/USER_GUIDE.md"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          color: '#e4e4e7',
+                          textDecoration: 'none',
+                          border: '1px solid rgba(255, 255, 255, 0.25)',
+                          padding: '2px 6px',
+                          borderRadius: 2,
+                          background: 'rgba(255, 255, 255, 0.08)',
+                        }}
+                      >
+                        📖 USER GUIDE
+                      </a>
+                      <a
+                        href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/ADDONS_AND_MODELS.md"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          color: '#fef08a',
+                          textDecoration: 'none',
+                          border: '1px solid rgba(254, 240, 138, 0.3)',
+                          padding: '2px 6px',
+                          borderRadius: 2,
+                          background: 'rgba(254, 240, 138, 0.08)',
+                        }}
+                      >
+                        📦 ADD-ONS
+                      </a>
                     </div>
                   </div>
                 </div>

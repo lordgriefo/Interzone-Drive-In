@@ -245,6 +245,46 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <a
+              href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/USER_GUIDE.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#e4e4e7',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 4,
+                padding: '7px 12px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: 1,
+                textDecoration: 'none',
+              }}
+              title="Read official operating manual on GitHub"
+            >
+              📖 USER GUIDE
+            </a>
+            <a
+              href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/ADDONS_AND_MODELS.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#e4e4e7',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 4,
+                padding: '7px 12px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: 1,
+                textDecoration: 'none',
+              }}
+              title="Browse downloadable AI models and SFZ instruments"
+            >
+              📦 ADD-ONS
+            </a>
+            <a
               href="https://lordgriefo.github.io/Strangelet-Lab/"
               target="_blank"
               rel="noopener noreferrer"
@@ -420,6 +460,44 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
               }}
             >
               💾 DOWNLOAD PORTABLE WINDOWS x64 (.ZIP)
+            </a>
+            <a
+              href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/USER_GUIDE.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#e4e4e7',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 4,
+                padding: '9px 16px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 1,
+                textDecoration: 'none',
+              }}
+            >
+              📖 USER GUIDE
+            </a>
+            <a
+              href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/ADDONS_AND_MODELS.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#e4e4e7',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 4,
+                padding: '9px 16px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 1,
+                textDecoration: 'none',
+              }}
+            >
+              📦 ADD-ONS & MODELS
             </a>
             <a
               href="https://github.com/lordgriefo/Strangelet-Lab/issues"
@@ -660,6 +738,171 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Official Documentation & Add-ons Hub */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 16,
+            marginBottom: 35,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'rgba(15, 15, 26, 0.88)',
+              border: '1px solid rgba(0, 229, 255, 0.4)',
+              borderRadius: 6,
+              padding: '18px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 0 16px rgba(0, 229, 255, 0.12)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span
+                style={{
+                  fontSize: 7,
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  letterSpacing: 1.2,
+                  padding: '2px 6px',
+                  borderRadius: 3,
+                  backgroundColor: 'rgba(0, 229, 255, 0.15)',
+                  color: '#00e5ff',
+                  border: '1px solid #00e5ff',
+                }}
+              >
+                OFFICIAL FIELD MANUAL
+              </span>
+              <span style={{ fontSize: 8, color: '#00e5ff', fontFamily: 'monospace' }}>v2.5.0 OFFLINE</span>
+            </div>
+            <h3 style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 12, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
+              📖 STRANGELET LAB USER GUIDE
+            </h3>
+            <p style={{ fontSize: 10, color: '#a1a1aa', lineHeight: 1.5, marginBottom: 14 }}>
+              Complete operating manual covering the 6-stage Gold Path mastering engine, Hadron Collider particle steering, Faust DSP Toy recipes, and keyboard shortcuts.
+            </p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 'auto' }}>
+              <a
+                href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/USER_GUIDE.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  background: 'rgba(0, 229, 255, 0.15)',
+                  color: '#00e5ff',
+                  border: '1px solid #00e5ff',
+                  borderRadius: 4,
+                  padding: '7px 12px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8,
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                }}
+              >
+                READ USER GUIDE (GITHUB) ↗
+              </a>
+              <a
+                href="./docs/USER_GUIDE.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#e4e4e7',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: 4,
+                  padding: '7px 10px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8,
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                }}
+                title="View local raw markdown file"
+              >
+                RAW .MD
+              </a>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: 'rgba(15, 15, 26, 0.88)',
+              border: '1px solid rgba(251, 191, 36, 0.4)',
+              borderRadius: 6,
+              padding: '18px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 0 16px rgba(251, 191, 36, 0.12)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span
+                style={{
+                  fontSize: 7,
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontWeight: 800,
+                  letterSpacing: 1.2,
+                  padding: '2px 6px',
+                  borderRadius: 3,
+                  backgroundColor: 'rgba(251, 191, 36, 0.15)',
+                  color: '#fbbf24',
+                  border: '1px solid #fbbf24',
+                }}
+              >
+                MODELS & EXPANSIONS HUB
+              </span>
+              <span style={{ fontSize: 8, color: '#fbbf24', fontFamily: 'monospace' }}>MODULAR GGUF</span>
+            </div>
+            <h3 style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 12, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
+              📦 ADD-ONS & MODELS CATALOG
+            </h3>
+            <p style={{ fontSize: 10, color: '#a1a1aa', lineHeight: 1.5, marginBottom: 14 }}>
+              Downloadable GHOST AI models (Qwen 2.5 3B/7B, Llama 3.1 8B), ACE-Step 1.5 loop diffusion, YuE 2.0 dual-track models, and 200+ free open-source SFZ instruments.
+            </p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 'auto' }}>
+              <a
+                href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/ADDONS_AND_MODELS.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  background: 'linear-gradient(135deg, #fbbf24, #ff6b00)',
+                  color: '#000',
+                  borderRadius: 4,
+                  padding: '7px 12px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8,
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                }}
+              >
+                BROWSE ADD-ONS & MODELS ↗
+              </a>
+              <a
+                href="./docs/ADDONS_AND_MODELS.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#e4e4e7',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: 4,
+                  padding: '7px 10px',
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 8,
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                }}
+                title="View local raw markdown file"
+              >
+                RAW .MD
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Global Keyboard Shortcuts Table */}
