@@ -119,6 +119,29 @@ export function AssetBin({
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // If active category has zero items or project was reset, automatically reset to 'ALL'
+  useEffect(() => {
+    if (activeCategory === 'ALL') return;
+    const catMap = {
+      CURRENT_TRACK: counts.currentTrack,
+      EXCAVATING: counts.excavating,
+      WAIT_SEE: counts.waitSee,
+      RADIATOR: counts.radiator,
+      THELEMA: counts.thelema,
+      EIGHTH_SPHERE: counts.eighthSphere,
+      HIGH_ROLLER: counts.highRoller,
+      THE_BREACH: counts.theBreach,
+      BABALON: counts.babalon,
+      SYNCHRO_VOX: counts.synchroVox,
+      VIDEOS: counts.videos,
+      STILLS: counts.stills,
+      DRIVE_IN: counts.driveIn,
+    };
+    if (!catMap[activeCategory] || catMap[activeCategory] === 0) {
+      setActiveCategory('ALL');
+    }
+  }, [counts, activeCategory]);
+
   const currentKeyword = useMemo(() => {
     if (!currentTrack && !currentTrackTitle) return null;
     const id = (currentTrack?.id || '').toLowerCase();
@@ -908,23 +931,23 @@ export function AssetBin({
         <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {[
             { id: 'ALL', label: `ALL (${counts.all})` },
-            ...(currentTrack || currentTrackTitle ? [{
+            ...(counts.currentTrack > 0 && (currentTrack || currentTrackTitle) ? [{
               id: 'CURRENT_TRACK',
               label: `🎵 CURRENT TRACK (${counts.currentTrack})`,
               isCurrentTrack: true,
             }] : []),
-            { id: 'RADIATOR', label: `🔥 RADIATOR (${counts.radiator})` },
-            { id: 'THELEMA', label: `🏔 THELEMA (${counts.thelema})` },
-            { id: 'EIGHTH_SPHERE', label: `🌑 8TH SPHERE (${counts.eighthSphere})` },
-            { id: 'HIGH_ROLLER', label: `🎲 HIGH ROLLER (${counts.highRoller})` },
-            { id: 'THE_BREACH', label: `⚡ THE BREACH (${counts.theBreach})` },
-            { id: 'BABALON', label: `🏛 BABALON (${counts.babalon})` },
-            { id: 'EXCAVATING', label: `🛸 EXCAVATING (${counts.excavating})` },
-            { id: 'WAIT_SEE', label: `👁 WAIT SEE (${counts.waitSee})` },
-            { id: 'SYNCHRO_VOX', label: `👄 SYNCHRO-VOX (${counts.synchroVox})` },
-            { id: 'VIDEOS', label: `🎬 VID (${counts.videos})` },
-            { id: 'STILLS', label: `🖼 STILLS (${counts.stills})` },
-            { id: 'DRIVE_IN', label: `📼 DRIVE-IN (${counts.driveIn})` },
+            ...(counts.radiator > 0 ? [{ id: 'RADIATOR', label: `🔥 RADIATOR (${counts.radiator})` }] : []),
+            ...(counts.thelema > 0 ? [{ id: 'THELEMA', label: `🏔 THELEMA (${counts.thelema})` }] : []),
+            ...(counts.eighthSphere > 0 ? [{ id: 'EIGHTH_SPHERE', label: `🌑 8TH SPHERE (${counts.eighthSphere})` }] : []),
+            ...(counts.highRoller > 0 ? [{ id: 'HIGH_ROLLER', label: `🎲 HIGH ROLLER (${counts.highRoller})` }] : []),
+            ...(counts.theBreach > 0 ? [{ id: 'THE_BREACH', label: `⚡ THE BREACH (${counts.theBreach})` }] : []),
+            ...(counts.babalon > 0 ? [{ id: 'BABALON', label: `🏛 BABALON (${counts.babalon})` }] : []),
+            ...(counts.excavating > 0 ? [{ id: 'EXCAVATING', label: `🛸 EXCAVATING (${counts.excavating})` }] : []),
+            ...(counts.waitSee > 0 ? [{ id: 'WAIT_SEE', label: `👁 WAIT SEE (${counts.waitSee})` }] : []),
+            ...(counts.synchroVox > 0 ? [{ id: 'SYNCHRO_VOX', label: `👄 SYNCHRO-VOX (${counts.synchroVox})` }] : []),
+            ...(counts.videos > 0 ? [{ id: 'VIDEOS', label: `🎬 VID (${counts.videos})` }] : []),
+            ...(counts.stills > 0 ? [{ id: 'STILLS', label: `🖼 STILLS (${counts.stills})` }] : []),
+            ...(counts.driveIn > 0 ? [{ id: 'DRIVE_IN', label: `📼 DRIVE-IN (${counts.driveIn})` }] : []),
           ].map(({ id, label, isCurrentTrack }) => {
             const active = activeCategory === id;
             return (
