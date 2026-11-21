@@ -104,8 +104,13 @@ export function StrangeletSuiteMenu({ currentAppId = 'keneticut', align = 'right
               marginBottom: 4,
             }}
           >
-            <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 8.5, fontWeight: 800, color: '#fbbf24', letterSpacing: 1.5 }}>
-              ⚡ INTERZONE CREATIVE NETWORK
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Syncopate', sans-serif", fontSize: 8.5, fontWeight: 800, color: '#fbbf24', letterSpacing: 1.5 }}>
+              <img 
+                src="./assets-bg/logos/strangelet-004.jpeg" 
+                alt="Strangelet Logo" 
+                style={{ width: 14, height: 14, borderRadius: '50%', border: '1px solid #fbbf24', objectFit: 'cover' }} 
+              />
+              <span>STRANGELET CREATIVE NETWORK</span>
             </div>
             <div style={{ fontSize: 8, color: '#a1a1aa', fontFamily: 'monospace' }}>
               {STRANGELET_SUITE_APPS.length} LIVE SITES

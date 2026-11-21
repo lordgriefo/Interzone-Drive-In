@@ -812,22 +812,76 @@ export function InterzoneDriveInTheater({
             <div style={{ width: '100%', marginBottom: 16 }}>
               <div
                 style={{
-                  fontFamily: "'Syncopate', sans-serif",
-                  fontSize: 10,
-                  letterSpacing: 3,
-                  color: '#fbbf24',
-                  textShadow: '0 0 10px rgba(251, 191, 36, 0.7)',
-                  fontWeight: 800,
-                  marginBottom: 14,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 8,
+                  gap: 16,
+                  marginBottom: 16,
+                  padding: '12px 20px',
+                  backgroundColor: 'rgba(10, 12, 26, 0.85)',
+                  border: '1px solid rgba(251, 191, 36, 0.45)',
+                  borderRadius: 8,
+                  boxShadow: '0 0 24px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(251, 191, 36, 0.08)',
+                  flexWrap: 'wrap',
                 }}
               >
-                <span>⚡</span>
-                <span>INTERZONE CREATIVE NETWORK · SUITE TOOLS & BETA APPS</span>
-                <span>⚡</span>
+                {/* Vintage Circular Seal: Méliès Moon & S-Matter Collider */}
+                <img
+                  src="./assets-bg/logos/strangelet-004.jpeg"
+                  alt="Strangelet Collider Seal"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    border: '2px solid #fbbf24',
+                    boxShadow: '0 0 16px rgba(251, 191, 36, 0.65)',
+                    objectFit: 'cover',
+                    flexShrink: 0,
+                  }}
+                />
+
+                <div style={{ textAlign: 'center' }}>
+                  <div
+                    style={{
+                      fontFamily: "'Syncopate', sans-serif",
+                      fontSize: 'clamp(11px, 2.2vw, 15px)',
+                      letterSpacing: 4,
+                      color: '#fbbf24',
+                      textShadow: '0 0 12px rgba(251, 191, 36, 0.85)',
+                      fontWeight: 800,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    THE STRANGELET CREATIVE NETWORK
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'Space Mono', monospace",
+                      fontSize: 8.5,
+                      letterSpacing: 2,
+                      color: '#67e8f9',
+                      textShadow: '0 0 8px rgba(103, 232, 249, 0.6)',
+                      marginTop: 4,
+                    }}
+                  >
+                    ⚡ SUITE TOOLS · QUANTUM-ACOUSTIC COLLIDERS · CREATIVE PERCHANCE APPS ⚡
+                  </div>
+                </div>
+
+                {/* Vintage Circular Seal: Accelerator Ring & Mass Collision */}
+                <img
+                  src="./assets-bg/logos/strangelet-010.jpeg"
+                  alt="Strangelet Accelerator Ring Seal"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    border: '2px solid #00e5ff',
+                    boxShadow: '0 0 16px rgba(0, 229, 255, 0.65)',
+                    objectFit: 'cover',
+                    flexShrink: 0,
+                  }}
+                />
               </div>
 
               <div
@@ -854,7 +908,11 @@ export function InterzoneDriveInTheater({
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 22 }}>🎞️</span>
+                      <img 
+                        src="./assets-bg/logos/strangelet-004.jpeg" 
+                        alt="Strangelet KinetiCUT Seal" 
+                        style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #00e5ff', objectFit: 'cover', boxShadow: '0 0 10px rgba(0, 229, 255, 0.5)' }} 
+                      />
                       <span
                         style={{
                           fontSize: 7.5,
@@ -1130,7 +1188,11 @@ export function InterzoneDriveInTheater({
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 22 }}>⚛️</span>
+                      <img 
+                        src="./assets-bg/logos/strangelet-010.jpeg" 
+                        alt="The Large Sonic Collider Seal" 
+                        style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #c084fc', objectFit: 'cover', boxShadow: '0 0 10px rgba(192, 132, 252, 0.5)' }} 
+                      />
                       <span style={{ fontSize: 8.5, color: '#c084fc', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#c084fc' }}>
@@ -1304,7 +1366,11 @@ export function InterzoneDriveInTheater({
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 22 }}>📽️</span>
+                      <img 
+                        src="./assets-bg/logos/strangelet-011.jpeg" 
+                        alt="Strangelet Cine-Sampler Seal" 
+                        style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #34d399', objectFit: 'cover', boxShadow: '0 0 10px rgba(52, 211, 153, 0.5)' }} 
+                      />
                       <span style={{ fontSize: 8.5, color: '#34d399', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#34d399' }}>
