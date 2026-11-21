@@ -1098,9 +1098,9 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 4. Phase 4 Pictures */}
+                {/* 4. +Hackjob+ Pictures */}
                 <a
-                  href="https://perchance.org/phase-4-pictures"
+                  href="https://perchance.org/hackjob"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -1133,13 +1133,13 @@ export function InterzoneDriveInTheater({
                       <span style={{ fontSize: 8.5, color: '#f43f5e', fontFamily: 'monospace' }}>perchance.org ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#f43f5e' }}>
-                      PHASE 4 PICTURES
+                      +HACKJOB+ PICTURES
                     </div>
                     <div style={{ fontSize: 7.5, color: '#fda4af', fontFamily: 'monospace', marginTop: 1 }}>
-                      AI SCREENPLAY GENERATOR
+                      * THE WRITER'S ROOM * · SCREENPLAY & PRE-VIZ
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Cinematic screenplay engine: blend any combination of directors, writers, and aesthetics to auto-generate full screenplays or co-write scene by scene.
+                      Mix 100s of influences (Lynch to Kurosawa, folk horror, lenses, lighting) → concept → scene beats → full screenplay with cast table read, Fountain/PDF export & poster key art + teaser lab.
                     </div>
                   </div>
                   <div
@@ -1152,7 +1152,7 @@ export function InterzoneDriveInTheater({
                       letterSpacing: 1,
                     }}
                   >
-                    GENERATE SCREENPLAY ➔
+                    ENTER WRITER'S ROOM ➔
                   </div>
                 </a>
 

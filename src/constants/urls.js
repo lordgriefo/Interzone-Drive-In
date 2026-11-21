@@ -17,7 +17,8 @@ export const PERCHANCE_KENETICUT_ALIAS_URL = 'https://perchance.org/keneticut';
 export const PERCHANCE_WUNDERBAR_URL = 'https://perchance.org/the-wunder-bar';
 export const PERCHANCE_WUNDERBAR_MIRROR_URL = 'https://perchance.org/the-wunderbar';
 export const PERCHANCE_FACE_FOR_RADIO_URL = 'https://perchance.org/face-for-radio';
-export const PERCHANCE_PHASE_4_PICTURES_URL = 'https://perchance.org/phase-4-pictures';
+export const PERCHANCE_HACKJOB_URL = 'https://perchance.org/hackjob';
+export const PERCHANCE_PHASE_4_PICTURES_URL = 'https://perchance.org/hackjob';
 export const PERCHANCE_THE_LSC_URL = 'https://perchance.org/the-lsc';
 export const PERCHANCE_AUDIO_ARC_URL = 'https://perchance.org/audioarc';
 export const POLLINATIONS_AUDIO_ARC_URL = 'https://audioarc.pollinations.app';
@@ -71,13 +72,15 @@ export const STRANGELET_SUITE_APPS = [
     glow: 'rgba(251, 191, 36, 0.45)',
   },
   {
-    id: 'phase-4-pictures',
-    title: 'Phase 4 Pictures',
-    tagline: 'Multi-Influence AI Screenplay Generator',
-    badge: 'SCREENPLAY & CINEMATIC AI',
+    id: 'hackjob',
+    title: '+Hackjob+ Pictures',
+    subtitle: "* The Writer's Room *",
+    tagline: 'Genre-Agnostic Film-Fiction & Screenwriting Engine',
+    badge: 'SCREENPLAY & WRITERS ROOM',
     icon: '🎬',
-    url: PERCHANCE_PHASE_4_PICTURES_URL,
-    desc: 'Screenplay generator: blend any amount of influences and AI will write the screenplay for you, or co-write it together scene by scene.',
+    url: PERCHANCE_HACKJOB_URL,
+    aliasUrl: 'https://perchance.org/phase-4-pictures',
+    desc: 'Mix 100s of cinematic influences (Lynch to Kurosawa, folk horror, lenses & lighting) → concept → scene beats → full screenplay with cast table read, Fountain/PDF export & poster key art + teaser lab.',
     color: '#f43f5e',
     glow: 'rgba(244, 63, 94, 0.45)',
   },
