@@ -214,7 +214,7 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <img
-              src="./assets-bg/logos/strangelet-lab-logo.jpg"
+              src="./assets-bg/logos/strangelet_lab_crt_seal.jpg"
               alt="Strangelet Lab Seal"
               style={{
                 width: 48,
@@ -238,7 +238,7 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
                 ⚡ STRANGELET LAB
               </div>
               <div style={{ fontSize: 9.5, color: '#a1a1aa', letterSpacing: 1 }}>
-                THE MOTHERSHIP · QUANTUM-ACOUSTIC PRODUCTION WORKSTATION
+                THE LAB · QUANTUM-ACOUSTIC PRODUCTION WORKSTATION
               </div>
             </div>
           </div>
@@ -395,6 +395,49 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
             PUBLIC BETA v2.5.0 — ACTIVELY EVOLVING WORKSTATION
           </div>
 
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+            <img
+              src="./assets-bg/logos/strangelet_lab_crt_seal.jpg"
+              alt="Strangelet Lab Official Seal - ESTD 1902"
+              style={{
+                width: 130,
+                height: 130,
+                borderRadius: '50%',
+                border: '2px solid #fbbf24',
+                boxShadow: '0 0 35px rgba(251, 191, 36, 0.45)',
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'rgba(255, 107, 0, 0.15)',
+              border: '1px solid #ff6b00',
+              color: '#ff6b00',
+              padding: '4px 14px',
+              borderRadius: 20,
+              fontSize: 9.5,
+              fontWeight: 700,
+              letterSpacing: 1.5,
+              marginBottom: 14,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                backgroundColor: '#ff6b00',
+                boxShadow: '0 0 10px #ff6b00',
+              }}
+            />
+            PUBLIC BETA v2.5.0 — ACTIVELY EVOLVING WORKSTATION
+          </div>
+
           <h1
             style={{
               fontFamily: "'Syncopate', sans-serif",
@@ -405,7 +448,7 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
               marginBottom: 8,
             }}
           >
-            THE <span style={{ color: '#fbbf24' }}>MOTHERSHIP</span> PRODUCTION LAB
+            STRANGELET <span style={{ color: '#fbbf24' }}>LAB</span>
           </h1>
           <p
             style={{
@@ -521,6 +564,168 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
           </div>
         </div>
 
+        {/* Meet GHOST: Our Strangelet Studio Sensei */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 20, 0.95))',
+            border: '1px solid rgba(251, 191, 36, 0.4)',
+            borderRadius: 8,
+            padding: '24px 22px',
+            marginBottom: 30,
+            boxShadow: '0 0 30px rgba(251, 191, 36, 0.15)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
+            <div style={{ flex: '1 1 500px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <span
+                  style={{
+                    backgroundColor: 'rgba(57, 255, 20, 0.15)',
+                    color: '#39ff14',
+                    border: '1px solid #39ff14',
+                    borderRadius: 3,
+                    padding: '2px 8px',
+                    fontSize: 8,
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontWeight: 800,
+                    letterSpacing: 1,
+                  }}
+                >
+                  RESIDENT STRANGELET
+                </span>
+                <span style={{ fontSize: 9, color: '#39ff14', fontFamily: "'Space Mono', monospace" }}>
+                  AIR-GAPPED SENSEI // GHOST IN THE MACHINE
+                </span>
+              </div>
+
+              <h2
+                style={{
+                  fontFamily: "'Syncopate', sans-serif",
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: '#fff',
+                  marginBottom: 10,
+                  letterSpacing: 1.5,
+                }}
+              >
+                MEET <span style={{ color: '#fbbf24' }}>GHOST</span> — OUR STRANGELET SENSEI
+              </h2>
+
+              <p style={{ fontSize: 11, color: '#d1d5db', lineHeight: 1.6, marginBottom: 12 }}>
+                <strong>GHOST</strong> is the resident sentient Strangelet entity living inside the workstation — an analog sound sage, particle navigator, and air-gapped studio companion.
+              </p>
+
+              <p style={{ fontSize: 10.5, color: '#a1a1aa', lineHeight: 1.6, marginBottom: 14 }}>
+                Imbued with the <strong>Software Dojo</strong> (the accumulated engineering lore and aesthetic philosophies of Lee "Scratch" Perry, Brian Eno, Dr. Dre, Bob Katz, and Georges Méliès), GHOST continuously monitors your active session telemetry:
+              </p>
+
+              <ul style={{ fontSize: 10, color: '#cbd5e1', paddingLeft: 18, lineHeight: 1.5, marginBottom: 18 }}>
+                <li><strong>Live Mix Telemetry</strong>: Flags frequency masking, low-end phase cancellations, and dynamic over-compression before you export.</li>
+                <li><strong>Faust DSP Alchemist</strong>: Synthesizes live <em>Prompt-to-Toy</em> WebAssembly DSP recipes on command (tape delays, acid filters, comb resonators).</li>
+                <li><strong>Collider Particle Pilot</strong>: Calculates relativistic Doppler curves and harmonic superposition ratios in the 27km toroidal collider.</li>
+                <li><strong>100% Air-Gapped or Local GGUF</strong>: Operates completely offline with embedded heuristics, or links directly to your local Kobold.cpp instance (<code>http://localhost:5001</code>).</li>
+              </ul>
+
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <a
+                  href="https://github.com/lordgriefo/Strangelet-Lab/blob/main/USER_GUIDE.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    background: 'rgba(0, 229, 255, 0.15)',
+                    color: '#00e5ff',
+                    border: '1px solid #00e5ff',
+                    borderRadius: 4,
+                    padding: '6px 12px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontSize: 8,
+                    fontWeight: 800,
+                    textDecoration: 'none',
+                  }}
+                >
+                  📖 CONSULT GHOST'S FIELD GUIDE
+                </a>
+                <a
+                  href="https://lordgriefo.github.io/Strangelet-Lab/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    background: 'linear-gradient(135deg, #fbbf24, #ff6b00)',
+                    color: '#000',
+                    borderRadius: 4,
+                    padding: '6px 12px',
+                    fontFamily: "'Syncopate', sans-serif",
+                    fontSize: 8,
+                    fontWeight: 800,
+                    textDecoration: 'none',
+                  }}
+                >
+                  ▶ TALK TO GHOST IN THE LAB
+                </a>
+              </div>
+            </div>
+
+            {/* Visual Strangelet Artifacts & Video Loop */}
+            <div style={{ flex: '1 1 340px', display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+              <video
+                src="./assets-bg/lab/strangelet-021.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                  width: '100%',
+                  maxWidth: 380,
+                  borderRadius: 6,
+                  border: '1px solid rgba(251, 191, 36, 0.5)',
+                  boxShadow: '0 0 20px rgba(251, 191, 36, 0.25)',
+                }}
+              />
+
+              <div style={{ display: 'flex', gap: 10, width: '100%', maxWidth: 380 }}>
+                <div style={{ flex: 1, textAlign: 'center' }}>
+                  <img
+                    src="./assets-bg/logos/strangelet_lab_crt_seal.jpg"
+                    alt="Strangelet Lab CRT Emblem"
+                    style={{
+                      width: '100%',
+                      maxHeight: 110,
+                      objectFit: 'contain',
+                      borderRadius: 4,
+                      border: '1px solid rgba(251, 191, 36, 0.3)',
+                      backgroundColor: '#000',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setSelectedImage({ src: './assets-bg/logos/strangelet_lab_crt_seal.jpg', caption: 'Strangelet Lab CRT Emblem - ESTD 1902' })}
+                  />
+                  <div style={{ fontSize: 7, color: '#fbbf24', marginTop: 3, fontFamily: "'Syncopate', sans-serif" }}>
+                    CRT SEAL · ESTD 1902
+                  </div>
+                </div>
+
+                <div style={{ flex: 1, textAlign: 'center' }}>
+                  <img
+                    src="./assets-bg/logos/strangelet_talisman_parchment.jpg"
+                    alt="Strangelet Sacred Geometry Parchment"
+                    style={{
+                      width: '100%',
+                      maxHeight: 110,
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                      border: '1px solid rgba(251, 191, 36, 0.3)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setSelectedImage({ src: './assets-bg/logos/strangelet_talisman_parchment.jpg', caption: 'Strangelet Celestial Talisman & Orbit Geometry' })}
+                  />
+                  <div style={{ fontSize: 7, color: '#fbbf24', marginTop: 3, fontFamily: "'Syncopate', sans-serif" }}>
+                    TALISMAN · SIGIL 01
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Notice Box: Kobold.cpp replaces ComfyUI */}
         <div
           style={{
@@ -591,7 +796,7 @@ export function StrangeletLabShowcase({ onClose, onSwitchToStudio }) {
               letterSpacing: 1.5,
             }}
           >
-            📸 MOTHERSHIP MODULE SHOWCASE ({filteredModules.length})
+            📸 THE LAB MODULE SHOWCASE ({filteredModules.length})
           </div>
 
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>

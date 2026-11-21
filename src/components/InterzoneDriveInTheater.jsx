@@ -483,7 +483,7 @@ export function InterzoneDriveInTheater({
           <StrangeletSuiteMenu currentAppId="keneticut" align="right" />
           <button
             onClick={() => setShowLabShowcase(true)}
-            title="Open Strangelet Lab Mothership Showcase (Public Beta v2.5 / Faust DSP / KoboldCpp Audio Bridge)"
+            title="Open Strangelet Lab Showcase (Public Beta v2.5 / Faust DSP / KoboldCpp Audio Bridge)"
             style={{
               background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(255, 107, 0, 0.2))',
               color: '#fbbf24',
@@ -510,7 +510,7 @@ export function InterzoneDriveInTheater({
               e.currentTarget.style.boxShadow = '0 0 10px rgba(251, 191, 36, 0.35)';
             }}
           >
-            <span>⚡ LAB MOTHERSHIP</span>
+            <span>⚡ THE LAB</span>
             <span style={{ fontSize: 8 }}>🔍</span>
           </button>
           <button
@@ -1396,7 +1396,7 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 8. Strangelet Lab (v2.5 Beta Native DAW - The Mothership) */}
+                {/* 8. Strangelet Lab (v2.5 Beta Native DAW - The Lab) */}
                 <div
                   onClick={() => setShowLabShowcase(true)}
                   style={{
@@ -1426,7 +1426,7 @@ export function InterzoneDriveInTheater({
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                       <img 
-                        src="./assets-bg/logos/strangelet-lab-logo.jpg" 
+                        src="./assets-bg/logos/strangelet_lab_crt_seal.jpg" 
                         alt="Strangelet Lab Seal" 
                         style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #fbbf24', objectFit: 'cover', boxShadow: '0 0 10px rgba(251, 191, 36, 0.45)' }} 
                       />
@@ -1448,10 +1448,10 @@ export function InterzoneDriveInTheater({
                       STRANGELET LAB
                     </div>
                     <div style={{ fontSize: 7.5, color: '#fef08a', fontFamily: 'monospace', marginTop: 1 }}>
-                      THE MOTHERSHIP DAW · PARTICLE COLLIDER
+                      THE LAB · QUANTUM-ACOUSTIC DAW
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Quantum-acoustic mothership DAW: Faust WebAssembly DSP, level-matched FFT mastering, drum transient replacer & Kobold.cpp AI music bridge.
+                      Quantum-acoustic production DAW: meet GHOST (our strangelet sensei), Faust WebAssembly DSP, level-matched FFT mastering & Kobold.cpp AI bridge.
                     </div>
                   </div>
                   <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -1464,7 +1464,7 @@ export function InterzoneDriveInTheater({
                         letterSpacing: 1,
                       }}
                     >
-                      ⚡ EXPLORE MOTHERSHIP LAB & GALLERY ➔
+                      ⚡ ENTER THE LAB & GALLERY ➔
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
                       <a
@@ -2631,7 +2631,7 @@ export function InterzoneDriveInTheater({
         </div>
       )}
 
-      {/* ── STRANGELET LAB MOTHERSHIP SHOWCASE MODAL ── */}
+      {/* ── STRANGELET LAB SHOWCASE MODAL ── */}
       {showLabShowcase && (
         <StrangeletLabShowcase
           onClose={() => setShowLabShowcase(false)}

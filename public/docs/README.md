@@ -122,7 +122,7 @@ Available both as a standalone portable Windows executable and as a browser-nati
 ### 8. 🎞️ Strangelet KenetiCut VJ Bridge
 - 1-Click export to **KenetiCut Studio**, formatting master audio stems and audio-reactive transient markers for visual cut-up choreography.
 
-### 9. 🔌 KoboldCpp REST Audio Bridge (Mothership Neural Engine)
+### 9. 🔌 KoboldCpp REST Audio Bridge (Universal AI Music & LLM Engine)
 - Unified local neural audio & GHOST intelligence powered by any local KoboldCpp server (`http://localhost:5001`).
 - **Two-Step Architecture**:
   - **Step 1 ("Prepare Plan")**: Dispatches `/api/extra/music/prepare` to establish musical key, BPM, and refined stylistic tags for user review and manual fine-tuning.
@@ -130,7 +130,7 @@ Available both as a standalone portable Windows executable and as a browser-nati
 
 ---
 
-## 📸 Mothership Interface & Feature Gallery (Public Beta v2.5)
+## 📸 The Lab Interface & Feature Gallery (Public Beta v2.5)
 
 <div align="center">
 

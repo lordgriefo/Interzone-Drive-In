@@ -1,4 +1,4 @@
-# ⚡ STRANGELET LAB: MOTHERSHIP OPERATING SYSTEM MANUAL & PRODUCTION BIBLE
+# ⚡ STRANGELET LAB: OPERATING SYSTEM MANUAL & PRODUCTION BIBLE
 **Classification**: Quantum-Acoustic Production Workstation & Offline-First Particle Collider DAW  
 **Release**: Public Beta v2.5 (`v2.5.0-beta.1`)  
 **Status**: ⚡ ACTIVE PUBLIC BETA (Zero-install Web & Windows x64 Portable)  
@@ -7,9 +7,9 @@
 
 ---
 
-## 🌌 1. EXECUTIVE SUMMARY & MOTHERSHIP ARCHITECTURE
+## 🌌 1. EXECUTIVE SUMMARY & LAB ARCHITECTURE
 
-**Strangelet Lab** is the flagship Digital Audio Workstation (DAW) and sonic physics laboratory of the **Strangelet Creative Network**. It marries classic analog console workflows with relativistic particle audio synthesis, real-time Faust WebAssembly DSP compilation, FFT reference mastering, and an air-gapped offline AI studio companion named **GHOST**.
+**Strangelet Lab** is the flagship Digital Audio Workstation (DAW) and sonic physics laboratory of the **Strangelet Creative Network**. It marries classic analog console workflows with relativistic particle audio synthesis, real-time Faust WebAssembly DSP compilation, FFT reference mastering, and our resident Strangelet AI studio companion, **GHOST**.
 
 ```
    ███████╗████████╗██████╗  █████╗ ███╗   ██╗ ██████╗ ███████╗██╗     ███████╗████████╗
