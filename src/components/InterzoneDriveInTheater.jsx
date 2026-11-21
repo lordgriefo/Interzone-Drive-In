@@ -343,7 +343,7 @@ export function InterzoneDriveInTheater({
                 marginTop: 2,
               }}
             >
-              STRANGELET, KINETICUT • EST. 1964
+              STRANGELET KINETICUT • EST. 1964
             </div>
           </div>
         </div>
@@ -870,10 +870,13 @@ export function InterzoneDriveInTheater({
                       </span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#00e5ff' }}>
-                      STRANGELET KENETICUT
+                      STRANGELET KINETICUT
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#67e8f9', fontFamily: 'monospace', marginTop: 1 }}>
+                      WELCOME TO STRANGELET, CT • AUDIO-REACTIVE MONTAGE
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Audio-reactive montage editor & living reel lab: beat-synced pacing, kinetic typography, multi-camera live switching & seamless visual cut-ups.
+                      Like Connecticut, but it chops film on the beat: audio-reactive VJ rig with 37 edit styles, 12 era grades, 12 Auto-MV beat profiles, multi-track timeline with EDL export, and AI Flipbook Studio.
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
@@ -896,10 +899,10 @@ export function InterzoneDriveInTheater({
                       ENTER STUDIO ➔
                     </button>
                     <a
-                      href="https://perchance.org/keneticut"
+                      href="https://perchance.org/strangelet-keneticut"
                       target="_blank"
                       rel="noopener noreferrer"
-                      title="Open Strangelet KenetiCut on Perchance"
+                      title="Open Strangelet KinetiCUT on Perchance (perchance.org/strangelet-keneticut)"
                       style={{
                         background: 'rgba(255,255,255,0.08)',
                         color: '#00e5ff',
@@ -1494,7 +1497,7 @@ export function InterzoneDriveInTheater({
                       COMMUNITY REEL SHOWCASE
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Screen 4! Watch music videos made by the community using KenetiCut & the Strangelet Suite.
+                      Screen 4! Watch music videos made by the community using Strangelet KinetiCUT & the Strangelet Suite.
                     </div>
                   </div>
                   <div
@@ -2431,7 +2434,7 @@ export function InterzoneDriveInTheater({
             </div>
 
             <p style={{ fontSize: 11, color: '#e4e4e7', lineHeight: 1.6, margin: '8px 0 16px' }}>
-              Did you choreograph a video in <strong>KenetiCut</strong> or generate a cut in <strong>Strangelet Stitch</strong>?
+              Did you choreograph a video in <strong>KinetiCUT</strong> or generate a cut in <strong>Strangelet Stitch</strong>?
               You can opt-in to have your creation screened right here on Screen 4 of the Interzone Drive-In!
             </p>
 
@@ -2450,7 +2453,7 @@ export function InterzoneDriveInTheater({
               <div style={{ color: '#c084fc', fontWeight: 700, marginBottom: 4 }}>
                 HOW TO SUBMIT:
               </div>
-              <div>1. In KenetiCut Studio or Stitch, export your finished WebM/MP4 video.</div>
+              <div>1. In KinetiCUT Studio or Stitch, export your finished WebM/MP4 video.</div>
               <div>2. Check the <strong>"Beam to Interzone Drive-In"</strong> box on export.</div>
               <div>3. Your cut is synced to the Cloudflare R2 / Google Drive community pool and queued for screening!</div>
             </div>

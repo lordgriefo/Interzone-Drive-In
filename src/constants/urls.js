@@ -12,7 +12,8 @@ export const DESKTOP_EXE_DOWNLOAD_URL =
 export const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/magicstatic/';
 
 // ── THE 7 ACTIVE PERCHANCE SITES IN THE STRANGELET SUITE ──
-export const PERCHANCE_KENETICUT_URL = 'https://perchance.org/keneticut';
+export const PERCHANCE_KENETICUT_URL = 'https://perchance.org/strangelet-keneticut';
+export const PERCHANCE_KENETICUT_ALIAS_URL = 'https://perchance.org/keneticut';
 export const PERCHANCE_WUNDERBAR_URL = 'https://perchance.org/the-wunder-bar';
 export const PERCHANCE_WUNDERBAR_MIRROR_URL = 'https://perchance.org/the-wunderbar';
 export const PERCHANCE_FACE_FOR_RADIO_URL = 'https://perchance.org/face-for-radio';
@@ -45,12 +46,14 @@ export const GOOGLE_FLOW_SYNCRO_VOX_URL = 'https://flow.google.com/shared/tool/2
 export const STRANGELET_SUITE_APPS = [
   {
     id: 'keneticut',
-    title: 'Strangelet KenetiCut',
-    tagline: 'Audio-Reactive Montage & Living Reel Studio',
-    badge: 'CHOREOGRAPHY & LIVING REEL',
+    title: 'Strangelet KinetiCUT',
+    subtitle: '(Welcome to Strangelet, CT)',
+    tagline: 'Audio-Reactive Montage & Multi-Track Sequencer',
+    badge: 'VJ RIG & LIVING REEL ENGINE',
     icon: '🎞️',
     url: PERCHANCE_KENETICUT_URL,
-    desc: 'Audio-reactive montage editor & living reel lab: beat-synced pacing, kinetic typography, multi-camera live switching & seamless visual cut-ups.',
+    aliasUrl: PERCHANCE_KENETICUT_ALIAS_URL,
+    desc: 'Like Connecticut, but it chops film on the beat: audio-reactive VJ rig with 37 edit styles, 12 era grades, 12 Auto-MV beat profiles, multi-track timeline with EDL export, and AI Flipbook Studio.',
     color: '#00e5ff',
     glow: 'rgba(0, 229, 255, 0.45)',
   },

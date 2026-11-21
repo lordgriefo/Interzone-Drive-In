@@ -324,7 +324,7 @@ export function InterzoneFrame({
               fontWeight: 400,
               whiteSpace: 'nowrap',
             }}>
-              STRANGELET · KENETICUT
+              STRANGELET · KINETICUT
             </div>
             <div style={{
               fontFamily: "'Syncopate', sans-serif",
@@ -374,7 +374,7 @@ export function InterzoneFrame({
             {/* Link / Tab to Choreography Studio */}
             <button
               onClick={() => onTabChange && onTabChange(activeTab === 'studio' ? 'editor' : 'studio')}
-              title={activeTab === 'studio' ? "Return to KenetiCut Editor" : "Open the AI Choreography & Flipbook Studio"}
+              title={activeTab === 'studio' ? "Return to KinetiCUT Editor" : "Open the AI Choreography & Flipbook Studio"}
               style={{
                 background: activeTab === 'studio'
                   ? 'linear-gradient(90deg, #ff6b00, #ff8c00)'
@@ -398,7 +398,7 @@ export function InterzoneFrame({
                 flexShrink: 0,
               }}
             >
-              {activeTab === 'studio' ? '🎬 KENETICUT' : '🎞️ FLIPBOOK'}
+              {activeTab === 'studio' ? '🎬 KINETICUT' : '🎞️ FLIPBOOK'}
             </button>
 
             {/* Sound Toggle */}
@@ -879,7 +879,7 @@ export function InterzoneFrame({
             href={BUY_ME_A_COFFEE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            title="Support Strangelet KenetiCut on Buy Me a Coffee"
+            title="Support Strangelet KinetiCUT on Buy Me a Coffee"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
