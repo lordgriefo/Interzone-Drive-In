@@ -119,29 +119,6 @@ export function AssetBin({
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // If active category has zero items or project was reset, automatically reset to 'ALL'
-  useEffect(() => {
-    if (activeCategory === 'ALL') return;
-    const catMap = {
-      CURRENT_TRACK: counts.currentTrack,
-      EXCAVATING: counts.excavating,
-      WAIT_SEE: counts.waitSee,
-      RADIATOR: counts.radiator,
-      THELEMA: counts.thelema,
-      EIGHTH_SPHERE: counts.eighthSphere,
-      HIGH_ROLLER: counts.highRoller,
-      THE_BREACH: counts.theBreach,
-      BABALON: counts.babalon,
-      SYNCHRO_VOX: counts.synchroVox,
-      VIDEOS: counts.videos,
-      STILLS: counts.stills,
-      DRIVE_IN: counts.driveIn,
-    };
-    if (!catMap[activeCategory] || catMap[activeCategory] === 0) {
-      setActiveCategory('ALL');
-    }
-  }, [counts, activeCategory]);
-
   const currentKeyword = useMemo(() => {
     if (!currentTrack && !currentTrackTitle) return null;
     const id = (currentTrack?.id || '').toLowerCase();
@@ -187,6 +164,29 @@ export function AssetBin({
     });
     return { all: assets.length, currentTrack: currentTrackCount, excavating, waitSee, synchroVox, radiator, thelema, eighthSphere, highRoller, theBreach, babalon, videos, stills, driveIn };
   }, [assets, currentKeyword, currentTrack]);
+
+  // If active category has zero items or project was reset, automatically reset to 'ALL'
+  useEffect(() => {
+    if (activeCategory === 'ALL') return;
+    const catMap = {
+      CURRENT_TRACK: counts.currentTrack,
+      EXCAVATING: counts.excavating,
+      WAIT_SEE: counts.waitSee,
+      RADIATOR: counts.radiator,
+      THELEMA: counts.thelema,
+      EIGHTH_SPHERE: counts.eighthSphere,
+      HIGH_ROLLER: counts.highRoller,
+      THE_BREACH: counts.theBreach,
+      BABALON: counts.babalon,
+      SYNCHRO_VOX: counts.synchroVox,
+      VIDEOS: counts.videos,
+      STILLS: counts.stills,
+      DRIVE_IN: counts.driveIn,
+    };
+    if (!catMap[activeCategory] || catMap[activeCategory] === 0) {
+      setActiveCategory('ALL');
+    }
+  }, [counts, activeCategory]);
 
   const filteredItems = useMemo(() => {
     return assets.map((a, origIndex) => ({ ...a, origIndex })).filter((asset) => {
