@@ -14,6 +14,7 @@ import {
 } from '../constants/radioStations';
 import { playTunerStatic } from '../utils/radioTunerAudio';
 import { DriveIn3DStage } from './DriveIn3DStage';
+import { StrangeletLabShowcase } from './StrangeletLabShowcase';
 
 export const FAKE_MARQUEE_MOVIES = [
   {
@@ -215,6 +216,7 @@ export function InterzoneDriveInTheater({
   // Community Reel cycling & modal
   const [communityIndex, setCommunityIndex] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showLabShowcase, setShowLabShowcase] = useState(false);
 
   const bass = Number(audioSignals?.bass) || 0;
   const isTransient = Boolean(audioSignals?.isTransient);
@@ -479,11 +481,9 @@ export function InterzoneDriveInTheater({
         {/* ── SUITE DROPDOWN & JUMP TO CHOREOGRAPHY STUDIO TAB ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <StrangeletSuiteMenu currentAppId="keneticut" align="right" />
-          <a
-            href="https://github.com/lordgriefo/Strangelet-Lab/releases"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Download Strangelet Lab v2.5 Beta (Windows x64 / Faust WebAssembly / GHOST AI DAW)"
+          <button
+            onClick={() => setShowLabShowcase(true)}
+            title="Open Strangelet Lab Mothership Showcase (Public Beta v2.5 / Faust DSP / KoboldCpp Audio Bridge)"
             style={{
               background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(255, 107, 0, 0.2))',
               color: '#fbbf24',
@@ -494,7 +494,6 @@ export function InterzoneDriveInTheater({
               fontWeight: 800,
               fontSize: 9,
               letterSpacing: 1.5,
-              textDecoration: 'none',
               cursor: 'pointer',
               boxShadow: '0 0 10px rgba(251, 191, 36, 0.35)',
               transition: 'all 0.15s ease',
@@ -511,9 +510,9 @@ export function InterzoneDriveInTheater({
               e.currentTarget.style.boxShadow = '0 0 10px rgba(251, 191, 36, 0.35)';
             }}
           >
-            <span>⚡ LAB BETA</span>
-            <span style={{ fontSize: 8 }}>↗</span>
-          </a>
+            <span>⚡ LAB MOTHERSHIP</span>
+            <span style={{ fontSize: 8 }}>🔍</span>
+          </button>
           <button
             onClick={onSwitchToStudio}
             style={{
@@ -1397,11 +1396,9 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
-                {/* 8. Strangelet Lab (v2.5 Beta Native DAW) */}
-                <a
-                  href="https://github.com/lordgriefo/Strangelet-Lab/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                {/* 8. Strangelet Lab (v2.5 Beta Native DAW - The Mothership) */}
+                <div
+                  onClick={() => setShowLabShowcase(true)}
                   style={{
                     padding: 16,
                     backgroundColor: 'rgba(30, 24, 12, 0.88)',
@@ -1409,7 +1406,7 @@ export function InterzoneDriveInTheater({
                     border: '1px solid rgba(251, 191, 36, 0.55)',
                     boxShadow: '0 0 14px rgba(251, 191, 36, 0.25)',
                     textAlign: 'left',
-                    textDecoration: 'none',
+                    cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -1451,25 +1448,79 @@ export function InterzoneDriveInTheater({
                       STRANGELET LAB
                     </div>
                     <div style={{ fontSize: 7.5, color: '#fef08a', fontFamily: 'monospace', marginTop: 1 }}>
-                      PARTICLE COLLIDER DAW
+                      THE MOTHERSHIP DAW · PARTICLE COLLIDER
                     </div>
                     <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 4, lineHeight: 1.4 }}>
-                      Quantum-acoustic DAW: Faust WebAssembly DSP, level-matched FFT mastering, drum transient replacer & air-gapped GHOST AI companion.
+                      Quantum-acoustic mothership DAW: Faust WebAssembly DSP, level-matched FFT mastering, drum transient replacer & Kobold.cpp AI music bridge.
                     </div>
                   </div>
-                  <div
-                    style={{
-                      marginTop: 12,
-                      fontSize: 8,
-                      fontFamily: "'Syncopate', sans-serif",
-                      color: '#fbbf24',
-                      fontWeight: 700,
-                      letterSpacing: 1,
-                    }}
-                  >
-                    DOWNLOAD v2.5 BETA (.EXE / ZIP) ➔
+                  <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div
+                      style={{
+                        fontSize: 8,
+                        fontFamily: "'Syncopate', sans-serif",
+                        color: '#fbbf24',
+                        fontWeight: 700,
+                        letterSpacing: 1,
+                      }}
+                    >
+                      ⚡ EXPLORE MOTHERSHIP LAB & GALLERY ➔
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                      <a
+                        href="https://lordgriefo.github.io/Strangelet-Lab/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          color: '#00e5ff',
+                          textDecoration: 'none',
+                          border: '1px solid rgba(0, 229, 255, 0.4)',
+                          padding: '2px 6px',
+                          borderRadius: 2,
+                          background: 'rgba(0, 229, 255, 0.1)',
+                        }}
+                      >
+                        ▶ BROWSER BETA
+                      </a>
+                      <a
+                        href="https://github.com/lordgriefo/Strangelet-Lab/releases"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          color: '#fbbf24',
+                          textDecoration: 'none',
+                          border: '1px solid rgba(251, 191, 36, 0.4)',
+                          padding: '2px 6px',
+                          borderRadius: 2,
+                          background: 'rgba(251, 191, 36, 0.1)',
+                        }}
+                      >
+                        💾 WINDOWS (.ZIP)
+                      </a>
+                      <a
+                        href="./strangelet-lab.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: 7.5,
+                          fontFamily: "'Syncopate', sans-serif",
+                          color: '#39ff14',
+                          textDecoration: 'none',
+                          border: '1px solid rgba(57, 255, 20, 0.4)',
+                          padding: '2px 6px',
+                          borderRadius: 2,
+                          background: 'rgba(57, 255, 20, 0.1)',
+                        }}
+                      >
+                        🌐 DEDICATED SITE
+                      </a>
+                    </div>
                   </div>
-                </a>
+                </div>
 
                 {/* 9. Strangelet Stitch */}
                 <a
@@ -2544,6 +2595,14 @@ export function InterzoneDriveInTheater({
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── STRANGELET LAB MOTHERSHIP SHOWCASE MODAL ── */}
+      {showLabShowcase && (
+        <StrangeletLabShowcase
+          onClose={() => setShowLabShowcase(false)}
+          onSwitchToStudio={onSwitchToStudio}
+        />
       )}
     </div>
   );

@@ -371,6 +371,34 @@ export function InterzoneFrame({
               🍿 DRIVE-IN
             </button>
 
+            {/* Direct Link / Tab to Strangelet Lab Mothership */}
+            <button
+              onClick={() => onTabChange && onTabChange('lab')}
+              title="Open Strangelet Lab Mothership Showcase (Public Beta v2.5)"
+              style={{
+                background: activeTab === 'lab'
+                  ? 'linear-gradient(90deg, #fbbf24, #ff6b00)'
+                  : 'rgba(251, 191, 36, 0.15)',
+                color: activeTab === 'lab' ? '#000' : '#fbbf24',
+                border: '1px solid #fbbf24',
+                borderRadius: 4,
+                padding: '3px 7px',
+                fontFamily: "'Syncopate', sans-serif",
+                fontWeight: 800,
+                fontSize: 7.5,
+                letterSpacing: 0.8,
+                cursor: 'pointer',
+                boxShadow: activeTab === 'lab' ? '0 0 10px rgba(251, 191, 36, 0.6)' : 'none',
+                transition: 'all 0.15s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+                flexShrink: 0,
+              }}
+            >
+              ⚡ LAB
+            </button>
+
             {/* Link / Tab to Choreography Studio */}
             <button
               onClick={() => onTabChange && onTabChange(activeTab === 'studio' ? 'editor' : 'studio')}

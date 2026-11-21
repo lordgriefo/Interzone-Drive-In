@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strangelet Lab — The Mothership DAW (Public Beta v2.5)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700;800&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070d;
+      --card-bg: rgba(15, 15, 26, 0.88);
+      --card-border: rgba(251, 191, 36, 0.25);
+      --amber: #fbbf24;
+      --orange: #ff6b00;
+      --cyan: #00e5ff;
+      --green: #39ff14;
+      --purple: #c084fc;
+      --rose: #f43f5e;
+      --text: #e4e4e7;
+      --text-dim: #a1a1aa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(ellipse at 50% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 10% 30%, rgba(0, 229, 255, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 70%, rgba(255, 107, 0, 0.06) 0%, transparent 45%);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      line-height: 1.6;
+      padding: 0 16px 80px;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    /* Top Nav Bar */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--amber);
+    }
+
+    .seal-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--amber);
+      object-fit: cover;
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.45);
+    }
+
+    .brand-text-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--amber);
+    }
+
+    .brand-text-sub {
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-family: 'Syncopate', sans-serif;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #fbbf24, #ff6b00);
+      color: #000;
+      border: none;
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.4);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 28px rgba(255, 107, 0, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .btn-cyan {
+      background: rgba(0, 229, 255, 0.12);
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+    }
+    .btn-cyan:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 20px var(--cyan);
+    }
+
+    .btn-dark {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-dark:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--text);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 40px 10px 50px;
+      position: relative;
+    }
+
+    .beta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 107, 0, 0.15);
+      border: 1px solid var(--orange);
+      color: var(--orange);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      margin-bottom: 18px;
+      box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+    }
+
+    .pulsing-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.4; }
+    }
+
+    .hero-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(24px, 4.5vw, 48px);
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(251, 191, 36, 0.35);
+      margin-bottom: 12px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #fbbf24 30%, #ff6b00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      max-width: 820px;
+      margin: 0 auto 30px;
+      font-style: italic;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    /* Notice Banner: Kobold.cpp replaces ComfyUI */
+    .notice-box {
+      background: linear-gradient(135deg, rgba(57, 255, 20, 0.08), rgba(0, 229, 255, 0.05));
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 30px auto 40px;
+      text-align: left;
+      box-shadow: 0 0 25px rgba(57, 255, 20, 0.15);
+      position: relative;
+    }
+
+    .notice-tag {
+      display: inline-block;
+      font-family: 'Syncopate', sans-serif;
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #000;
+      background: var(--green);
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .notice-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--green);
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    .notice-desc {
+      font-size: 11px;
+      color: #d1d5db;
+      line-height: 1.7;
+    }
+
+    /* Gallery Grid */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+      padding-bottom: 10px;
+      margin: 50px 0 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-badge {
+      font-size: 9px;
+      font-family: 'Space Mono', monospace;
+      color: var(--text-dim);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: var(--amber);
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .card-thumb-wrap {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #000;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-thumb {
+      transform: scale(1.03);
+    }
+
+    .card-zoom-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 8px;
+      font-family: 'Syncopate', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+    }
+
+    .card-body {
+      padding: 16px 18px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 7.5px;
+      font-family: 'Syncopate', sans-serif;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .badge-amber { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid var(--amber); }
+    .badge-cyan { background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid var(--cyan); }
+    .badge-orange { background: rgba(255, 107, 0, 0.15); color: var(--orange); border: 1px solid var(--orange); }
+    .badge-green { background: rgba(57, 255, 20, 0.15); color: var(--green); border: 1px solid var(--green); }
+    .badge-purple { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid var(--purple); }
+    .badge-rose { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid var(--rose); }
+
+    .card-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .card-bullets {
+      font-size: 10px;
+      color: #cbd5e1;
+      padding-left: 18px;
+      margin-top: auto;
+    }
+
+    .card-bullets li {
+      margin-bottom: 4px;
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.94);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 92vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border: 1px solid var(--amber);
+      border-radius: 4px;
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.4);
+    }
+
+    .lightbox-caption {
+      margin-top: 12px;
+      font-family: 'Syncopate', sans-serif;
+      font-size: 11px;
+      color: var(--amber);
+      text-align: center;
+      letter-spacing: 1.5px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -36px;
+      right: 0;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .lightbox-close:hover {
+      color: var(--orange);
+    }
+
+    /* Shortcuts Table */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 9px;
+      color: var(--amber);
+      background: rgba(251, 191, 36, 0.08);
+      letter-spacing: 1.5px;
+    }
+
+    td kbd {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-family: monospace;
+      color: var(--cyan);
+      font-size: 10px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 70px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(251, 191, 36, 0.2);
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    footer a {
+      color: var(--amber);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Top Navigation -->
+    <header class="top-nav">
+      <a href="./index.html" class="brand-link" title="Return to Strangelet Creative Network">
+        <img src="./assets-bg/logos/strangelet-lab-logo.jpg" alt="Strangelet Lab Seal" class="seal-logo" />
+        <div>
+          <div class="brand-text-title">⚡ STRANGELET LAB</div>
+          <div class="brand-text-sub">THE MOTHERSHIP · QUANTUM-ACOUSTIC DAW</div>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <a href="./index.html" class="btn btn-dark">📼 DRIVE-IN & NETWORK</a>
+        <a href="https://lordgriefo.github.io/Strangelet-Lab/" target="_blank" rel="noopener noreferrer" class="btn btn-cyan">
+          ▶ LAUNCH BROWSER BETA
+        </a>
+        <a href="https://github.com/lordgriefo/Strangelet-Lab/releases" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          💾 DOWNLOAD WINDOWS (.ZIP)
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="beta-pill">
+        <span class="pulsing-dot"></span>
+        PUBLIC BETA v2.5.0 — ACTIVELY EVOLVING WORKSTATION
+      </div>
+      <h1 class="hero-title">
+        THE <span>MOTHERSHIP</span> AUDIO WORKSTATION
+      </h1>
+      <p class="hero-subtitle">
+        Quantum-Acoustic Production Workstation & Offline-First Particle Collider DAW.<br>
+        Inspired by Georges Méliès (1902), David Lynchian Tape Realism & High-Energy Particle Physics.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="https://lordgriefo.github.io/Strangelet-Lab/" target="_blank" rel="noopener noreferrer" class="btn btn-cyan" style="padding: 12px 24px; font-size: 10.5px;">
+          ▶ LAUNCH ZERO-INSTALL WEB BETA
+        </a>
+        <a href="https://github.com/lordgriefo/Strangelet-Lab/releases" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 12px 24px; font-size: 10.5px;">
+          💾 PORTABLE WINDOWS x64 (.ZIP)
+        </a>
+        <a href="https://github.com/lordgriefo/Strangelet-Lab/issues" target="_blank" rel="noopener noreferrer" class="btn btn-dark" style="padding: 12px 20px; font-size: 10px;">
+          🐛 TEST BETA / REPORT QUIRKS
+        </a>
+      </div>
+    </section>
+
+    <!-- Notice Box: KoboldCpp replaces ComfyUI -->
+    <div class="notice-box">
+      <div class="notice-tag">SYSTEM UPGRADE</div>
+      <div class="notice-title">⚡ KOBOLD.CPP REPLACES COMFYUI FOR ALL LOCAL NEURAL GENERATION</div>
+      <div class="notice-desc">
+        Strangelet Lab has retired ComfyUI in favor of <strong>Kobold.cpp</strong> (<code>http://localhost:5001</code>). 
+        Kobold.cpp now serves as the unified, lightweight engine for <strong>ACE-Step 1.5</strong> loop diffusion, 
+        <strong>YuE 2.0</strong> full-track synthesis, and offline <strong>GHOST</strong> sensei intelligence through direct REST endpoints 
+        (<code>/api/extra/music/prepare</code> and <code>/api/extra/music/generate</code>). 
+        No complicated node graphs, no Python dependency hell, lower idle VRAM, and zero friction.
+      </div>
+    </div>
+
+    <!-- Module Showcase Gallery -->
+    <div class="section-header">
+      <div class="section-title">
+        <span>📸 MOTHERSHIP MODULE SHOWCASE & INTERFACE DEEP DIVE</span>
+      </div>
+      <div class="section-badge">12 OFFICIAL LAB WORKBENCHES · CLICK TO EXPAND</div>
+    </div>
+
+    <div class="gallery-grid">
+
+      <!-- 1. Pure Timeline -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/timeline_multitrack.jpg', 'Pure Timeline Multi-Track Arrangement')">
+          <img src="./assets-bg/lab/timeline_multitrack.jpg" alt="Pure Timeline Arrangement" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-amber">CORE TIMELINE</span>
+          <h3 class="card-title">Pure Timeline Multi-Track Arrangement</h3>
+          <p class="card-desc">
+            Edge-to-edge arrangement workspace with micro-transport, hardware-accelerated 60fps cursor, and multi-track audio lanes with real-time automation.
+          </p>
+          <ul class="card-bullets">
+            <li>Volume, pan & Faust VST parameter envelope curves</li>
+            <li>Subtle, Warm, or Lynchian tape realism saturation deck</li>
+            <li>Instant A/B mix balance snapshots (1–8 recall)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2. Faust DSP Toy Lab -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/faust_dsp_toy_lab.png', 'Faust DSP Toy Lab // VST & Instrument Builder')">
+          <img src="./assets-bg/lab/faust_dsp_toy_lab.png" alt="Faust DSP Toy Lab" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-cyan">FAUST COMPILER</span>
+          <h3 class="card-title">Faust DSP Toy Lab // VST Builder</h3>
+          <p class="card-desc">
+            Code boutique guitar pedals, tape delays, and physical modeling synths in Faust (Functional Audio Stream) compiled directly to WebAssembly.
+          </p>
+          <ul class="card-bullets">
+            <li>12 Boutique Presets: Lynchian Tape Echo, TB-303 Diode Acid Filter, VHS 1985 Chorus</li>
+            <li>Live audition test signals (Guitar Riff, Drum Break, Synth Arp)</li>
+            <li>Prompt-to-Toy live recipe synthesizer powered by GHOST</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3. Large Sonic Collider (Toroidal Chamber) -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/lsc_chamber.png', 'The Large Sonic Collider // LSC-27KM Toroidal Chamber')">
+          <img src="./assets-bg/lab/lsc_chamber.png" alt="Large Sonic Collider Chamber" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-orange">PARTICLE PHYSICS</span>
+          <h3 class="card-title">The Large Sonic Collider [LSC-27KM]</h3>
+          <p class="card-desc">
+            Superconducting 27km particle ring simulating stems as relativistic charged hadrons. Sound particles collide at sub-light speeds to generate new textures.
+          </p>
+          <ul class="card-bullets">
+            <li>Relativistic Doppler pitch modulations and quantum sonic fission</li>
+            <li>Active particle weight & nuance ratio sliders (e.g. Samba 80%, Indie Rock 85%)</li>
+            <li>Synchronized prompt physics generation for Ace-Step 1.5 & YuE 2.0</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4. LSC Header & Beam Injector -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/lsc_header.png', 'LSC Beam Injectors & Energy Controls')">
+          <img src="./assets-bg/lab/lsc_header.png" alt="LSC Beam Injectors" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-orange">BEAM INJECTOR</span>
+          <h3 class="card-title">LSC Hadron Matrix & Beam Sectors</h3>
+          <p class="card-desc">
+            Multi-sector injection hub controlling particle charge (8.4 Tesla), collision cross-section, and musical style particles.
+          </p>
+          <ul class="card-bullets">
+            <li>Beam A: Genres, Eras & Rhythms (Bossa Nova, Trip Hop, 90s Lo-Fi)</li>
+            <li>Beam B: Studio Gear & Microphones (Studer A800, Pultec EQP-1A, U47)</li>
+            <li>Sonic Sector, Lyric Lab, Deconstructor & Archive Vault</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5. Beam Splitter & Optical Refractor -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/beam_splitter_optical.png', 'Beam Splitter & Optical Refractor (Snell’s Law)')">
+          <img src="./assets-bg/lab/beam_splitter_optical.png" alt="Beam Splitter & Optical Refractor" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-green">PRISM CHOPPER</span>
+          <h3 class="card-title">Beam Splitter & Optical Refractor</h3>
+          <p class="card-desc">
+            Simulates Snell's Law caustic dispersion across audio wavelengths using a virtual quartz prism (n = 1.544) to slice beats into spectral rays.
+          </p>
+          <ul class="card-bullets">
+            <li>Transient onset detection dividing beats into 16 spectral rays</li>
+            <li>Spectral Ray Chromatic Pads (Keys 1–8, Q–I) for finger-drumming</li>
+            <li>Stereo dispersion fan spreading refracted slices across stereo space</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 6. Parametric EQ & Mastering Suite -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/parametric_eq_mastering.png', 'Parametric EQ & Gold Path Mastering Suite with Matchering')">
+          <img src="./assets-bg/lab/parametric_eq_mastering.png" alt="Mastering Suite" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-amber">GOLD PATH MASTERING</span>
+          <h3 class="card-title">Parametric EQ & Mastering Suite</h3>
+          <p class="card-desc">
+            6-stage Gold Path audiophile mastering deck with real-time D3 FFT spectral analysis and AI reference track auto-EQ matching.
+          </p>
+          <ul class="card-bullets">
+            <li>Live FFT Matchering: Drop any reference track to match EQ curve</li>
+            <li>Level-matched A/B comparison (Processed vs Dry Original)</li>
+            <li>Broadcast targets: -14 LUFS, -1 dBFS True-Peak limiter</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 7. Drum Trigger // SFZ Replacer -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/drum_trigger_sfz.png', 'Drum Trigger // Transient-to-MIDI & SFZ Replacement')">
+          <img src="./assets-bg/lab/drum_trigger_sfz.png" alt="Drum Trigger" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-rose">DRUM TRIGGER</span>
+          <h3 class="card-title">Drum Trigger & SFZ Replacer</h3>
+          <p class="card-desc">
+            Detects Kick, Snare, Hi-Hat, and Tom attack peaks over any audio stem and replaces them with 1-click vintage SFZ drum samples or MIDI.
+          </p>
+          <ul class="card-bullets">
+            <li>Interactive transient detection threshold scope</li>
+            <li>Internal SFZ Kits: 808 Boom, 909 Vintage Kit, Acoustic Snare</li>
+            <li>General MIDI Channel 10 mapping and polyphonic MIDI export</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 8. Laser Audio Editor & WSOLA Time-Stretch -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/laser_audio_editor.png', 'Laser Audio Editor & Loop Crossfade Studio')">
+          <img src="./assets-bg/lab/laser_audio_editor.png" alt="Laser Audio Editor" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-cyan">DSP EDITOR</span>
+          <h3 class="card-title">Laser Audio Editor & Loop Studio</h3>
+          <p class="card-desc">
+            Precision sample editor with pitch-locked WSOLA time-stretching, Chronopins, loop crossfade studio, and zero-crossing waveform alignment.
+          </p>
+          <ul class="card-bullets">
+            <li>Pitch-locked time stretch from 0.50x to 2.00x speed</li>
+            <li>Chronopin time-warping anchors for individual words & hits</li>
+            <li>DSP suite: Fade In/Out, Normalize, Reverse, Polarity Invert, DC Zero</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 9. Spectral Wave Splitter & Stem Deck -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/spectral_wave_splitter.png', 'Spectral Wave Splitter & Stem Deck')">
+          <img src="./assets-bg/lab/spectral_wave_splitter.png" alt="Stem Splitter" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-purple">HYBRID AI STEMS</span>
+          <h3 class="card-title">Spectral Wave Splitter & Stem Deck</h3>
+          <p class="card-desc">
+            Separates full songs and AI generations into 4 isolated stems powered by Demucs v4 Hybrid + Spotify Basic Pitch neural nets.
+          </p>
+          <ul class="card-bullets">
+            <li>Stems: Vocals, Sub & Synth Bass, Drums & Transients, Synths & Guitars</li>
+            <li>Per-stem gain, solo, mute, and direct "Transcribe to MIDI"</li>
+            <li>Batch 1-click Stem ZIP export for remixes or VJ synchronization</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 10. Project Statistics & Telemetry Radar -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/project_statistics_telemetry.png', 'Project Statistics & Mix Complexity Telemetry')">
+          <img src="./assets-bg/lab/project_statistics_telemetry.png" alt="Project Statistics" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-green">TELEMETRY</span>
+          <h3 class="card-title">Project Statistics & Mix Telemetry</h3>
+          <p class="card-desc">
+            Real-time radar telemetry analyzing arrangement density, dynamic range, harmonic saturation, stereo width, and frequency balance.
+          </p>
+          <ul class="card-bullets">
+            <li>Radar complexity index visualizer built on Recharts</li>
+            <li>Spectral health check alerting to phase issues & harshness</li>
+            <li>DSP buffer latency & memory consumption telemetry</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 11. Guided Workflows & Templates -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/guided_workflows_templates.png', 'Guided Workflows & Production Templates')">
+          <img src="./assets-bg/lab/guided_workflows_templates.png" alt="Guided Workflows" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-amber">PRODUCTION TEMPLATES</span>
+          <h3 class="card-title">Guided Workflows & Templates</h3>
+          <p class="card-desc">
+            Pre-engineered production pipelines guided by GHOST to take ideas from raw prompts to radio-ready mastered tracks.
+          </p>
+          <ul class="card-bullets">
+            <li>The Quantum Alchemist: Prompt -> Collider -> Faust -> Gold Path</li>
+            <li>Suno De-Glaze: Removes digital crunch & restores dynamic depth</li>
+            <li>GHOST Mad Scientist: AI mentor offering analog wisdom</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 12. AudioArc Integration -->
+      <div class="card">
+        <div class="card-thumb-wrap" onclick="openLightbox('./assets-bg/lab/audioarc_gemini.jpg', 'AudioArc Gemini Visual Storyboarder')">
+          <img src="./assets-bg/lab/audioarc_gemini.jpg" alt="AudioArc Integration" class="card-thumb" />
+          <div class="card-zoom-badge">🔍 ZOOM</div>
+        </div>
+        <div class="card-body">
+          <span class="card-badge badge-cyan">NETWORK INTEGRATION</span>
+          <h3 class="card-title">AudioArc & KinetiCUT VJ Bridges</h3>
+          <p class="card-desc">
+            Direct roundtrip integration across the Strangelet Creative Network for visual music video storyboarding and automated beat-cutting.
+          </p>
+          <ul class="card-bullets">
+            <li>AudioArc: Gemini-powered lyric-to-scene prompts & visual storyboards</li>
+            <li>Strangelet KinetiCUT: 1-click audio & transient export for beat choreography</li>
+            <li>Wunderbar!: Hardware groovebox & synth sample import</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Keyboard Shortcuts -->
+    <div class="section-header">
+      <div class="section-title">
+        <span>⌨️ GLOBAL KEYBOARD SHORTCUTS</span>
+      </div>
+      <div class="section-badge">SPEED RUN WORKFLOW CHEAT SHEET</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>KEYBOARD SHORTCUT</th>
+            <th>ENGINE ACTION</th>
+            <th>CONTEXT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Start / Pause Master Audio Transport</td>
+            <td>Global Engine</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Toggle Arrange View (Pure Timeline) / Console View (Mixer)</td>
+            <td>Workspace Layout</td>
+          </tr>
+          <tr>
+            <td><kbd>B</kbd></td>
+            <td>Flip A/B Audition (Active Master vs. Reference Track / Dry Signal)</td>
+            <td>Mastering Suite</td>
+          </tr>
+          <tr>
+            <td><kbd>Ctrl + Z</kbd> / <kbd>Ctrl + Y</kbd></td>
+            <td>Undo / Redo Timeline, Parameter & DSP Edits</td>
+            <td>Global History</td>
+          </tr>
+          <tr>
+            <td><kbd>Ctrl + S</kbd></td>
+            <td>Save Project Snapshot (<code>.slp</code> file)</td>
+            <td>Session Management</td>
+          </tr>
+          <tr>
+            <td><kbd>1</kbd> – <kbd>8</kbd></td>
+            <td>Recall Mix Snapshots (Mixer) / Trigger Chromatic Pads (Beam Splitter)</td>
+            <td>Mixer & Slicer</td>
+          </tr>
+          <tr>
+            <td><kbd>L</kbd></td>
+            <td>Toggle Transport Loop Region</td>
+            <td>Timeline Transport</td>
+          </tr>
+          <tr>
+            <td><kbd>Alt + G</kbd></td>
+            <td>Toggle GHOST (The Ghost in the Machine) Terminal</td>
+            <td>AI Companion</td>
+          </tr>
+          <tr>
+            <td><kbd>Ctrl + E</kbd></td>
+            <td>Open Batch Stem Export (.WAV ZIP)</td>
+            <td>Stem Deck</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- System Requirements & Hardware Tiers -->
+    <div class="section-header">
+      <div class="section-title">
+        <span>⚙️ HARDWARE SCALABILITY & SYSTEM TIERS</span>
+      </div>
+      <div class="section-badge">OPTIMIZED FOR 6GB LAPTOPS TO 24GB+ TITANS</div>
+    </div>
+
+    <div class="gallery-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="card" style="padding: 16px 20px;">
+        <span class="card-badge badge-green" style="margin-bottom: 6px;">TIER 1 · 6GB VRAM</span>
+        <h4 style="font-family: 'Syncopate', sans-serif; font-size: 11px; color: #fff; margin-bottom: 6px;">LAPTOP / TIGHT MODE</h4>
+        <p style="font-size: 10px; color: var(--text-dim); line-height: 1.5;">
+          RTX 2060, 3060 6GB, Apple M 8GB.<br>
+          Recommended: Llama 3.2 3B or Qwen 2.5 3B/7B Slim via Kobold.cpp. Memory scavenging with single-stem processing.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 16px 20px;">
+        <span class="card-badge badge-cyan" style="margin-bottom: 6px;">TIER 2 · 8GB VRAM</span>
+        <h4 style="font-family: 'Syncopate', sans-serif; font-size: 11px; color: #fff; margin-bottom: 6px;">BALANCED DESKTOP</h4>
+        <p style="font-size: 10px; color: var(--text-dim); line-height: 1.5;">
+          RTX 3070, 4060, Apple M1/M2/M3 16GB.<br>
+          Recommended: Qwen 2.5 7B or Llama 3.1 8B Q4. Parallel DSP filters, live FFT analysis, and Kobold.cpp ACE-Step loop generation.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 16px 20px;">
+        <span class="card-badge badge-amber" style="margin-bottom: 6px;">TIER 3 · 16GB VRAM</span>
+        <h4 style="font-family: 'Syncopate', sans-serif; font-size: 11px; color: #fff; margin-bottom: 6px;">PRO STUDIO MODE</h4>
+        <p style="font-size: 10px; color: var(--text-dim); line-height: 1.5;">
+          RTX 4070 Ti, RTX 4080 16GB, Apple M Pro 24GB+.<br>
+          Recommended: Qwen 2.5 14B or Llama 3.1 8B Q8_0 High-Def. Resident Demucs FP16 stems in VRAM and 60fps telemetry.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 16px 20px;">
+        <span class="card-badge badge-purple" style="margin-bottom: 6px;">TIER 4 · 24GB+ VRAM</span>
+        <h4 style="font-family: 'Syncopate', sans-serif; font-size: 11px; color: #fff; margin-bottom: 6px;">STUDIO TITAN</h4>
+        <p style="font-size: 10px; color: var(--text-dim); line-height: 1.5;">
+          RTX 3090, 4090, Apple M Max/Ultra 64GB+.<br>
+          Recommended: YuE 2.0 dual-track 7B full-song synthesis and un-quantized FP16 GHOST LLMs with zero disk offload delays.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p style="margin-bottom: 8px;">
+        Designed & Developed by <strong>The Strangelet Cybernetics & Audio Division</strong> · 
+        Official Homage to Georges Méliès' <em>Le Voyage dans la Lune</em> (1902)
+      </p>
+      <p>
+        <a href="./index.html">Interzone Drive-In & Strangelet Creative Network</a> &nbsp;•&nbsp; 
+        <a href="https://lordgriefo.github.io/Strangelet-Lab/" target="_blank" rel="noopener noreferrer">Launch Browser Beta</a> &nbsp;•&nbsp; 
+        <a href="https://github.com/lordgriefo/Strangelet-Lab/releases" target="_blank" rel="noopener noreferrer">Download Windows Binary</a> &nbsp;•&nbsp; 
+        <a href="https://github.com/lordgriefo/Strangelet-Lab/issues" target="_blank" rel="noopener noreferrer">Report Quirks on GitHub</a>
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox()" title="Close (ESC)">✕</button>
+      <img id="lightbox-img" src="" alt="Enlarged Screenshot" class="lightbox-img" />
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <script>
+    function openLightbox(src, caption) {
+      const modal = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const cap = document.getElementById('lightbox-caption');
+      img.src = src;
+      cap.textContent = caption;
+      modal.classList.add('active');
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById('lightbox');
+      modal.classList.remove('active');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -14,6 +14,7 @@ import { AssetBin }           from './components/AssetBin';
 import { FXConsole }          from './components/FXConsole';
 import { InterzoneFrame }     from './components/InterZoneFrame';
 import { InterzoneDriveInTheater } from './components/InterzoneDriveInTheater';
+import { StrangeletLabShowcase } from './components/StrangeletLabShowcase';
 import { MultiTrackTimeline } from './components/MultiTrackTimeline';
 import { CanvasWorkspace }    from './components/CanvasWorkspace';
 import { TransportBar }       from './components/TransportBar';
@@ -296,7 +297,7 @@ export default function App() {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
-        if (tab === 'studio' || tab === 'drivein' || tab === 'editor') return tab;
+        if (tab === 'studio' || tab === 'drivein' || tab === 'editor' || tab === 'lab') return tab;
       }
     } catch (_) {}
     return 'drivein';
@@ -318,7 +319,7 @@ export default function App() {
       try {
         const params = new URLSearchParams(window.location.search);
         const tab = params.get('tab') || (window.location.hash ? window.location.hash.replace('#', '') : null);
-        if (tab === 'studio' || tab === 'drivein' || tab === 'editor') {
+        if (tab === 'studio' || tab === 'drivein' || tab === 'editor' || tab === 'lab') {
           setActiveTab(tab);
         }
       } catch (_) {}
@@ -1576,6 +1577,11 @@ export default function App() {
                 handlePlayTrack(stationTracks[startIdx], startIdx);
               }
             }}
+          />
+        ) : activeTab === 'lab' ? (
+          <StrangeletLabShowcase
+            onClose={() => handleTabChange('drivein')}
+            onSwitchToStudio={() => handleTabChange('editor')}
           />
         ) : (
           <>
