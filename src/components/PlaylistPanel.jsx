@@ -75,6 +75,8 @@ export function PlaylistPanel({
   // For loading presets back into App
   onLoadPreset = () => {},      // (preset, assets?) → restores app state from playlist entry
   onLoadAssets = () => {},
+  onClearAssets = () => {},
+  onRestoreDemos = null,
 
   // Currently loaded song — lets us export it even when it isn't in the playlist
   currentTrackTitle = '',
@@ -350,8 +352,37 @@ export function PlaylistPanel({
 
           {/* Track list */}
           {playlist.length === 0 ? (
-            <div style={{ fontSize: 9, color: 'var(--text-dim)', padding: '8px 0', textAlign: 'center' }}>
-              No tracks yet — click ADD TRACKS to load audio files.
+            <div style={{
+              fontSize: 9,
+              color: 'var(--text-dim)',
+              padding: '12px 8px',
+              textAlign: 'center',
+              background: 'var(--bg-secondary)',
+              borderRadius: 4,
+              border: '1px dashed var(--border-dim)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}>
+              <div>Playlist is empty — clean slate active.</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  style={actionBtn('var(--accent-orange)')}
+                >
+                  + ADD TRACKS
+                </button>
+                {onRestoreDemos && (
+                  <button
+                    onClick={onRestoreDemos}
+                    style={actionBtn('#10b981')}
+                    title="Restore demo playlist & showcase songs"
+                  >
+                    📥 LOAD DEMO SONGS
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -549,18 +580,33 @@ export function PlaylistPanel({
                 </button>
                 <button
                   onClick={() => {
-                    if (window.confirm('Clear entire playlist?')) {
+                    if (window.confirm('Reset & clear entire playlist and all demo media folders for a clean slate?')) {
                       onPlaylistChange((prev) => {
                         prev.forEach((e) => { if (e.url?.startsWith('blob:')) URL.revokeObjectURL(e.url); });
                         return [];
                       });
+                      onClearAssets?.();
+                      try {
+                        localStorage.setItem('kineticut_blank_slate', 'true');
+                        localStorage.removeItem('kineticut_user_folders');
+                      } catch (_) {}
                     }
                   }}
                   style={actionBtn('#ef4444')}
+                  title="Clear entire playlist and purge all demo media & folders for a clean slate"
                 >
                   🗑 CLEAR
                 </button>
               </>
+            )}
+            {playlist.length === 0 && onRestoreDemos && (
+              <button
+                onClick={onRestoreDemos}
+                style={actionBtn('#10b981')}
+                title="Restore full demo showcase playlist and media"
+              >
+                📥 RESTORE DEMOS
+              </button>
             )}
           </div>
 

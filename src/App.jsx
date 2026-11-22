@@ -407,13 +407,26 @@ export default function App() {
 
 
   // ── Asset state ──
-  const [assets, setAssets] = useState(DEFAULT_MEDIA_ITEMS);
+  const [assets, setAssets] = useState(() => {
+    try {
+      if (localStorage.getItem('kineticut_blank_slate') === 'true') {
+        return [];
+      }
+    } catch (_) {}
+    return DEFAULT_MEDIA_ITEMS;
+  });
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
 
   // ── Synchro-Vox puppet lip-sync ──
   const [puppetMode, setPuppetMode] = useState('2'); // '2' | '4' | '8'
   const [puppetSlots, setPuppetSlots] = useState(() => {
     try {
+      if (localStorage.getItem('kineticut_blank_slate') === 'true') {
+        return {
+          rest: null, open: null, narrow: null, wide: null,
+          teeth: null, pucker: null, midOpen: null, snap: null,
+        };
+      }
       const synchroAssets = (DEFAULT_MEDIA_ITEMS || []).filter((a) =>
         a.url?.includes('synchro-vox') ||
         a.url?.includes('puppet') ||
@@ -489,7 +502,14 @@ export default function App() {
   const [selectedRube,  setSelectedRube]  = useState('none');
   const [chaosLevel,    setChaosLevel]    = useState(0);
   const [rubeDecay,     setRubeDecay]     = useState(800);
-  const [trackTitle,    setTrackTitle]    = useState('Excavating Neverland by The Magic Static Society');
+  const [trackTitle,    setTrackTitle]    = useState(() => {
+    try {
+      if (localStorage.getItem('kineticut_blank_slate') === 'true') {
+        return 'No Music Loaded — Drop or Select Audio Track';
+      }
+    } catch (_) {}
+    return 'Excavating Neverland by The Magic Static Society';
+  });
 
   const basePresetRef = useRef({
     era: 'default',
@@ -596,7 +616,14 @@ export default function App() {
   const [adaptiveTheme, setAdaptiveTheme] = useState(false);
 
   // ── Playlist ──────────────────────────────────────────────────────────────
-  const [playlist,       setPlaylist]      = useState(DEFAULT_PLAYLIST);
+  const [playlist,       setPlaylist]      = useState(() => {
+    try {
+      if (localStorage.getItem('kineticut_blank_slate') === 'true') {
+        return [];
+      }
+    } catch (_) {}
+    return DEFAULT_PLAYLIST;
+  });
   const [playlistIndex,  setPlaylistIndex] = useState(0);
   const [autoAdvance,    setAutoAdvance]   = useState(true);
   const [saveImages,     setSaveImages]    = useState(false);
@@ -932,12 +959,13 @@ export default function App() {
   const DEFAULT_TRACK_URL = DEFAULT_PLAYLIST[0].url;
   const DEFAULT_TRACK_TITLE = DEFAULT_PLAYLIST[0].title;
 
-  const lastAudioFileRef = useRef(DEFAULT_TRACK_URL);
+  const lastAudioFileRef = useRef(null);
   const hasAudioLoaded   = Boolean(lastAudioFileRef.current);
 
-  // Auto-load initial track + synced LRC lyrics on startup
+  // Auto-load initial track + synced LRC lyrics on startup (only if not clean slate)
   useEffect(() => {
     try {
+      if (localStorage.getItem('kineticut_blank_slate') === 'true') return;
       const resolvedTrackUrl = resolveRadioAudioUrl(DEFAULT_TRACK_URL);
       loadAudioTrack(resolvedTrackUrl);
       setTrackTitle(DEFAULT_TRACK_TITLE);
@@ -949,6 +977,8 @@ export default function App() {
     } catch (err) {
       console.warn('[App] Default audio track init warning:', err);
     }
+
+    if (localStorage.getItem('kineticut_blank_slate') === 'true') return;
 
     // Auto-load synchronized LRC lyrics if the initial track has them
     setLyricSegments([]);
@@ -1287,14 +1317,92 @@ export default function App() {
     });
   };
 
-  const handleClearAllAssets = () => {
+  const handleClearAllAssets = useCallback(() => {
     assets.forEach((a) => { if (a.url?.startsWith('blob:')) URL.revokeObjectURL(a.url); });
     setAssets([]);
     setSelectedAssetIndex(0);
     setPuppetSlots({ rest: null, open: null, narrow: null, wide: null, teeth: null, pucker: null, midOpen: null, snap: null });
     clearVideoClips();
     setSelectedClipId(null);
-  };
+    try {
+      localStorage.setItem('kineticut_blank_slate', 'true');
+      localStorage.removeItem('kineticut_user_folders');
+    } catch (_) {}
+  }, [assets, clearVideoClips]);
+
+  const handleSetAssetFolder = useCallback((assetId, folder) => {
+    setAssets((prev) => prev.map((a) => (a.id === assetId ? { ...a, folder: folder || null } : a)));
+  }, []);
+
+  const handleRestoreDemos = useCallback(() => {
+    try {
+      localStorage.removeItem('kineticut_blank_slate');
+      localStorage.removeItem('kineticut_user_folders');
+    } catch (_) {}
+
+    // 1. Restore assets
+    setAssets(DEFAULT_MEDIA_ITEMS);
+    setSelectedAssetIndex(0);
+
+    // 2. Restore puppet slots
+    const synchroAssets = (DEFAULT_MEDIA_ITEMS || []).filter((a) =>
+      a.url?.includes('synchro-vox') ||
+      a.url?.includes('puppet') ||
+      a.name?.toLowerCase().includes('mouth') ||
+      a.name?.toLowerCase().includes('speaking') ||
+      a.name?.toLowerCase().includes('talking') ||
+      a.name?.toLowerCase().includes('character_')
+    );
+    if (synchroAssets.length >= 2) {
+      const findMatch = (terms) => {
+        for (const t of terms) {
+          const found = synchroAssets.find((a) => (a.name || a.url || '').toLowerCase().includes(t.toLowerCase()));
+          if (found) return found.id;
+        }
+        return null;
+      };
+      setPuppetSlots({
+        rest: findMatch(['speaking_in_1960s', 'speaking_in_las', 'talking_in_las', 'speaking_with_las', 'rest', 'speaking']) || synchroAssets[0]?.id,
+        open: findMatch(['mouth_open_talking', 'opening_mouth_wide_20261009000343.jpg', 'open_mouth_pose', 'open']) || synchroAssets[1]?.id,
+        narrow: findMatch(['intense_mou', 'talking_pose_with_open', 'narrow']) || synchroAssets[2]?.id,
+        wide: findMatch(['mouth_wide_open', 'screaming', 'wide']) || synchroAssets[3]?.id,
+        teeth: findMatch(['intense_vocaliz', 'teeth', 'posing_with_open']) || synchroAssets[4]?.id,
+        pucker: findMatch(['mouth_pose', 'to_speak', 'pucker']) || synchroAssets[5]?.id,
+        midOpen: findMatch(['open_mouth_pose_2', 'opening_mouth_widely', 'mid']) || synchroAssets[6]?.id,
+        snap: findMatch(['talking_pose_mouth_open', 'speaking_with_mouth', 'snap']) || synchroAssets[7]?.id,
+      });
+    }
+
+    // 3. Restore playlist
+    setPlaylist(DEFAULT_PLAYLIST);
+    setPlaylistIndex(0);
+
+    // 4. Load initial track + presets
+    try {
+      const resolvedTrackUrl = resolveRadioAudioUrl(DEFAULT_TRACK_URL);
+      loadAudioTrack(resolvedTrackUrl);
+      setTrackTitle(DEFAULT_TRACK_TITLE);
+      lastAudioFileRef.current = resolvedTrackUrl;
+      const p = DEFAULT_PLAYLIST[0]?.preset;
+      if (p) applyPreset(p);
+      if (DEFAULT_PLAYLIST[0].lrcUrl) {
+        fetch(DEFAULT_PLAYLIST[0].lrcUrl)
+          .then((res) => (res.ok ? res.text() : ''))
+          .then((raw) => {
+            if (raw) {
+              const segs = parseLrcString(raw);
+              if (segs.length > 0) setLyricSegments(segs);
+            }
+          })
+          .catch(() => {});
+      }
+      if (DEFAULT_PLAYLIST[0]?.storyboardId && STORYBOARD_PRESETS[DEFAULT_PLAYLIST[0].storyboardId]) {
+        handleLoadStoryboard(DEFAULT_PLAYLIST[0].storyboardId);
+      }
+    } catch (err) {
+      console.warn('[App] Error restoring demos:', err);
+    }
+  }, [loadAudioTrack, applyPreset, handleLoadStoryboard]);
 
   // Reorder assets in Media Bin and automatically re-sequence timeline clips
   const handleReorderAssets = useCallback((fromIndex, toIndex) => {
@@ -1405,11 +1513,13 @@ export default function App() {
     setIsLooping(false);
 
     try {
+      localStorage.setItem('kineticut_blank_slate', 'true');
+      localStorage.removeItem('kineticut_user_folders');
       localStorage.removeItem('keneticut_session_backup');
       sessionStorage.clear();
     } catch (_) {}
 
-    alert("✨ Clean Slate Activated!\n\nAll demo music and clips cleared. You can now drag and drop your own audio and video/images to start fresh.");
+    alert("✨ Clean Slate Activated!\n\nAll demo music, clips, and folders cleared. You can now drag and drop your own audio, photos, videos, and folders to start fresh.");
   }, [stopEngine, clearAudioTrack, clearVideoClips]);
 
   const handleAudioUpload = (e) => {
@@ -1595,6 +1705,8 @@ export default function App() {
             onAddAssets={handleAddAssets}
           onRemoveAsset={handleRemoveAsset}
           onClearAll={handleClearAllAssets}
+          onSetAssetFolder={handleSetAssetFolder}
+          onRestoreDemos={handleRestoreDemos}
           selectedAssetIndex={selectedAssetIndex}
           onSelectAsset={setSelectedAssetIndex}
           puppetSlots={puppetSlots}
@@ -1796,6 +1908,8 @@ export default function App() {
         {!cinemaMode && (
           <FXConsole
             onResetProject={handleResetProject}
+            onClearAssets={handleClearAllAssets}
+            onRestoreDemos={handleRestoreDemos}
             selectedEra={selectedEra}
           setSelectedEra={setSelectedEra}
           isEraLocked={isEraLocked}

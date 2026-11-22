@@ -218,6 +218,8 @@ export function FXConsole({
   lyricFont = 'major_mono',
   setLyricFont = () => {},
   onResetProject = () => {},
+  onClearAssets = () => {},
+  onRestoreDemos = null,
   onAudioUpload = () => {},
   isPlaying = false,
   onTogglePlay = () => {},
@@ -389,6 +391,33 @@ export function FXConsole({
         >
           🔄 RESET PROJECT (FRESH SLATE)
         </button>
+        {onRestoreDemos && (
+          <button
+            type="button"
+            onClick={onRestoreDemos}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              marginTop: 4,
+              padding: '5px 10px',
+              backgroundColor: 'rgba(16, 185, 129, 0.14)',
+              border: '1px solid rgba(16, 185, 129, 0.45)',
+              color: '#a7f3d0',
+              borderRadius: 4,
+              fontSize: 9.5,
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              cursor: 'pointer',
+              letterSpacing: '0.6px',
+              transition: 'all 0.15s ease',
+            }}
+            title="Reload full 10-song demo showcase with 400+ assets and storyboards"
+          >
+            📥 RESTORE DEMO SHOWCASE
+          </button>
+        )}
       </div>
       {/* ── PLAYLIST PANEL ── */}
       <div style={panelSection}>
@@ -398,6 +427,8 @@ export function FXConsole({
           onPlaylistChange={setPlaylist}
           onPlayTrack={onPlayTrack}
           onAdvanceTrack={onPlaylistAdvance}
+          onClearAssets={onClearAssets}
+          onRestoreDemos={onRestoreDemos}
           autoAdvance={autoAdvance}
           setAutoAdvance={setAutoAdvance}
           saveImages={saveImages}

@@ -89,6 +89,8 @@ export function AssetBin({
   onAddAssets = () => {},
   onRemoveAsset = () => {},
   onClearAll = () => {},
+  onSetAssetFolder = () => {},
+  onRestoreDemos = null,
   selectedAssetIndex = 0,
   onSelectAsset = () => {},
   puppetSlots = {},
@@ -114,6 +116,70 @@ export function AssetBin({
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [isMaskPanelOpen, setIsMaskPanelOpen] = useState(false);
+
+  // Dynamic User Folders state
+  const [userFolders, setUserFolders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kineticut_user_folders');
+      return saved ? JSON.parse(saved) : [];
+    } catch (_) {
+      return [];
+    }
+  });
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const folderInputRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kineticut_user_folders', JSON.stringify(userFolders));
+    } catch (_) {}
+  }, [userFolders]);
+
+  const allFolders = useMemo(() => {
+    const fromAssets = assets.map((a) => a.folder).filter(Boolean);
+    return Array.from(new Set([...userFolders, ...fromAssets]));
+  }, [userFolders, assets]);
+
+  const folderCounts = useMemo(() => {
+    const map = {};
+    allFolders.forEach((f) => { map[f] = 0; });
+    assets.forEach((a) => {
+      if (a.folder && map[a.folder] !== undefined) {
+        map[a.folder]++;
+      }
+    });
+    return map;
+  }, [allFolders, assets]);
+
+  const handleCreateFolder = () => {
+    const trimmed = newFolderName.trim();
+    if (!trimmed) {
+      setIsCreatingFolder(false);
+      return;
+    }
+    if (!userFolders.includes(trimmed)) {
+      setUserFolders((prev) => [...prev, trimmed]);
+    }
+    setActiveCategory(trimmed);
+    setNewFolderName('');
+    setIsCreatingFolder(false);
+  };
+
+  const handleDeleteFolder = (folderName) => {
+    if (window.confirm(`Delete folder "${folderName}"? Assets inside will remain in your bin.`)) {
+      setUserFolders((prev) => prev.filter((f) => f !== folderName));
+      assets.forEach((a) => {
+        if (a.folder === folderName) {
+          onSetAssetFolder(a.id, null);
+        }
+      });
+      if (activeCategory === folderName) {
+        setActiveCategory('ALL');
+      }
+    }
+  };
 
   // Category filter and live search
   const [activeCategory, setActiveCategory] = useState('ALL');
@@ -168,6 +234,7 @@ export function AssetBin({
   // If active category has zero items or project was reset, automatically reset to 'ALL'
   useEffect(() => {
     if (activeCategory === 'ALL') return;
+    if (allFolders.includes(activeCategory)) return;
     const catMap = {
       CURRENT_TRACK: counts.currentTrack,
       EXCAVATING: counts.excavating,
@@ -186,7 +253,7 @@ export function AssetBin({
     if (!catMap[activeCategory] || catMap[activeCategory] === 0) {
       setActiveCategory('ALL');
     }
-  }, [counts, activeCategory]);
+  }, [counts, activeCategory, allFolders]);
 
   const filteredItems = useMemo(() => {
     return assets.map((a, origIndex) => ({ ...a, origIndex })).filter((asset) => {
@@ -198,6 +265,10 @@ export function AssetBin({
         if (currentKeyword && (urlLower.includes(currentKeyword) || nameLower.includes(currentKeyword))) return true;
         if (asset.songId && currentTrack?.id && asset.songId === currentTrack.id) return true;
         return false;
+      }
+
+      if (allFolders.includes(activeCategory)) {
+        return asset.folder === activeCategory;
       }
 
       if (activeCategory === 'SYNCHRO_VOX' && !urlLower.includes('synchro-vox') && !urlLower.includes('puppet') && !nameLower.includes('mouth') && !nameLower.includes('character_') && !nameLower.includes('transform_')) return false;
@@ -216,11 +287,12 @@ export function AssetBin({
         const q = searchQuery.toLowerCase();
         const matchName = nameLower.includes(q);
         const matchUrl = urlLower.includes(q);
-        if (!matchName && !matchUrl) return false;
+        const matchFolder = (asset.folder || '').toLowerCase().includes(q);
+        if (!matchName && !matchUrl && !matchFolder) return false;
       }
       return true;
     });
-  }, [assets, activeCategory, searchQuery, currentKeyword, currentTrack]);
+  }, [assets, activeCategory, searchQuery, currentKeyword, currentTrack, allFolders]);
 
   const selectedAsset = assets[selectedAssetIndex] || null;
   const selectedIsVideo = selectedAsset?.mediaType === 'video' || selectedAsset?.type === 'video' || selectedAsset?.url?.endsWith('.webm') || selectedAsset?.url?.endsWith('.mp4');
@@ -270,6 +342,7 @@ export function AssetBin({
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
+    const targetFolder = allFolders.includes(activeCategory) ? activeCategory : null;
     const newAssets = files.map((file) => {
       const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.webm') || file.name.endsWith('.mov');
       const url = URL.createObjectURL(file);
@@ -279,6 +352,7 @@ export function AssetBin({
         url,
         mediaType: isVideo ? 'video' : 'image',
         duration: isVideo ? 0 : 5,
+        folder: targetFolder,
       };
       if (isVideo) {
         const v = document.createElement('video');
@@ -294,6 +368,58 @@ export function AssetBin({
     });
     onAddAssets(newAssets);
     e.target.value = '';
+  };
+
+  const handleFolderUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    const discovered = new Set();
+    const newAssets = files.map((file) => {
+      const relPath = file.webkitRelativePath || '';
+      const parts = relPath.split('/');
+      let folder = parts.length > 1 ? parts[0] : (allFolders.includes(activeCategory) ? activeCategory : null);
+      if (folder) discovered.add(folder);
+      const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mp4') || file.name.endsWith('.webm') || file.name.endsWith('.mov');
+      const url = URL.createObjectURL(file);
+      const asset = {
+        id: Math.random().toString(36).substring(2, 9),
+        name: file.name,
+        url,
+        mediaType: isVideo ? 'video' : 'image',
+        duration: isVideo ? 0 : 5,
+        folder: folder || null,
+      };
+      if (isVideo) {
+        const v = document.createElement('video');
+        v.preload = 'metadata';
+        v.src = url;
+        v.onloadedmetadata = () => {
+          if (v.duration && !Number.isNaN(v.duration)) {
+            asset.duration = v.duration;
+          }
+        };
+      }
+      return asset;
+    });
+    if (discovered.size > 0) {
+      setUserFolders((prev) => Array.from(new Set([...prev, ...discovered])));
+      const firstDiscovered = Array.from(discovered)[0];
+      if (firstDiscovered) setActiveCategory(firstDiscovered);
+    }
+    onAddAssets(newAssets);
+    e.target.value = '';
+  };
+
+  const handleClearAll = () => {
+    if (window.confirm('Clear all media assets and custom folders for a clean slate?')) {
+      setUserFolders([]);
+      setActiveCategory('ALL');
+      try {
+        localStorage.removeItem('kineticut_user_folders');
+        localStorage.setItem('kineticut_blank_slate', 'true');
+      } catch (_) {}
+      onClearAll();
+    }
   };
 
   // Auto-assign phoneme slots from Synchro-Vox faces folder
@@ -372,42 +498,87 @@ export function AssetBin({
         📁 MEDIA BIN
       </h3>
 
-      {/* ── FILE DROP ZONE ── */}
-      <label style={{
-        backgroundColor: 'var(--bg-panel-alt)',
-        border: '1px dashed var(--border-mid)',
-        padding: '10px 8px',
-        borderRadius: 5,
-        textAlign: 'center',
-        cursor: 'pointer',
-        color: 'var(--accent-blue)',
-        fontWeight: 700,
-        fontSize: 10,
-        letterSpacing: 0.5,
-        transition: 'border-color 0.15s, background-color 0.15s',
-        lineHeight: 1.5,
-      }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'var(--accent-orange)';
-          e.currentTarget.style.backgroundColor = 'var(--accent-orange-dim)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'var(--border-mid)';
-          e.currentTarget.style.backgroundColor = 'var(--bg-panel-alt)';
-        }}
-      >
-        + DROP / UPLOAD MEDIA
-        <span style={{ display: 'block', fontSize: 8, color: 'var(--text-dim)', fontWeight: 400, marginTop: 3 }}>
-          images · video (.mp4 .webm .mov .mkv) · gif · webp
-        </span>
-        <input
-          type="file"
-          multiple
-          accept={MEDIA_ACCEPT}
-          onChange={handleFileUpload}
-          style={{ display: 'none' }}
-        />
-      </label>
+      {/* ── FILE & FOLDER DROP ZONE ── */}
+      <div style={{ display: 'flex', gap: 4 }}>
+        <label
+          style={{
+            flex: 1,
+            backgroundColor: 'var(--bg-panel-alt)',
+            border: '1px dashed var(--border-mid)',
+            padding: '8px 4px',
+            borderRadius: 5,
+            textAlign: 'center',
+            cursor: 'pointer',
+            color: 'var(--accent-blue)',
+            fontWeight: 700,
+            fontSize: 9,
+            letterSpacing: 0.5,
+            transition: 'border-color 0.15s, background-color 0.15s',
+            lineHeight: 1.4,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--accent-orange)';
+            e.currentTarget.style.backgroundColor = 'var(--accent-orange-dim)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-mid)';
+            e.currentTarget.style.backgroundColor = 'var(--bg-panel-alt)';
+          }}
+        >
+          + UPLOAD FILES
+          <span style={{ display: 'block', fontSize: 7, color: 'var(--text-dim)', fontWeight: 400, marginTop: 2 }}>
+            images · video · gif
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept={MEDIA_ACCEPT}
+            onChange={handleFileUpload}
+            style={{ display: 'none' }}
+          />
+        </label>
+
+        <label
+          style={{
+            flex: 1,
+            backgroundColor: 'var(--bg-panel-alt)',
+            border: '1px dashed var(--border-mid)',
+            padding: '8px 4px',
+            borderRadius: 5,
+            textAlign: 'center',
+            cursor: 'pointer',
+            color: '#38bdf8',
+            fontWeight: 700,
+            fontSize: 9,
+            letterSpacing: 0.5,
+            transition: 'border-color 0.15s, background-color 0.15s',
+            lineHeight: 1.4,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#38bdf8';
+            e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.12)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-mid)';
+            e.currentTarget.style.backgroundColor = 'var(--bg-panel-alt)';
+          }}
+        >
+          📁 UPLOAD FOLDER
+          <span style={{ display: 'block', fontSize: 7, color: 'var(--text-dim)', fontWeight: 400, marginTop: 2 }}>
+            keeps folder name
+          </span>
+          <input
+            ref={folderInputRef}
+            type="file"
+            webkitdirectory=""
+            directory=""
+            multiple
+            onChange={handleFolderUpload}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
 
       {/* ── AI FLIPBOOK STUDIO BUTTON ── */}
       {onOpenStudio && (
@@ -438,26 +609,51 @@ export function AssetBin({
         </button>
       )}
 
-      {/* ── CLEAR ALL ── */}
-      <button
-        type="button"
-        onClick={onClearAll}
-        disabled={assets.length === 0}
-        style={{
-          backgroundColor: assets.length === 0 ? 'var(--bg-panel-alt)' : 'rgba(127,29,29,0.6)',
-          color: assets.length === 0 ? 'var(--text-dim)' : '#fecaca',
-          border: `1px solid ${assets.length === 0 ? 'var(--border-dim)' : '#991b1b'}`,
-          padding: '7px 8px',
-          borderRadius: 4,
-          fontWeight: 700,
-          cursor: assets.length === 0 ? 'not-allowed' : 'pointer',
-          fontSize: 10,
-          fontFamily: 'var(--font-label)',
-          transition: 'all 0.15s',
-        }}
-      >
-        🗑 CLEAR ALL / RESET
-      </button>
+      {/* ── CLEAR ALL & RESTORE DEMOS ROW ── */}
+      <div style={{ display: 'flex', gap: 4 }}>
+        <button
+          type="button"
+          onClick={handleClearAll}
+          disabled={assets.length === 0}
+          style={{
+            flex: 1,
+            backgroundColor: assets.length === 0 ? 'var(--bg-panel-alt)' : 'rgba(127,29,29,0.6)',
+            color: assets.length === 0 ? 'var(--text-dim)' : '#fecaca',
+            border: `1px solid ${assets.length === 0 ? 'var(--border-dim)' : '#991b1b'}`,
+            padding: '6px 8px',
+            borderRadius: 4,
+            fontWeight: 700,
+            cursor: assets.length === 0 ? 'not-allowed' : 'pointer',
+            fontSize: 9.5,
+            fontFamily: 'var(--font-label)',
+            transition: 'all 0.15s',
+          }}
+        >
+          🗑 CLEAR ALL / RESET
+        </button>
+        {assets.length === 0 && onRestoreDemos && (
+          <button
+            type="button"
+            onClick={onRestoreDemos}
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.5)',
+              color: '#6ee7b7',
+              padding: '6px 8px',
+              borderRadius: 4,
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontSize: 9,
+              fontFamily: 'var(--font-mono)',
+              transition: 'all 0.15s',
+            }}
+            title="Load demo assets showcase (400+ files)"
+          >
+            📥 RESTORE DEMOS
+          </button>
+        )}
+      </div>
 
       {/* ── SELECTED ASSET PREVIEW PANEL ── */}
       {selectedAsset && (
@@ -847,6 +1043,65 @@ export function AssetBin({
             </button>
           </div>
 
+          {/* Quick Folder Assigner */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+            <span style={{ fontSize: 7, color: 'var(--text-dim)', letterSpacing: 0.5, fontWeight: 700 }}>
+              FOLDER:
+            </span>
+            <select
+              value={selectedAsset.folder || ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '__NEW__') {
+                  const name = window.prompt('Enter new folder name:');
+                  if (name?.trim()) {
+                    const clean = name.trim();
+                    if (!userFolders.includes(clean)) {
+                      setUserFolders((prev) => [...prev, clean]);
+                    }
+                    onSetAssetFolder(selectedAsset.id, clean);
+                  }
+                } else {
+                  onSetAssetFolder(selectedAsset.id, val || null);
+                }
+              }}
+              style={{
+                flex: 1,
+                background: 'var(--bg-panel-alt)',
+                border: '1px solid var(--border-mid)',
+                color: selectedAsset.folder ? 'var(--accent-orange)' : 'var(--text-dim)',
+                borderRadius: 2,
+                padding: '2px 4px',
+                fontSize: 8,
+                fontFamily: 'var(--font-mono)',
+                outline: 'none',
+              }}
+            >
+              <option value="">(No Folder / Root)</option>
+              {allFolders.map((f) => (
+                <option key={f} value={f}>📁 {f}</option>
+              ))}
+              <option value="__NEW__">+ New Folder...</option>
+            </select>
+            {selectedAsset.folder && (
+              <button
+                type="button"
+                onClick={() => onSetAssetFolder(selectedAsset.id, null)}
+                title="Remove asset from folder"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  fontSize: 8,
+                  cursor: 'pointer',
+                  padding: '0 2px',
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
           {/* Quick Synchro-Vox Mouth Shape Assigner */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 2 }}>
             <span style={{ fontSize: 7, color: 'var(--text-dim)', letterSpacing: 0.5, fontWeight: 700 }}>
@@ -928,14 +1183,203 @@ export function AssetBin({
         </div>
 
         {/* Filter Pills */}
-        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* ALL items */}
+          <button
+            type="button"
+            onClick={() => setActiveCategory('ALL')}
+            style={{
+              background: activeCategory === 'ALL' ? 'var(--accent-orange)' : 'var(--bg-secondary)',
+              color: activeCategory === 'ALL' ? '#000' : 'var(--text-dim)',
+              border: `1px solid ${activeCategory === 'ALL' ? 'var(--accent-orange)' : 'var(--border-dim)'}`,
+              borderRadius: 2,
+              padding: '2px 5px',
+              fontSize: 8,
+              fontWeight: activeCategory === 'ALL' ? 800 : 600,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-mono, monospace)',
+              letterSpacing: 0.2,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ALL ({counts.all})
+          </button>
+
+          {/* CURRENT TRACK (if available and matching items) */}
+          {counts.currentTrack > 0 && (currentTrack || currentTrackTitle) && (
+            <button
+              type="button"
+              onClick={() => setActiveCategory('CURRENT_TRACK')}
+              style={{
+                background: activeCategory === 'CURRENT_TRACK' ? '#06b6d4' : 'rgba(6, 182, 212, 0.12)',
+                color: activeCategory === 'CURRENT_TRACK' ? '#000' : '#22d3ee',
+                border: `1px solid ${activeCategory === 'CURRENT_TRACK' ? '#22d3ee' : 'rgba(34, 211, 238, 0.45)'}`,
+                borderRadius: 2,
+                padding: '2px 5px',
+                fontSize: 8,
+                fontWeight: activeCategory === 'CURRENT_TRACK' ? 800 : 700,
+                cursor: 'pointer',
+                fontFamily: 'var(--font-mono, monospace)',
+                letterSpacing: 0.2,
+                whiteSpace: 'nowrap',
+                boxShadow: '0 0 4px rgba(6, 182, 212, 0.2)',
+              }}
+            >
+              🎵 CURRENT TRACK ({counts.currentTrack})
+            </button>
+          )}
+
+          {/* User Custom Folders */}
+          {allFolders.map((folder) => {
+            const active = activeCategory === folder;
+            const cnt = folderCounts[folder] || 0;
+            return (
+              <div
+                key={`user_f_${folder}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'copy';
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const assetId = e.dataTransfer.getData('application/x-kinet-asset');
+                  if (assetId) {
+                    onSetAssetFolder?.(assetId, folder);
+                  }
+                }}
+                onClick={() => setActiveCategory(folder)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  background: active ? 'var(--accent-orange)' : 'rgba(255, 107, 0, 0.08)',
+                  color: active ? '#000' : 'var(--text-bright)',
+                  border: `1px solid ${active ? 'var(--accent-orange)' : 'rgba(255, 107, 0, 0.35)'}`,
+                  borderRadius: 2,
+                  padding: '2px 5px',
+                  fontSize: 8,
+                  fontWeight: active ? 800 : 700,
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  letterSpacing: 0.2,
+                  whiteSpace: 'nowrap',
+                }}
+                title={`Folder "${folder}" — Click to filter, or drag an asset here to assign`}
+              >
+                <span>📁 {folder.toUpperCase()} ({cnt})</span>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteFolder(folder);
+                  }}
+                  title={`Delete folder "${folder}"`}
+                  style={{
+                    marginLeft: 2,
+                    opacity: 0.7,
+                    fontSize: 8,
+                    lineHeight: 1,
+                    cursor: 'pointer',
+                    padding: '0 2px',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                >
+                  ✕
+                </span>
+              </div>
+            );
+          })}
+
+          {/* ➕ FOLDER BUTTON / INLINE FORM */}
+          {isCreatingFolder ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleCreateFolder();
+              }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}
+            >
+              <input
+                autoFocus
+                type="text"
+                placeholder="Folder..."
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setIsCreatingFolder(false);
+                    setNewFolderName('');
+                  }
+                }}
+                style={{
+                  background: 'var(--bg-panel-alt)',
+                  border: '1px solid var(--accent-orange)',
+                  color: 'var(--text-bright)',
+                  fontSize: 8,
+                  padding: '2px 4px',
+                  borderRadius: 2,
+                  fontFamily: 'var(--font-mono)',
+                  width: 70,
+                  outline: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  background: 'var(--accent-orange)',
+                  color: '#000',
+                  border: 'none',
+                  borderRadius: 2,
+                  padding: '2px 4px',
+                  fontSize: 8,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
+              >
+                ✓
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCreatingFolder(false);
+                  setNewFolderName('');
+                }}
+                style={{
+                  background: 'transparent',
+                  color: 'var(--text-dim)',
+                  border: 'none',
+                  fontSize: 8,
+                  cursor: 'pointer',
+                  padding: '0 2px',
+                }}
+              >
+                ✕
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsCreatingFolder(true)}
+              style={{
+                background: 'rgba(255, 107, 0, 0.1)',
+                border: '1px dashed var(--accent-orange)',
+                color: 'var(--accent-orange)',
+                borderRadius: 2,
+                padding: '2px 5px',
+                fontSize: 8,
+                fontWeight: 700,
+                cursor: 'pointer',
+                fontFamily: 'var(--font-mono, monospace)',
+                whiteSpace: 'nowrap',
+              }}
+              title="Create a new custom folder for your assets"
+            >
+              ➕ FOLDER
+            </button>
+          )}
+
+          {/* Demo Song Folder Pills — ONLY rendered when demo assets exist! */}
           {[
-            { id: 'ALL', label: `ALL (${counts.all})` },
-            ...(counts.currentTrack > 0 && (currentTrack || currentTrackTitle) ? [{
-              id: 'CURRENT_TRACK',
-              label: `🎵 CURRENT TRACK (${counts.currentTrack})`,
-              isCurrentTrack: true,
-            }] : []),
             ...(counts.radiator > 0 ? [{ id: 'RADIATOR', label: `🔥 RADIATOR (${counts.radiator})` }] : []),
             ...(counts.thelema > 0 ? [{ id: 'THELEMA', label: `🏔 THELEMA (${counts.thelema})` }] : []),
             ...(counts.eighthSphere > 0 ? [{ id: 'EIGHTH_SPHERE', label: `🌑 8TH SPHERE (${counts.eighthSphere})` }] : []),
@@ -948,7 +1392,7 @@ export function AssetBin({
             ...(counts.videos > 0 ? [{ id: 'VIDEOS', label: `🎬 VID (${counts.videos})` }] : []),
             ...(counts.stills > 0 ? [{ id: 'STILLS', label: `🖼 STILLS (${counts.stills})` }] : []),
             ...(counts.driveIn > 0 ? [{ id: 'DRIVE_IN', label: `📼 DRIVE-IN (${counts.driveIn})` }] : []),
-          ].map(({ id, label, isCurrentTrack }) => {
+          ].map(({ id, label }) => {
             const active = activeCategory === id;
             return (
               <button
@@ -956,26 +1400,17 @@ export function AssetBin({
                 type="button"
                 onClick={() => setActiveCategory(id)}
                 style={{
-                  background: active
-                    ? (isCurrentTrack ? '#06b6d4' : 'var(--accent-orange)')
-                    : (isCurrentTrack ? 'rgba(6, 182, 212, 0.12)' : 'var(--bg-secondary)'),
-                  color: active
-                    ? '#000'
-                    : (isCurrentTrack ? '#22d3ee' : 'var(--text-dim)'),
-                  border: `1px solid ${
-                    active
-                      ? (isCurrentTrack ? '#22d3ee' : 'var(--accent-orange)')
-                      : (isCurrentTrack ? 'rgba(34, 211, 238, 0.45)' : 'var(--border-dim)')
-                  }`,
+                  background: active ? 'var(--accent-orange)' : 'var(--bg-secondary)',
+                  color: active ? '#000' : 'var(--text-dim)',
+                  border: `1px solid ${active ? 'var(--accent-orange)' : 'var(--border-dim)'}`,
                   borderRadius: 2,
                   padding: '2px 5px',
                   fontSize: 8,
-                  fontWeight: active ? 800 : (isCurrentTrack ? 700 : 600),
+                  fontWeight: active ? 800 : 600,
                   cursor: 'pointer',
                   fontFamily: 'var(--font-mono, monospace)',
                   letterSpacing: 0.2,
                   whiteSpace: 'nowrap',
-                  boxShadow: isCurrentTrack ? '0 0 4px rgba(6, 182, 212, 0.2)' : 'none',
                 }}
               >
                 {label}
@@ -1013,7 +1448,149 @@ export function AssetBin({
         gap: 7,
         alignContent: 'start',
       }}>
-        {filteredItems.map((asset) => {
+        {assets.length === 0 ? (
+          <div style={{
+            gridColumn: '1 / -1',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px 12px',
+            background: 'rgba(0,0,0,0.35)',
+            borderRadius: 6,
+            border: '1px dashed var(--border-mid)',
+            textAlign: 'center',
+            gap: 7,
+          }}>
+            <div style={{ fontSize: 24 }}>📁</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-bright)' }}>
+              Asset Bin Ready For Your Media
+            </div>
+            <div style={{ fontSize: 8.5, color: 'var(--text-dim)', maxWidth: 220, lineHeight: 1.4 }}>
+              Create your own custom folders, upload files or drag an entire folder of photos & videos.
+            </div>
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
+              <button
+                type="button"
+                onClick={() => setIsCreatingFolder(true)}
+                style={{
+                  background: 'var(--accent-orange-dim)',
+                  border: '1px solid var(--accent-orange)',
+                  color: 'var(--accent-orange)',
+                  padding: '4px 8px',
+                  borderRadius: 3,
+                  fontSize: 8.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                ➕ NEW FOLDER
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-bright)',
+                  color: 'var(--text-primary)',
+                  padding: '4px 8px',
+                  borderRadius: 3,
+                  fontSize: 8.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                📤 UPLOAD FILES
+              </button>
+              <button
+                type="button"
+                onClick={() => folderInputRef.current?.click()}
+                style={{
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-bright)',
+                  color: '#38bdf8',
+                  padding: '4px 8px',
+                  borderRadius: 3,
+                  fontSize: 8.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                📂 UPLOAD FOLDER
+              </button>
+              {onRestoreDemos && (
+                <button
+                  type="button"
+                  onClick={onRestoreDemos}
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.55)',
+                    color: '#6ee7b7',
+                    padding: '4px 8px',
+                    borderRadius: 3,
+                    fontSize: 8.5,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    marginTop: 4,
+                  }}
+                >
+                  📥 RESTORE DEMO SHOWCASE
+                </button>
+              )}
+            </div>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div style={{
+            gridColumn: '1 / -1',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px 10px',
+            background: 'rgba(0,0,0,0.2)',
+            borderRadius: 6,
+            border: '1px dashed var(--border-dim)',
+            textAlign: 'center',
+            gap: 6,
+          }}>
+            <div style={{ fontSize: 9.5, color: 'var(--text-dim)' }}>
+              No items in folder <strong style={{ color: 'var(--accent-orange)' }}>{activeCategory}</strong>
+            </div>
+            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-mid)',
+                  color: 'var(--accent-orange)',
+                  padding: '3px 7px',
+                  borderRadius: 3,
+                  fontSize: 8,
+                  cursor: 'pointer',
+                }}
+              >
+                + Upload into this folder
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory('ALL')}
+                style={{
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-mid)',
+                  color: 'var(--text-dim)',
+                  padding: '3px 7px',
+                  borderRadius: 3,
+                  fontSize: 8,
+                  cursor: 'pointer',
+                }}
+              >
+                View ALL
+              </button>
+            </div>
+          </div>
+        ) : (
+          filteredItems.map((asset) => {
           const index      = asset.origIndex;
           const isSelected = selectedAssetIndex === index;
           const isVideo    = asset.mediaType === 'video' || asset.type === 'video' || asset.url?.endsWith('.webm') || asset.url?.endsWith('.mp4');
@@ -1107,6 +1684,29 @@ export function AssetBin({
                 </span>
               )}
 
+              {/* Folder badge */}
+              {asset.folder && (
+                <span style={{
+                  position: 'absolute',
+                  top: 2,
+                  left: isVideo ? 36 : 18,
+                  background: 'rgba(0,0,0,0.85)',
+                  color: '#fbbf24',
+                  fontSize: 6.5,
+                  padding: '1px 3px',
+                  borderRadius: 2,
+                  pointerEvents: 'none',
+                  fontWeight: 700,
+                  maxWidth: 48,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  border: '1px solid rgba(251, 191, 36, 0.4)',
+                }}>
+                  📁 {asset.folder}
+                </span>
+              )}
+
               {/* DELETE */}
               <button
                 type="button"
@@ -1176,7 +1776,7 @@ export function AssetBin({
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* ── SYNCHRO-VOX PUPPET PANEL ── */}
