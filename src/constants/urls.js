@@ -170,4 +170,17 @@ export const STRANGELET_SUITE_APPS = [
     color: '#c084fc',
     glow: 'rgba(192, 132, 252, 0.55)',
   },
+  {
+    id: 'as-above-so-below',
+    title: 'As Above, So Below',
+    subtitle: 'An Occult Songbook (Double LP)',
+    tagline: '30 Master Tracks · The Archivist Lore · Whitman Sampler Lyrics',
+    badge: 'DOUBLE LP & OCCULT SONGBOOK',
+    icon: '🔮',
+    url: 'https://perchance.org/as-above-so-below',
+    aliasUrl: 'https://interzone-drive-in.vercel.app/#album',
+    desc: "30 master tracks of country weirdcore by O’Shibboleth & The Magic Static Society: 1920s clawhammer banjo meets Paul's Boutique boom-bap breakbeats, featuring The Archivist radio fact cards & hand-stitched Whitman sampler lyrics.",
+    color: '#fbbf24',
+    glow: 'rgba(251, 191, 36, 0.65)',
+  },
 ];
