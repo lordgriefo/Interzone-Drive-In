@@ -38,7 +38,8 @@ export const STRANGELET_LAB_URL = 'https://github.com/lordgriefo/Strangelet-Lab'
 export const STRANGELET_LAB_BETA_URL = 'https://github.com/lordgriefo/Strangelet-Lab/releases';
 
 // Strangelet Stitch (Living Reel Montage & Video Stitcher)
-export const STRANGELET_STITCH_URL = 'https://github.com/lordgriefo/strangelet-stitch';
+export const STRANGELET_STITCH_URL = 'https://lordgriefo.github.io/strangelet-stitch/';
+export const STRANGELET_STITCH_REPO_URL = 'https://github.com/lordgriefo/strangelet-stitch';
 
 // Google Flow Syncro-Vox Tool (Talking Mouth Shape Generator)
 export const GOOGLE_FLOW_SYNCRO_VOX_URL = 'https://flow.google.com/shared/tool/245908d5-dceb-42ed-884c-9c2f8f21b98a';
@@ -165,6 +166,7 @@ export const STRANGELET_SUITE_APPS = [
     badge: 'CINEMATIC REEL STITCHER',
     icon: '🪡',
     url: STRANGELET_STITCH_URL,
+    aliasUrl: STRANGELET_STITCH_REPO_URL,
     external: true,
     desc: 'Beat-synced video montage choreography, multi-scene living reel stitcher, fast cuts & audio-reactive visual cut-up laboratory.',
     color: '#c084fc',
