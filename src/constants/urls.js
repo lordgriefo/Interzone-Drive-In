@@ -3,10 +3,13 @@
 
 export const WEB_APP_URL = 'https://interzone-drive-in.vercel.app/';
 
-// Windows Desktop Executable (.exe) download link.
+// Windows Desktop Executable (.exe) download link for Strangelet Stitch
 export const DESKTOP_EXE_DOWNLOAD_URL =
   import.meta.env.VITE_DESKTOP_DOWNLOAD_URL ||
-  'https://github.com/lordgriefo/strangelet-kineto-cut/releases/tag/v1.27';
+  'https://github.com/lordgriefo/strangelet-stitch/releases/download/v1.1.0/Strangelet_Stitch_1.1.0_x64-setup.exe';
+
+export const STRANGELET_STITCH_RELEASE_URL =
+  'https://github.com/lordgriefo/strangelet-stitch/releases/tag/v1.1.0';
 
 // Creator Support Page (Buy Me a Coffee)
 export const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/magicstatic/';

@@ -198,7 +198,7 @@ export function InterzoneFrame({
           href={DESKTOP_EXE_DOWNLOAD_URL}
           target="_blank"
           rel="noopener noreferrer"
-          title="Download Standalone Windows Desktop App (.exe / .zip)"
+          title="Download Strangelet Stitch Windows Desktop App (.exe)"
           style={{
             position: 'absolute',
             top: 10,
