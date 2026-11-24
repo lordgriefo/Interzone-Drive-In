@@ -1558,7 +1558,7 @@ export function InterzoneDriveInTheater({
 
                 {/* 9. Strangelet Stitch */}
                 <a
-                  href="https://github.com/lordgriefo/strangelet-kineto-cut"
+                  href="https://github.com/lordgriefo/strangelet-stitch"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
