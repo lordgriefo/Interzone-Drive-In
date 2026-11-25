@@ -1614,6 +1614,102 @@ export function InterzoneDriveInTheater({
                   </div>
                 </a>
 
+                {/* 10. As Above, So Below by O'Shibboleth */}
+                <div
+                  style={{
+                    padding: 16,
+                    backgroundColor: 'rgba(30, 20, 10, 0.92)',
+                    borderRadius: 6,
+                    border: '1px solid rgba(251, 191, 36, 0.65)',
+                    boxShadow: '0 0 16px rgba(251, 191, 36, 0.3)',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#ffd700';
+                    e.currentTarget.style.boxShadow = '0 0 24px rgba(255, 215, 0, 0.55)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.65)';
+                    e.currentTarget.style.boxShadow = '0 0 16px rgba(251, 191, 36, 0.3)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <img
+                        src="./as-above-so-below-cover.jpg"
+                        alt="As Above, So Below Album Cover"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 4,
+                          border: '1px solid #fbbf24',
+                          objectFit: 'cover',
+                          boxShadow: '0 0 12px rgba(251, 191, 36, 0.6)',
+                        }}
+                      />
+                      <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>30 MASTER TRACKS ↗</span>
+                    </div>
+                    <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
+                      AS ABOVE, SO BELOW
+                    </div>
+                    <div style={{ fontSize: 8.5, color: '#ffd700', fontFamily: 'monospace', marginTop: 2, fontWeight: 700 }}>
+                      BY O'SHIBBOLETH
+                    </div>
+                    <div style={{ fontSize: 7.5, color: '#fef08a', fontFamily: 'monospace', marginTop: 1 }}>
+                      ROOTSY WEIRDCORE HIP-HOP • DOUBLE LP
+                    </div>
+                    <div style={{ fontSize: 9.5, color: '#e4e4e7', marginTop: 5, lineHeight: 1.4 }}>
+                      Appalachian clawhammer banjo meets boom-bap breakbeats, The Archivist lore cards, 12 grimoire covers, and hand-stitched Whitman sampler lyrics.
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <a
+                      href="https://lordgriefo.github.io/as-above-so-below/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        flex: '1 1 auto',
+                        textAlign: 'center',
+                        fontSize: 8,
+                        fontFamily: "'Syncopate', sans-serif",
+                        color: '#000',
+                        background: '#fbbf24',
+                        fontWeight: 800,
+                        letterSpacing: 1,
+                        padding: '6px 10px',
+                        borderRadius: 3,
+                        textDecoration: 'none',
+                        boxShadow: '0 0 8px rgba(251, 191, 36, 0.4)',
+                      }}
+                    >
+                      ▶ STREAM ALBUM ➔
+                    </a>
+                    <a
+                      href="https://github.com/lordgriefo/as-above-so-below"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontSize: 7.5,
+                        fontFamily: "'Syncopate', sans-serif",
+                        color: '#fbbf24',
+                        border: '1px solid rgba(251, 191, 36, 0.5)',
+                        padding: '5px 8px',
+                        borderRadius: 3,
+                        textDecoration: 'none',
+                        background: 'rgba(251, 191, 36, 0.1)',
+                      }}
+                    >
+                      📂 GITHUB
+                    </a>
+                  </div>
+                </div>
+
                 {/* 8. Community Reel Card */}
                 <div
                   onClick={() => {
