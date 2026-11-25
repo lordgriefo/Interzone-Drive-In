@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Strangelet KenetiCut — AI Choreography & Living Reel Flipbook Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090c;
+      --panel: #121218;
+      --panel-dark: #0a0a0f;
+      --border: #242432;
+      --accent: #00ffcc;
+      --accent-glow: rgba(0, 255, 204, 0.35);
+      --hot-pink: #ff0077;
+      --amber: #ffaa00;
+      --text: #e2e2ec;
+      --text-muted: #84849a;
+      --orange: #ff6b00;
+      --orange-glow: rgba(255, 107, 0, 0.45);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Top Header & Song Transport ── */
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-return-keneticut {
+      background: linear-gradient(90deg, #ff6b00, #ff8800);
+      color: #000;
+      border: 1px solid #ff6b00;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'Syncopate', sans-serif;
+      font-weight: 800;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 10px var(--orange-glow);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-return-keneticut:hover {
+      background: #ffa04d;
+      box-shadow: 0 0 14px var(--orange);
+      transform: translateY(-1px);
+    }
+    .brand h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 10px var(--accent-glow);
+      white-space: nowrap;
+    }
+    .beat-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2a2a36;
+      transition: background 0.05s ease-out;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+      flex-shrink: 0;
+    }
+    .beat-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+    .song-counter {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: #000;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .song-counter span.label {
+      color: var(--accent);
+      font-size: 10px;
+    }
+
+    /* ── Secondary Control Bar: Prompt & Choreography Timing ── */
+    .choreo-bar {
+      background: #14141d;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    select, input, button {
+      background: #1b1b26;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+    select:focus, input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    button:hover {
+      background: #252538;
+      border-color: #3f3f58;
+    }
+    button.btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 10px var(--accent-glow);
+      white-space: nowrap;
+    }
+    button.btn-primary:hover {
+      background: #33ffdd;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+    button.btn-cue {
+      background: #2a1a38;
+      border-color: var(--hot-pink);
+      color: #ff88cc;
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+    button.btn-cue:hover {
+      background: #3d2452;
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    #prompt-input {
+      flex: 1;
+      min-width: 180px;
+    }
+    .timing-input {
+      width: 62px;
+      text-align: center;
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+    /* ── Main Work Area ── */
+    #main-content {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ── Cues Sidebar ── */
+    #cue-sidebar {
+      width: 250px;
+      background: var(--panel-dark);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 8px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #cue-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cue-card {
+      background: #14141e;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 11px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .cue-card.active-now {
+      border-color: var(--accent);
+      background: #102422;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+    }
+    .cue-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .cue-time {
+      font-family: monospace;
+      font-weight: bold;
+      color: var(--accent);
+      font-size: 10px;
+    }
+    .cue-name {
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 140px;
+    }
+    .cue-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 5px;
+    }
+    .cue-btn-seek {
+      padding: 2px 6px;
+      font-size: 10px;
+      background: #1f1f2e;
+      border: 1px solid #333;
+    }
+
+    /* ── Full-Page Living Reel Theater Viewport ── */
+    #viewport-container {
+      flex: 1;
+      position: relative;
+      background: #050508;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* Theater Monitor Header HUD */
+    .theater-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      background: #0c0c12;
+      border-bottom: 1px solid var(--border);
+      font-family: monospace;
+      font-size: 10.5px;
+      flex-shrink: 0;
+      z-index: 5;
+    }
+    .theater-hud-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .hud-pill {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .live-pill {
+      background: rgba(0, 255, 204, 0.15);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+    .hud-title {
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .theater-hud-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .hud-tag {
+      background: #181824;
+      border: 1px solid #282838;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9.5px;
+      color: #a0a0b8;
+    }
+    .hud-tag.frame-counter {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* Theater Main Screen Area */
+    #theater-screen {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at center, #11121d 0%, #050508 100%);
+      overflow: hidden;
+      padding: 8px;
+    }
+    #flipbook-canvas {
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 229, 255, 0.1);
+      border-radius: 4px;
+      border: 1px solid #1a1a2b;
+      display: none;
+      z-index: 2;
+    }
+    #theater-video {
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 229, 255, 0.1);
+      border-radius: 4px;
+      border: 1px solid #1a1a2b;
+      display: none;
+      z-index: 2;
+      background: #000;
+    }
+
+    /* CRT Scanline & Cinema Vignette Overlay */
+    .crt-scanline-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                  radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
+      background-size: 100% 4px, 100% 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.7;
+    }
+
+    /* Standby Poster State */
+    .screen-standby {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+      padding: 24px;
+      max-width: 540px;
+      z-index: 2;
+      background: rgba(14, 14, 22, 0.85);
+      border: 1px solid #232336;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+    }
+    .standby-sigil {
+      font-size: 40px;
+      animation: floatSigil 3s ease-in-out infinite;
+    }
+    .screen-standby h2 {
+      font-size: 16px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 800;
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+    .screen-standby p {
+      font-size: 11px;
+      color: #9d9db3;
+      line-height: 1.5;
+    }
+    .quick-preset-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    .quick-preset-chips button {
+      background: #1b1b2a;
+      border: 1px solid #313149;
+      color: #c0c0d8;
+      font-size: 10px;
+      padding: 4px 9px;
+      border-radius: 4px;
+    }
+    .quick-preset-chips button:hover {
+      border-color: var(--accent);
+      color: #fff;
+      background: #25253b;
+    }
+
+    /* Subliminal Text Flash Overlay */
+    .subliminal-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: "Impact", "Arial Black", sans-serif;
+      font-size: clamp(24px, 4vw, 54px);
+      letter-spacing: 4px;
+      color: #fff;
+      text-transform: uppercase;
+      text-align: center;
+      text-shadow: 0 0 16px #000, 0 0 24px var(--hot-pink);
+      pointer-events: none;
+      z-index: 4;
+      opacity: 0;
+      transition: opacity 0.08s ease-out;
+      width: 90%;
+    }
+    .subliminal-overlay.flash {
+      opacity: 1;
+    }
+
+    /* Theater Transport & Scrubber Bar */
+    .theater-transport {
+      background: #0d0d14;
+      border-top: 1px solid var(--border);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 5;
+    }
+    .transport-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .transport-btn {
+      padding: 5px 9px;
+      font-size: 11px;
+      background: #181824;
+      border: 1px solid #2e2e42;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .transport-btn.play-btn {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 800;
+      min-width: 68px;
+      justify-content: center;
+    }
+    .transport-btn.play-btn:hover {
+      background: #33ffdd;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    .scrubber-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .scrubber-wrap input[type="range"] {
+      width: 100%;
+      height: 6px;
+      appearance: none;
+      background: #1c1c28;
+      border-radius: 3px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .scrubber-wrap input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent);
+      border: 2px solid #000;
+    }
+    .fps-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .fps-btn {
+      padding: 3px 6px;
+      font-size: 10px;
+      background: #161622;
+      border: 1px solid #272739;
+      color: #8888a0;
+      border-radius: 3px;
+    }
+    .fps-btn.active {
+      background: rgba(0, 255, 204, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 800;
+    }
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+    .btn-push-action {
+      background: linear-gradient(90deg, #ff6b00, #ff8533);
+      color: #000;
+      border: none;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 10px var(--orange-glow);
+      white-space: nowrap;
+    }
+    .btn-push-action:hover {
+      box-shadow: 0 0 14px var(--orange);
+    }
+    .btn-download-action {
+      background: #1b1b28;
+      border: 1px solid #323249;
+      color: #00e5ff;
+      font-size: 10.5px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .btn-download-action:hover {
+      border-color: #00e5ff;
+      background: #232338;
+    }
+
+    /* ── Bottom Reel Strip ── */
+    #reel-strip {
+      background: #0a0a10;
+      border-top: 1px solid var(--border);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      min-height: 52px;
+      flex-shrink: 0;
+    }
+    .reel-thumb {
+      width: 64px;
+      height: 38px;
+      object-fit: cover;
+      border-radius: 3px;
+      border: 1px solid #333;
+      flex-shrink: 0;
+      cursor: pointer;
+      animation: popIn 0.2s ease-out;
+      transition: all 0.15s ease;
+    }
+    .reel-thumb:hover, .reel-thumb.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      transform: scale(1.05);
+    }
+    .video-loop-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #14141e;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 3px 8px;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px var(--accent-glow);
+      animation: popIn 0.3s ease-out;
+    }
+    .video-loop-card video {
+      width: 72px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 3px;
+      background: #000;
+      border: 1px solid #333;
+      cursor: pointer;
+    }
+    .video-loop-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .loop-badge {
+      font-size: 9.5px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .btn-download-video {
+      font-size: 9.5px;
+      padding: 2px 6px;
+      background: var(--accent);
+      color: #000;
+      text-decoration: none;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    /* Toast Notification */
+    #toast-msg {
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      background: #111e1c;
+      border: 1px solid var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 5px;
+      box-shadow: 0 0 16px rgba(0, 255, 204, 0.35);
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+    #toast-msg.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    @keyframes floatSigil {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header>
+    <div class="brand">
+      <button class="btn-return-keneticut" onclick="returnToKenetiCut()" title="Return to Strangelet KenetiCut Timeline & Media Bin">
+        ← BACK TO KENETICUT (MEDIA BIN)
+      </button>
+      <div id="beat-dot" class="beat-dot"></div>
+      <h1>AI Choreography & Living Reel Studio</h1>
+      <span id="bpm-badge" style="font-size: 11px; color: var(--text-muted); font-family: monospace;">120 BPM</span>
+    </div>
+
+    <!-- Live Running Timecode Counter -->
+    <div class="song-counter">
+      <span class="label">SONG TIME:</span>
+      <span id="timecode-display">00:00.0</span>
+      <span style="color:#555;">/</span>
+      <span id="duration-display" style="color:#888;">00:32.0</span>
+    </div>
+
+    <div style="display:flex; gap:5px; align-items:center;">
+      <button onclick="flashSubliminal()" title="Send beat-synced cut-up phrase">
+        ⚡ Cut-Up
+      </button>
+      <button onclick="triggerChop()" title="Instant manual cut">
+        ✂️ Cut
+      </button>
+      <button onclick="togglePlay()" title="Toggle song playback" style="min-width: 44px;">
+        ⏯️ Song
+      </button>
+    </div>
+  </header>
+
+  <!-- Choreography Cue & AI Generation Bar -->
+  <div class="choreo-bar">
+    <!-- Preset Dropdown -->
+    <select id="preset-selector" onchange="onSelectPreset()" style="max-width: 200px;">
+      <option value="" disabled selected>🎬 Select a Preset Theme...</option>
+      <option value="p11">💥 1. Nevada '55: Atomic Rearview Escape</option>
+      <option value="p1">🪧 2. Vegas Corridor '59 (Burma-Shave Highway)</option>
+      <option value="p2">🌌 3. The 8th Sphere: Enochian Horizon</option>
+      <option value="p3">🏍️ 4. Kenneth Anger: Scorpio Rites</option>
+      <option value="p4">📻 5. W-OCCULT AM 660 Broadcast Intrusion</option>
+      <option value="p5">🏭 6. Eraserhead: Industrial Radiator Shimmer</option>
+      <option value="p6">🛋️ 7. The Black Lodge: Chevron Horizon</option>
+      <option value="p7">🛸 8. 1956 Drive-In Atomic Invasion</option>
+      <option value="p8">🗝️ 9. Maya Deren: Meshes of the Afternoon</option>
+      <option value="p9">💊 10. Interzone Burroughs Cut-Up</option>
+      <option value="p10">🧬 11. Sacred Geometry Hyperspace</option>
+      <option value="p12">🪦 12. Neon Boneyard: Mojave Sign Graveyard</option>
+      <option value="p13">🏨 13. The Starlight Motel: Room 13</option>
+      <option value="p14">🕶️ 14. Route 375: Black Sedan Pursuit</option>
+      <option value="p15">⚡ 15. Wardenclyffe Desert: The Tesla Spire</option>
+      <option value="p16">🦋 16. Stan Brakhage: Mothlight Emulsion</option>
+      <option value="p17">⏳ 17. Chris Marker: La Jetée Jetty</option>
+      <option value="p18">🔮 18. The Fox Sisters: 1920s Spirit Cabinet</option>
+      <option value="p19">📂 19. Project Blue Book: Redacted Microfilm</option>
+      <option value="p20">🍄 20. Psilocybin Breath: The Living Tapestry</option>
+    </select>
+
+    <input id="prompt-input" type="text" placeholder="Type prompt or select a preset..." />
+
+    <!-- Choreography Timing Controls -->
+    <div class="input-group">
+      <span>Cue In:</span>
+      <input id="cue-in" class="timing-input" type="text" value="00:00" placeholder="00:00" />
+      <button class="btn-cue" onclick="snapCueToCurrentTime()" title="Snap Cue In to current playing song time">
+        ⏱️ Current
+      </button>
+    </div>
+
+    <div class="input-group">
+      <span>Dur:</span>
+      <input id="cue-dur" class="timing-input" type="text" value="15s" placeholder="15s" />
+    </div>
+
+    <div class="input-group">
+      <select id="frame-count">
+        <option value="6">6 Frames</option>
+        <option value="12" selected>12 Frames</option>
+        <option value="16">16 Frames</option>
+        <option value="24">24 Frames</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <span>Output:</span>
+      <select id="output-mode" onchange="toggleMotionControls()">
+        <option value="webm_loop" selected>🎥 WebM Video Loop</option>
+        <option value="flipbook_stills">🎞️ Flipbook Stills</option>
+      </select>
+    </div>
+
+    <div class="input-group" id="motion-mode-wrap">
+      <span>Motion:</span>
+      <select id="motion-style">
+        <option value="cinematic_cut" selected>⚡ Rapid Cinema (12fps)</option>
+        <option value="smooth_drift">🌊 Ken Burns Drift & Zoom</option>
+        <option value="pulse_strobe">💥 Strobe / Pulse</option>
+        <option value="hyper_speed">🚀 Hyper Speed (24fps)</option>
+      </select>
+    </div>
+
+    <button id="gen-btn" class="btn-primary" onclick="generateChoreographedReel()">
+      <span>🎬</span> Choreograph Reel
+    </button>
+  </div>
+
+  <!-- Main Split: Cue Board + Living Reel Theater -->
+  <div id="main-content">
+    
+    <!-- Choreography Cue Board Sidebar -->
+    <div id="cue-sidebar">
+      <div class="sidebar-header">
+        <span>Active Song Cues</span>
+        <span id="cue-count" style="color: var(--accent); font-family: monospace;">0</span>
+      </div>
+      <div id="cue-list">
+        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 24px; padding: 0 16px;">
+          Set a "Cue In" timestamp (e.g. 01:14) and generate a reel. KenetiCut chops that specific reel during that exact window of your song!
+        </div>
+      </div>
+    </div>
+
+    <!-- Full-Page Living Reel Theater Monitor -->
+    <div id="viewport-container">
+      <!-- Screen Header HUD -->
+      <div class="theater-hud">
+        <div class="theater-hud-left">
+          <span class="hud-pill live-pill">● LIVING THEATER</span>
+          <span id="active-reel-title" class="hud-title">INTERZONE DRIVE-IN · FLIPBOOK MONITOR</span>
+        </div>
+        <div class="theater-hud-right">
+          <span id="screen-res-badge" class="hud-tag">1280 × 720 HD</span>
+          <span id="screen-fps-badge" class="hud-tag">12 FPS</span>
+          <span id="screen-frame-badge" class="hud-tag frame-counter">FRAME 0 / 0</span>
+        </div>
+      </div>
+
+      <!-- Main Display Screen (Canvas for Flipbook, Video for WebM loops) -->
+      <div id="theater-screen">
+        <!-- Standby / Empty Screen State -->
+        <div id="screen-standby" class="screen-standby">
+          <div class="standby-sigil">🎞️</div>
+          <h2>AI LIVING REEL THEATER</h2>
+          <p>Generate choreographed flipbook frames or cinematic WebM loops synced to your song cues. Frames stream live into KenetiCut's Media Bin.</p>
+          <div class="quick-preset-chips">
+            <button onclick="quickLoadPreset('p11')">💥 Nevada '55</button>
+            <button onclick="quickLoadPreset('p1')">🪧 Vegas '59</button>
+            <button onclick="quickLoadPreset('p4')">📻 W-OCCULT AM</button>
+            <button onclick="quickLoadPreset('p9')">💊 Burroughs Cut-Up</button>
+          </div>
+        </div>
+
+        <!-- Canvas for rapid image flipbook sequences -->
+        <canvas id="flipbook-canvas" width="1280" height="720"></canvas>
+
+        <!-- Video element for compiled WebM loops & video previews -->
+        <video id="theater-video" width="1280" height="720" loop muted playsinline></video>
+
+        <!-- Film Grain & CRT Scanline Overlay -->
+        <div class="crt-scanline-overlay"></div>
+
+        <!-- Subliminal Text Flash Overlay -->
+        <div id="subliminal-overlay" class="subliminal-overlay"></div>
+      </div>
+
+      <!-- Theater Transport & Scrubber Bar -->
+      <div class="theater-transport">
+        <!-- Play / Pause & Single Frame Step -->
+        <div class="transport-group">
+          <button id="transport-play-btn" class="transport-btn play-btn" onclick="toggleFlipbookPlayback()" title="Play / Pause Flipbook (Space)">
+            ▶ PLAY
+          </button>
+          <button class="transport-btn" onclick="stepFrame(-1)" title="Step 1 Frame Back (Left Arrow)">
+            ⏮
+          </button>
+          <button class="transport-btn" onclick="stepFrame(1)" title="Step 1 Frame Forward (Right Arrow)">
+            ⏭
+          </button>
+        </div>
+
+        <!-- Frame Scrubber Slider -->
+        <div class="scrubber-wrap">
+          <input id="frame-scrubber" type="range" min="0" max="0" value="0" oninput="onScrubFrame(this.value)" disabled />
+        </div>
+
+        <!-- Speed / FPS Switcher -->
+        <div class="fps-group">
+          <span style="font-size:9.5px;">SPEED:</span>
+          <button class="fps-btn" data-fps="6" onclick="setFlipbookFps(6)">6</button>
+          <button class="fps-btn active" data-fps="12" onclick="setFlipbookFps(12)">12</button>
+          <button class="fps-btn" data-fps="24" onclick="setFlipbookFps(24)">24</button>
+          <button class="fps-btn" data-fps="30" onclick="setFlipbookFps(30)">30</button>
+        </div>
+
+        <!-- Push to KenetiCut & Export Actions -->
+        <div class="action-group">
+          <button id="btn-push-keneticut" class="btn-push-action" onclick="pushCurrentReelToKenetiCut()" title="Push active reel into KenetiCut Media Bin">
+            ⚡ PUSH TO KENETICUT
+          </button>
+          <button id="btn-download-reel" class="btn-download-action" onclick="downloadCurrentReel()" title="Download current reel as WebM loop or image frame sequence">
+            ⬇️ DOWNLOAD
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Reel Thumbnail Strip -->
+  <div id="reel-strip">
+    <span id="reel-status" style="font-size: 11px; color: var(--text-muted);">
+      Generated frames will appear here and stream directly into the active song cue.
+    </span>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-msg"></div>
+
+  <script>
+    // ── 20 Presets Dictionary ──
+    const PRESETS = {
+      p11: { name: "Nevada '55 Atomic Rearview", prompt: "Framed tightly inside the vintage chrome rearview mirror of a 1955 car speeding away on dark Nevada desert highway, distant atomic mushroom cloud detonating on horizon, boiling orange fireball and purple radioactive ionization glow, blinding nuclear flash reflecting off windshield and dashboard chrome, 35mm Technicolor cinema frame, motion blur on asphalt", style: "strobe" },
+      p1:  { name: "Vegas Highway '59", prompt: "1950s highway billboards heading into Las Vegas at night, sequential Burma-Shave signs on desert asphalt, glowing neon cactus and arrow motels, taillights of 1957 chrome finned cars, 35mm Kodachrome slide, cinematic depth of field, heat mirage", style: "montage" },
+      p2:  { name: "The 8th Sphere Horizon", prompt: "Giant glowing celestial event horizon over an abandoned desert drive-in theater, rotating Enochian portal ring with golden occult sigils in dark purple sky, eclipse halo, silhouetted lone watcher in trenchcoat, retro Panavision 70mm lens flare", style: "dmt_breakthrough" },
+      p3:  { name: "Scorpio Rites (Anger)", prompt: "Kenneth Anger 1965 Scorpio Rising aesthetic, close-up gleaming chrome motorcycle exhaust pipes, leather jacket studs, flickering ritual candles, Luciferian occult neon blue and crimson red gel lighting, 16mm Technicolor grain, blown highlights", style: "anger_scorpio" },
+      p4:  { name: "W-OCCULT AM 660 Pirate", prompt: "Analog pirate radio tower under stormy clouds at 3 AM, glowing orange vacuum tubes, glowing phosphor oscilloscope screen waveforms, retro TV test pattern emergency broadcast card, magnetic tape distortion, CRT scanlines, 1980s VHS tape pause glitch", style: "magnetic_tape" },
+      p5:  { name: "Eraserhead Factory", prompt: "David Lynch Eraserhead 1977 aesthetic, stark industrial factory interior, steam radiator emitting white mist, heavy mechanical gears and spinning belts, deep pitch black shadows and tungsten blown highlights, gritty 35mm silver gelatin monochrome film", style: "lynch_eraserhead" },
+      p6:  { name: "Black Lodge Red Room", prompt: "Twin Peaks Red Room aesthetic, flowing heavy scarlet velvet curtains, black and white zigzag chevron patterned floor, warm 1940s art-deco floor lamp casting long shadows, dreamlike atmospheric fog, 35mm cinematic film still", style: "lynch_redroom" },
+      p7:  { name: "1956 Saucer Invasion", prompt: "1956 vintage drive-in movie screen showing retro flying saucer invasion, glowing green beam over a 1950s neon diner parking lot, chrome fins of vintage cars, dramatic B-movie lobby card coloring, two-tone Technicolor, retro movie poster grain", style: "montage" },
+      p8:  { name: "Meshes of the Afternoon", prompt: "Maya Deren 1943 Meshes of the Afternoon aesthetic, close-up of a bronze skeleton key lying in desert sand turning into a reflection, figure in black cloak with mirror face reflecting clouds, harsh afternoon sun casting geometric shadows, 16mm Bolex black and white film grain", style: "deren_meshes" },
+      p9:  { name: "Burroughs Interzone", prompt: "William S. Burroughs Naked Lunch Interzone aesthetic, 1953 mechanical typewriter with torn newspaper headline collage, cigarette smoke curling under green banker lamp, classified government teletype tape, murky sepia and amber lighting, grainy 16mm spy camera film", style: "third_mind" },
+      p10: { name: "Sacred Geometry Hyperspace", prompt: "Intricate sacred geometry portal chamber, glowing neon cyan and magenta fractal mandalas, iridescent holographic lattices, hyper-dimensional crystal refraction, volumetric light rays, dark void background, high symmetry, cinematic 8k render", style: "dmt_breakthrough" },
+      p12: { name: "Mojave Neon Boneyard", prompt: "Overgrown Mojave desert neon sign boneyard at twilight, tangled pile of massive rusted 1950s casino marquee letters, broken buzzing neon glass tubes glowing dim turquoise and hot pink in sand, cracked porcelain enamel signs, heat distortion, 35mm film grain, moody atmospheric lighting", style: "apple_kinetic" },
+      p13: { name: "Starlight Motel Room 13", prompt: "1950s isolated desert roadside motel at 3 AM in rain, buzzing neon red NO VACANCY sign reflecting in wet asphalt puddle, peeling turquoise painted door numbered 13 cracked open, silhouette watcher visible through venetian blinds, noir low-angle camera, Kodachrome vintage film still", style: "fiona_voyeur" },
+      p14: { name: "Route 375 Black Sedan", prompt: "Pair of menacing black 1951 government sedans pursuing closely on desert highway at night, twin spotlight beams cutting through dust, chrome bumper grill reflecting red pursuit flashers, long radio whip antennas bending in wind, cinematic 70mm anamorphic lens flare, gritty night grain", style: "montage" },
+      p15: { name: "Tesla Wardenclyffe Spire", prompt: "Massive copper-wound Nikola Tesla electrical spire standing in dried desert salt flat, violent blinding violet electric lightning arcs discharging into dark storm clouds, copper spheres glowing with plasma aura, vintage 1940s scientific expedition equipment, silver-gelatin black and white film with electric blue toning", style: "strobe" },
+      p16: { name: "Mothlight Emulsion", prompt: "Stan Brakhage 1963 Mothlight experimental film aesthetic, translucent moth wings pressed between clear 16mm celluloid frames, microscopic view of amber insect wing scales and dandelion seeds, hand-scratched razor film cuts, chemical emulsion burns, intense organic abstract texture, macro cinema still", style: "brakhage_emulsion" },
+      p17: { name: "La Jetee Jetty", prompt: "Chris Marker 1962 La Jetee aesthetic, dramatic high-contrast black and white photography, viewing jetty of 1960s airport terminal, woman face turning toward camera in wind, harsh grey overcast sky, vintage mechanical chronograph stopwatch in foreground, deep film grain, cinematic timeless memory stillness", style: "marker_jetee" },
+      p18: { name: "1920s Spirit Cabinet", prompt: "1920s spiritualist seance in dark velvet Victorian parlor, glowing white ectoplasm wisp floating from medium hands, tin spirit trumpet levitating above mahogany circular table, startled sitters in antique suits, magnesium powder flashbulb explosion casting harsh shadows, vintage sepia photographic plate", style: "seance_dissolve" },
+      p19: { name: "Project Blue Book Dossier", prompt: "Glowing green CRT screen of vintage 1950s microfilm reader machine, classified military UFO incident report with heavy black marker redactions, stamped in red ink TOP SECRET RESTRICTED, grainy black and white saucer photo inset, scratches and dust on microfilm tape, macro angle", style: "third_mind" },
+      p20: { name: "Psilocybin Living Tapestry", prompt: "Ancient mossy forest floor and giant twisted oak roots breathing with bioluminescent turquoise and amber light, bark texture morphing into subtle intricate Celtic knotwork patterns, floating glowing spores in damp evening air, macro shallow depth of field, mystical psychedelic dreamscape", style: "psilocybin_breath" }
+    };
+
+    const BURROUGHS_LINES = [
+      "THE WORD IS A VIRUS", "REARVIEW MIRROR IGNITION", "PAST PORTAL NINE // IN '59",
+      "RADIO W-OCCULT AM 660", "SILVER GELATIN PROTOCOL", "THE OWLS ARE CALLING",
+      "DO NOT STOP IN RACHEL", "BURMA-SHAVE", "TAPE DECAY 0.088", "THE 8TH SPHERE REALIGNED"
+    ];
+
+    const beatDot = document.getElementById('beat-dot');
+    const bpmBadge = document.getElementById('bpm-badge');
+    const timeDisplay = document.getElementById('timecode-display');
+    const durDisplay = document.getElementById('duration-display');
+
+    // ── Multi-Target Broadcaster ──
+    // Reaches embedded KenetiCut iframe (on Perchance), parent window, or opener popup
+    function postToKenetiCut(msg) {
+      const frame = document.getElementById('keneticut-embedded-iframe');
+      if (frame && frame.contentWindow) {
+        try { frame.contentWindow.postMessage(msg, '*'); } catch (_) {}
+      }
+      if (window.parent && window.parent !== window) {
+        try { window.parent.postMessage(msg, '*'); } catch (_) {}
+      }
+      if (window.opener) {
+        try { window.opener.postMessage(msg, '*'); } catch (_) {}
+      }
+    }
+
+    function returnToKenetiCut() {
+      // 1. If running embedded inside KenetiCut app itself, tell parent to switch tab
+      const isEmbeddedInKenetiCut = window.parent && window.parent !== window &&
+        !window.location.hostname.includes('perchance.org') &&
+        !window.location.href.includes('null');
+
+      if (isEmbeddedInKenetiCut) {
+        postToKenetiCut({ type: 'SWITCH_TAB', tab: 'editor' });
+        return;
+      }
+
+      // 2. If running as popup from KenetiCut, notify opener
+      if (window.opener) {
+        try { window.opener.postMessage({ type: 'SWITCH_TAB', tab: 'editor' }, '*'); } catch (_) {}
+        try { window.close(); return; } catch (_) {}
+      }
+
+      // 3. Running directly on Perchance or standalone: open embedded KenetiCut right here on the same page!
+      const container = document.getElementById('keneticut-embedded-container');
+      if (container) {
+        container.style.display = 'flex';
+        return;
+      }
+
+      // Fallback
+      window.location.href = './index.html?tab=editor';
+    }
+
+    function switchToFlipbookView() {
+      const container = document.getElementById('keneticut-embedded-container');
+      if (container) {
+        container.style.display = 'none';
+      }
+    }
+
+    // Listen for tab switch requests from embedded KenetiCut
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SWITCH_TAB' && (event.data.tab === 'studio' || event.data.tab === 'flipbook')) {
+        switchToFlipbookView();
+      }
+    });
+
+    let currentSongTime = 0;
+    let songDuration = 32;
+    let activeCues = [];
+
+    // Helper: format seconds to mm:ss.s
+    function formatTime(sec) {
+      if (isNaN(sec) || sec < 0) sec = 0;
+      const m = Math.floor(sec / 60);
+      const s = (sec % 60).toFixed(1);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(4, '0')}`;
+    }
+
+    // Helper: parse mm:ss or seconds to float
+    function parseTimeToSeconds(str) {
+      str = String(str).trim();
+      if (str.includes(':')) {
+        const parts = str.split(':');
+        return (parseFloat(parts[0]) || 0) * 60 + (parseFloat(parts[1]) || 0);
+      }
+      return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    // ── Listen to Live State & Beats from KenetiCut ──
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (!d || typeof d !== 'object') return;
+
+      if (d.type === 'KENETICUT_STATE') {
+        currentSongTime = d.currentTime || 0;
+        songDuration = d.duration || 32;
+        timeDisplay.textContent = formatTime(currentSongTime);
+        durDisplay.textContent = formatTime(songDuration);
+        if (d.bpm) bpmBadge.textContent = `${Math.round(d.bpm)} BPM`;
+
+        // Update active status on cue cards
+        document.querySelectorAll('.cue-card').forEach((card) => {
+          const start = parseFloat(card.dataset.start);
+          const end = parseFloat(card.dataset.end);
+          if (currentSongTime >= start && currentSongTime <= end) {
+            card.classList.add('active-now');
+          } else {
+            card.classList.remove('active-now');
+          }
+        });
+      }
+
+      if (d.type === 'KENETICUT_BEAT') {
+        beatDot.classList.add('active');
+        setTimeout(() => beatDot.classList.remove('active'), 75);
+      }
+    });
+
+    function snapCueToCurrentTime() {
+      document.getElementById('cue-in').value = formatTime(currentSongTime);
+    }
+
+    function onSelectPreset() {
+      const key = document.getElementById('preset-selector').value;
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('prompt-input').value = p.prompt;
+      document.getElementById('active-reel-title').textContent = p.name.toUpperCase();
+      if (p.style) {
+        postToKenetiCut({ type: 'SET_STYLE', style: p.style });
+      }
+    }
+
+    function quickLoadPreset(key) {
+      document.getElementById('preset-selector').value = key;
+      onSelectPreset();
+    }
+
+    function toggleMotionControls() {
+      const mode = document.getElementById('output-mode')?.value;
+      const wrap = document.getElementById('motion-mode-wrap');
+      if (wrap) wrap.style.display = (mode === 'webm_loop') ? 'inline-flex' : 'none';
+    }
+
+    // Helper: load image safely into an Image element
+    function loadImageElement(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(img);
+        img.src = src;
+      });
+    }
+
+    // ── Living Reel Theater & Flipbook Playback Engine ──
+    let loadedFlipbookImages = [];
+    let currentFrameIndex = 0;
+    let isFlipbookPlaying = false;
+    let flipbookFps = 12;
+    let flipbookTimer = null;
+    let currentWebmBlob = null;
+    let currentWebmUrl = null;
+    let activeReelName = "Living Reel";
+
+    function updatePlayButtonUI() {
+      const btn = document.getElementById('transport-play-btn');
+      if (!btn) return;
+      btn.innerHTML = isFlipbookPlaying ? '⏸ PAUSE' : '▶ PLAY';
+    }
+
+    function renderCurrentFrame() {
+      const canvas = document.getElementById('flipbook-canvas');
+      const videoEl = document.getElementById('theater-video');
+      const standbyEl = document.getElementById('screen-standby');
+      const scrubber = document.getElementById('frame-scrubber');
+      const frameBadge = document.getElementById('screen-frame-badge');
+
+      if (!canvas || !videoEl) return;
+      const ctx = canvas.getContext('2d');
+
+      if (loadedFlipbookImages.length === 0 && !currentWebmUrl) {
+        standbyEl.style.display = 'flex';
+        canvas.style.display = 'none';
+        videoEl.style.display = 'none';
+        if (scrubber) scrubber.disabled = true;
+        if (frameBadge) frameBadge.textContent = 'FRAME 0 / 0';
+        return;
+      }
+
+      standbyEl.style.display = 'none';
+
+      // If WebM Loop is currently displayed
+      if (currentWebmUrl && videoEl.style.display !== 'none') {
+        return;
+      }
+
+      canvas.style.display = 'block';
+      videoEl.style.display = 'none';
+
+      const img = loadedFlipbookImages[currentFrameIndex];
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+
+      if (scrubber) {
+        scrubber.disabled = false;
+        scrubber.max = Math.max(0, loadedFlipbookImages.length - 1);
+        scrubber.value = currentFrameIndex;
+      }
+
+      if (frameBadge) {
+        frameBadge.textContent = `FRAME ${currentFrameIndex + 1} / ${loadedFlipbookImages.length}`;
+      }
+
+      // Highlight corresponding thumb in strip
+      document.querySelectorAll('.reel-thumb').forEach((thumb, idx) => {
+        thumb.classList.toggle('selected', idx === currentFrameIndex);
+      });
+    }
+
+    function playFlipbook() {
+      if (loadedFlipbookImages.length <= 1) return;
+      isFlipbookPlaying = true;
+      updatePlayButtonUI();
+
+      if (flipbookTimer) clearInterval(flipbookTimer);
+      flipbookTimer = setInterval(() => {
+        currentFrameIndex = (currentFrameIndex + 1) % loadedFlipbookImages.length;
+        renderCurrentFrame();
+      }, 1000 / flipbookFps);
+    }
+
+    function pauseFlipbook() {
+      isFlipbookPlaying = false;
+      if (flipbookTimer) {
+        clearInterval(flipbookTimer);
+        flipbookTimer = null;
+      }
+      updatePlayButtonUI();
+    }
+
+    function toggleFlipbookPlayback() {
+      const videoEl = document.getElementById('theater-video');
+      if (currentWebmUrl && videoEl.style.display !== 'none') {
+        if (videoEl.paused) {
+          videoEl.play();
+          isFlipbookPlaying = true;
+        } else {
+          videoEl.pause();
+          isFlipbookPlaying = false;
+        }
+        updatePlayButtonUI();
+        return;
+      }
+
+      if (isFlipbookPlaying) {
+        pauseFlipbook();
+      } else {
+        playFlipbook();
+      }
+    }
+
+    function stepFrame(delta) {
+      const videoEl = document.getElementById('theater-video');
+      if (currentWebmUrl && videoEl.style.display !== 'none') {
+        videoEl.pause();
+        videoEl.currentTime = Math.max(0, videoEl.currentTime + (delta / flipbookFps));
+        return;
+      }
+
+      pauseFlipbook();
+      if (loadedFlipbookImages.length === 0) return;
+      currentFrameIndex = (currentFrameIndex + delta + loadedFlipbookImages.length) % loadedFlipbookImages.length;
+      renderCurrentFrame();
+    }
+
+    function onScrubFrame(val) {
+      pauseFlipbook();
+      currentFrameIndex = parseInt(val, 10);
+      renderCurrentFrame();
+    }
+
+    function setFlipbookFps(fps) {
+      flipbookFps = fps;
+      document.querySelectorAll('.fps-btn').forEach((b) => {
+        b.classList.toggle('active', parseInt(b.dataset.fps, 10) === fps);
+      });
+      const badge = document.getElementById('screen-fps-badge');
+      if (badge) badge.textContent = `${fps} FPS`;
+
+      if (isFlipbookPlaying) {
+        playFlipbook();
+      }
+    }
+
+    // Keyboard navigation (Space for play/pause, Left/Right for single frame)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleFlipbookPlayback();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        stepFrame(-1);
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        stepFrame(1);
+      }
+    });
+
+    // ── In-Browser WebM Video Loop Compiler ──
+    async function compileFramesToWebM(loadedImages, fps, motionStyle, loopSeconds = 4.0) {
+      if (!loadedImages || !loadedImages.length) return null;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+
+      const stream = canvas.captureStream(fps);
+      let mimeType = 'video/webm; codecs=vp9';
+      if (!window.MediaRecorder || !MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/webm; codecs=vp8';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm';
+        }
+      }
+
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5000000 });
+      const chunks = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      const recordPromise = new Promise((resolve) => {
+        recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+      });
+
+      recorder.start();
+
+      const totalFrames = Math.round(loopSeconds * fps);
+      const frameMs = 1000 / fps;
+      const nImages = loadedImages.length;
+
+      for (let f = 0; f < totalFrames; f++) {
+        const progress = f / totalFrames;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 1280, 720);
+
+        if (motionStyle === 'smooth_drift') {
+          // Ken Burns drift: Continuous pan & slow zoom across images
+          const imgIdx = Math.floor(progress * nImages) % nImages;
+          const nextIdx = (imgIdx + 1) % nImages;
+          const localP = (progress * nImages) % 1.0;
+          const zoom = 1.05 + 0.12 * localP;
+          const panX = Math.sin(progress * Math.PI * 2) * 45;
+          const panY = Math.cos(progress * Math.PI * 2) * 25;
+
+          const currentImg = loadedImages[imgIdx];
+          if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
+            ctx.save();
+            ctx.translate(640 + panX, 360 + panY);
+            ctx.scale(zoom, zoom);
+            ctx.drawImage(currentImg, -640, -360, 1280, 720);
+            ctx.restore();
+          }
+
+          if (localP > 0.70) {
+            const fade = (localP - 0.70) / 0.30;
+            const nextImg = loadedImages[nextIdx];
+            if (nextImg && nextImg.complete && nextImg.naturalWidth > 0) {
+              ctx.save();
+              ctx.globalAlpha = fade;
+              ctx.translate(640 - panX * 0.4, 360 - panY * 0.4);
+              ctx.scale(1.04, 1.04);
+              ctx.drawImage(nextImg, -640, -360, 1280, 720);
+              ctx.restore();
+            }
+          }
+        } else if (motionStyle === 'pulse_strobe') {
+          // High-energy strobe flash / pulse cut
+          const imgIdx = Math.floor(progress * nImages) % nImages;
+          const currentImg = loadedImages[imgIdx];
+          if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
+            ctx.drawImage(currentImg, 0, 0, 1280, 720);
+          }
+          if (f % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+            ctx.fillRect(0, 0, 1280, 720);
+          }
+        } else {
+          // Rapid flipbook cut
+          const imgIdx = Math.floor(progress * nImages) % nImages;
+          const currentImg = loadedImages[imgIdx];
+          if (currentImg && currentImg.complete && currentImg.naturalWidth > 0) {
+            ctx.drawImage(currentImg, 0, 0, 1280, 720);
+          }
+        }
+
+        await new Promise((r) => setTimeout(r, frameMs));
+      }
+
+      recorder.stop();
+      return await recordPromise;
+    }
+
+    // ── Choreographed AI Reel Generation ──
+    async function generateChoreographedReel() {
+      const prompt = document.getElementById('prompt-input').value.trim();
+      if (!prompt) {
+        alert('Please enter a prompt or choose a preset!');
+        return;
+      }
+
+      const cueInSec = parseTimeToSeconds(document.getElementById('cue-in').value);
+      const cueDurSec = parseTimeToSeconds(document.getElementById('cue-dur').value) || 15;
+      const cueEndSec = cueInSec + cueDurSec;
+
+      const count = parseInt(document.getElementById('frame-count').value, 10);
+      const outputMode = document.getElementById('output-mode')?.value || 'webm_loop';
+      const motionStyle = document.getElementById('motion-style')?.value || 'cinematic_cut';
+
+      const btn = document.getElementById('gen-btn');
+      const strip = document.getElementById('reel-strip');
+
+      const presetKey = document.getElementById('preset-selector').value;
+      activeReelName = PRESETS[presetKey]?.name || 'Custom Reel';
+      document.getElementById('active-reel-title').textContent = activeReelName.toUpperCase();
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> Generating Frames...';
+      strip.innerHTML = '';
+      pauseFlipbook();
+
+      loadedFlipbookImages = [];
+      currentFrameIndex = 0;
+      currentWebmBlob = null;
+      currentWebmUrl = null;
+
+      // Add to sidebar cue board
+      addCueToBoard({
+        name: `${activeReelName} (${outputMode === 'webm_loop' ? '🎥 WebM' : '🎞️ Stills'})`,
+        start: cueInSec,
+        end: cueEndSec,
+        frameCount: count
+      });
+
+      const collectedUrls = [];
+      const imagePromises = [];
+
+      for (let i = 0; i < count; i++) {
+        btn.innerHTML = `<span>⏳</span> Generating Frame ${i + 1}/${count}...`;
+        const seed = Math.floor(Math.random() * 9000000) + 1000000;
+        const cleanPrompt = encodeURIComponent(prompt + `, sequential cinema frame ${i + 1}`);
+        let imgUrl = null;
+
+        // 1. Native Perchance text-to-image plugin
+        if (typeof t2i !== 'undefined') {
+          try {
+            const res = await t2i({ prompt: prompt + ', frame variation ' + (i + 1), seed: seed, shape: 'landscape' });
+            if (typeof res === 'string') imgUrl = res;
+            else if (res && res.url) imgUrl = res.url;
+            else if (res && res.src) imgUrl = res.src;
+          } catch (e) {
+            console.warn('Perchance t2i error:', e);
+          }
+        } else if (typeof image !== 'undefined' && typeof image === 'function') {
+          try {
+            const res = await image({ prompt: prompt + ', frame variation ' + (i + 1), seed: seed, shape: 'landscape' });
+            if (typeof res === 'string') imgUrl = res;
+            else if (res && res.url) imgUrl = res.url;
+            else if (res && res.src) imgUrl = res.src;
+          } catch (e) {
+            console.warn('Perchance image plugin error:', e);
+          }
+        }
+
+        // 2. High-speed Pollinations fallback
+        if (!imgUrl) {
+          imgUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?seed=${seed}&width=1280&height=720&nologo=true`;
+        }
+
+        collectedUrls.push(imgUrl);
+        const imgPromise = loadImageElement(imgUrl);
+        imagePromises.push(imgPromise);
+
+        // Load image live into theater canvas as soon as ready
+        imgPromise.then((loadedImg) => {
+          loadedFlipbookImages.push(loadedImg);
+          currentFrameIndex = loadedFlipbookImages.length - 1;
+          renderCurrentFrame();
+        });
+
+        // Create thumb in strip
+        const thumb = document.createElement('img');
+        thumb.className = 'reel-thumb';
+        thumb.src = imgUrl;
+        thumb.title = `${activeReelName} · Frame #${i + 1} (${formatTime(cueInSec)} - ${formatTime(cueEndSec)})`;
+        const frameIdx = i;
+        thumb.onclick = () => {
+          pauseFlipbook();
+          currentFrameIndex = frameIdx;
+          renderCurrentFrame();
+        };
+        strip.appendChild(thumb);
+        thumb.scrollIntoView({ behavior: 'smooth', inline: 'end' });
+
+        // If in Stills mode, stream each frame immediately into KenetiCut
+        if (outputMode === 'flipbook_stills') {
+          postToKenetiCut({
+            type: 'ADD_ASSET',
+            url: imgUrl,
+            name: `${activeReelName}_#${i + 1}`,
+            mediaType: 'image',
+            cueStart: cueInSec,
+            cueEnd: cueEndSec,
+            reelName: activeReelName
+          });
+        }
+
+        await new Promise((r) => setTimeout(r, 300));
+      }
+
+      const loadedImgs = await Promise.all(imagePromises);
+      loadedFlipbookImages = loadedImgs;
+
+      // If WebM Loop mode: compile sequence into a native WebM video loop!
+      if (outputMode === 'webm_loop') {
+        btn.innerHTML = '<span>🎬</span> Compiling WebM Video Loop...';
+        const fps = (motionStyle === 'hyper_speed') ? 24 : 12;
+        currentWebmBlob = await compileFramesToWebM(loadedImgs, fps, motionStyle, 4.0);
+
+        if (currentWebmBlob) {
+          currentWebmUrl = URL.createObjectURL(currentWebmBlob);
+          const safeReelName = activeReelName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+          const videoFileName = `${safeReelName}_loop.webm`;
+
+          // Stream compiled video loop into KenetiCut as native video!
+          postToKenetiCut({
+            type: 'ADD_ASSET',
+            url: currentWebmUrl,
+            name: videoFileName,
+            mediaType: 'video',
+            cueStart: cueInSec,
+            cueEnd: cueEndSec,
+            reelName: activeReelName
+          });
+
+          // Mount into the main theater screen video element!
+          const videoEl = document.getElementById('theater-video');
+          const canvas = document.getElementById('flipbook-canvas');
+          videoEl.src = currentWebmUrl;
+          videoEl.style.display = 'block';
+          canvas.style.display = 'none';
+          document.getElementById('screen-standby').style.display = 'none';
+          videoEl.play();
+          isFlipbookPlaying = true;
+          updatePlayButtonUI();
+
+          // Add playable video preview card to the bottom strip
+          const card = document.createElement('div');
+          card.className = 'video-loop-card';
+          card.innerHTML = `
+            <video src="${currentWebmUrl}" autoplay loop muted playsinline onclick="focusTheaterVideo()"></video>
+            <div class="video-loop-info">
+              <span class="loop-badge">🎥 WEBM LOOP (${fps}fps)</span>
+              <a href="${currentWebmUrl}" download="${videoFileName}" class="btn-download-video">
+                ⬇️ Download .webm
+              </a>
+            </div>
+          `;
+          strip.insertBefore(card, strip.firstChild);
+          card.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+
+          showToast(`✓ Generated & Sent ${videoFileName} to KenetiCut!`);
+        }
+      } else {
+        // Stills mode: start flipbook animation loop automatically!
+        currentFrameIndex = 0;
+        playFlipbook();
+        showToast(`✓ Generated ${count} frames & streaming into KenetiCut!`);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>🎬</span> Choreograph Reel';
+    }
+
+    function focusTheaterVideo() {
+      if (!currentWebmUrl) return;
+      const videoEl = document.getElementById('theater-video');
+      const canvas = document.getElementById('flipbook-canvas');
+      canvas.style.display = 'none';
+      videoEl.style.display = 'block';
+      videoEl.play();
+      isFlipbookPlaying = true;
+      updatePlayButtonUI();
+    }
+
+    function pushCurrentReelToKenetiCut() {
+      if (loadedFlipbookImages.length === 0 && !currentWebmUrl) {
+        alert('Please choreograph a reel first!');
+        return;
+      }
+
+      const cueInSec = parseTimeToSeconds(document.getElementById('cue-in').value);
+      const cueDurSec = parseTimeToSeconds(document.getElementById('cue-dur').value) || 15;
+      const cueEndSec = cueInSec + cueDurSec;
+
+      if (currentWebmUrl) {
+        const safeReelName = activeReelName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        postToKenetiCut({
+          type: 'ADD_ASSET',
+          url: currentWebmUrl,
+          name: `${safeReelName}_loop.webm`,
+          mediaType: 'video',
+          cueStart: cueInSec,
+          cueEnd: cueEndSec,
+          reelName: activeReelName
+        });
+        showToast(`⚡ WebM loop pushed to KenetiCut Media Bin!`);
+      } else {
+        loadedFlipbookImages.forEach((img, idx) => {
+          postToKenetiCut({
+            type: 'ADD_ASSET',
+            url: img.src,
+            name: `${activeReelName}_#${idx + 1}`,
+            mediaType: 'image',
+            cueStart: cueInSec,
+            cueEnd: cueEndSec,
+            reelName: activeReelName
+          });
+        });
+        showToast(`⚡ ${loadedFlipbookImages.length} frames pushed to KenetiCut Media Bin!`);
+      }
+    }
+
+    function downloadCurrentReel() {
+      if (currentWebmUrl) {
+        const a = document.createElement('a');
+        a.href = currentWebmUrl;
+        const safeReelName = activeReelName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        a.download = `${safeReelName}_loop.webm`;
+        a.click();
+      } else if (loadedFlipbookImages.length > 0) {
+        const currentImg = loadedFlipbookImages[currentFrameIndex];
+        if (currentImg && currentImg.src) {
+          const a = document.createElement('a');
+          a.href = currentImg.src;
+          a.download = `${activeReelName}_frame_${currentFrameIndex + 1}.png`;
+          a.click();
+        }
+      } else {
+        alert('No reel loaded to download!');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-msg');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function addCueToBoard(cue) {
+      activeCues.push(cue);
+      document.getElementById('cue-count').textContent = activeCues.length;
+
+      const list = document.getElementById('cue-list');
+      if (activeCues.length === 1) list.innerHTML = '';
+
+      const card = document.createElement('div');
+      card.className = 'cue-card';
+      card.dataset.start = cue.start;
+      card.dataset.end = cue.end;
+
+      card.innerHTML = `
+        <div class="cue-card-top">
+          <span class="cue-name" title="${cue.name}">${cue.name}</span>
+          <span class="cue-time">${formatTime(cue.start)} – ${formatTime(cue.end)}</span>
+        </div>
+        <div style="font-size:10px; color:#888;">${cue.frameCount} Frames</div>
+        <div class="cue-actions">
+          <button class="cue-btn-seek" onclick="seekSong(${cue.start})">▶ Seek</button>
+        </div>
+      `;
+      list.appendChild(card);
+    }
+
+    function seekSong(time) {
+      postToKenetiCut({ type: 'SEEK_TO', time: parseFloat(time) });
+    }
+
+    function flashSubliminal() {
+      const line = BURROUGHS_LINES[Math.floor(Math.random() * BURROUGHS_LINES.length)];
+      postToKenetiCut({ type: 'SET_SUBLIMINAL', text: line, duration: 600 });
+
+      // Flash in theater screen too!
+      const overlay = document.getElementById('subliminal-overlay');
+      if (overlay) {
+        overlay.textContent = line;
+        overlay.classList.add('flash');
+        setTimeout(() => overlay.classList.remove('flash'), 650);
+      }
+    }
+
+    function triggerChop() {
+      postToKenetiCut({ type: 'TRIGGER_CHOP' });
+    }
+
+    function togglePlay() {
+      postToKenetiCut({ type: 'TOGGLE_PLAY' });
+    }
+  </script>
+
+  <!-- Embedded KenetiCut Studio Tab View (Allows running 100% on Perchance without leaving!) -->
+  <div id="keneticut-embedded-container" style="display:none; position:fixed; inset:0; z-index:999999; background:#000; flex-direction:column;">
+    <div style="background:#09090c; border-bottom:1px solid #1f1f2e; padding:5px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button onclick="switchToFlipbookView()" style="background:linear-gradient(90deg, #00e5ff, #00b0ff); border:1px solid #00e5ff; color:#000; font-family:'Syncopate',sans-serif; font-weight:800; font-size:7.5px; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; border-radius:4px; cursor:pointer; box-shadow:0 0 10px rgba(0,229,255,0.45); display:inline-flex; align-items:center; gap:4px; transition:all 0.15s;">
+          ← BACK TO AI FLIPBOOK STUDIO
+        </button>
+        <span style="font-family:'Bebas Neue',sans-serif; color:#ffffff; font-size:18px; letter-spacing:3px; text-shadow:0 0 10px rgba(0,229,255,0.7); display:inline-flex; align-items:center; gap:8px;">
+          STRANGELET · KENETICUT
+          <span style="font-family:'Syncopate',sans-serif; color:#ff6b00; font-size:7px; letter-spacing:2px; font-weight:700;">
+            TIMELINE & MEDIA BIN
+          </span>
+        </span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:7.5px; color:#00ffcc; font-family:'Syncopate',sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+          ⚡ ACTIVE ON PERCHANCE
+        </span>
+        <button onclick="switchToFlipbookView()" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.2); color:#aaa; font-family:'Syncopate',sans-serif; font-size:7px; font-weight:700; letter-spacing:0.8px; padding:3px 8px; border-radius:3px; cursor:pointer; transition:all 0.15s;" onmouseenter="this.style.color='#fff'; this.style.borderColor='#ff6b6b'" onmouseleave="this.style.color='#aaa'; this.style.borderColor='rgba(255,255,255,0.2)'">
+          ✕ CLOSE
+        </button>
+      </div>
+    </div>
+    <iframe
+      id="keneticut-embedded-iframe"
+      src="https://lordgriefo.github.io/strangelet-kineticut-perchance/index.html?tab=editor"
+      style="flex:1; width:100%; height:100%; border:none;"
+      allow="autoplay; clipboard-write; display-capture"
+    ></iframe>
+  </div>
+</body>
+</html>

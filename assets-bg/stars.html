@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Starfield Sigil Layer</title>
+    <style>
+        /* All backgrounds are pure matte black — zero green/blue bleed */
+        html, body {
+            background: #020202;
+            margin: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: 1;
+        }
+        /* Sigils use orange + pink only — no green */
+        .sigil {
+            position: absolute;
+            font-family: serif;
+            color: #D4AF37;
+            text-shadow: 0 0 12px #D4AF37, 0 0 25px #FF007F;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+        }
+        /* Occasional blue-white comet streak */
+        .comet {
+            position: absolute;
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0,229,255,0.7));
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+        }
+        @keyframes pop-in {
+            0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+            50%  { transform: scale(1.6) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1.2) rotate(20deg); opacity: 0; }
+        }
+        @keyframes comet-fly {
+            0%   { opacity: 0; transform: translateX(0) translateY(0); }
+            20%  { opacity: 0.8; }
+            100% { opacity: 0; transform: translateX(200px) translateY(80px); }
+        }
+    </style>
+</head>
+<body>
+<script>
+    // Interzone sigil characters — alchemical / Enochian / Sumerian fragments
+    const sigils = ['☿','♄','⊕','⊗','✦','⟁','⧖','⌬','⍟','⊛','⌘','☽','⊹','⁂','⌖'];
+
+    // Spawn 150 white stars — sizes weighted toward tiny (more realistic)
+    for (let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = (Math.random() * 1.5 + 0.3).toFixed(1) + 'px';
+        star.style.width  = size;
+        star.style.height = size;
+        star.style.left   = Math.random() * 100 + 'vw';
+        star.style.top    = Math.random() * 100 + 'vh';
+        star.style.opacity = (Math.random() * 0.6 + 0.2).toFixed(2);
+        document.body.appendChild(star);
+    }
+
+    // Sigil pop-in on audio transient or timer
+    function triggerPop() {
+        const p = document.createElement('div');
+        p.className  = 'sigil';
+        p.innerText  = sigils[Math.floor(Math.random() * sigils.length)];
+        p.style.left = Math.random() * 90 + 'vw';
+        p.style.top  = (Math.random() * 65 + 15) + 'vh';
+        p.style.fontSize  = (Math.random() * 38 + 18) + 'px';
+        p.style.animation = 'pop-in 0.8s ease-out forwards';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 900);
+    }
+
+    // Occasional comet streak in blue-white only
+    function triggerComet() {
+        const c = document.createElement('div');
+        c.className  = 'comet';
+        c.style.left = Math.random() * 80 + 'vw';
+        c.style.top  = Math.random() * 60 + 'vh';
+        c.style.transform = `rotate(${Math.random() * 40 + 10}deg)`;
+        c.style.animation = 'comet-fly 0.9s ease-out forwards';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 950);
+    }
+
+    // Auto-trigger at low rate — mostly ambient, not distracting
+    setInterval(() => { if (Math.random() > 0.65) triggerPop(); }, 400);
+    setInterval(() => { if (Math.random() > 0.85) triggerComet(); }, 2200);
+
+    // Twinkle: randomly vary star opacity for life
+    setInterval(() => {
+        const allStars = document.querySelectorAll('.star');
+        const s = allStars[Math.floor(Math.random() * allStars.length)];
+        if (s) s.style.opacity = (Math.random() * 0.7 + 0.1).toFixed(2);
+    }, 180);
+
+    // React to audio transients from parent frame
+    window.addEventListener('message', (e) => {
+        if (e.data === 'sigil-pop') triggerPop();
+    });
+</script>
+</body>
+</html>
