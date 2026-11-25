@@ -1657,24 +1657,18 @@ export function InterzoneDriveInTheater({
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <img
-                        src="./as-above-so-below-cover.gif"
-                        alt="As Above, So Below Animated Cover"
-                        onError={(e) => {
-                          e.currentTarget.src = './as-above-so-below-cover.jpg';
-                        }}
+                        src="./as-above-so-below-cover.jpg"
+                        alt="As Above, So Below Cover"
                         style={{
-                          width: 48,
-                          height: 48,
+                          width: 44,
+                          height: 44,
                           borderRadius: 4,
                           border: '1.5px solid #fbbf24',
                           objectFit: 'cover',
-                          boxShadow: '0 0 14px rgba(251, 191, 36, 0.7)',
+                          boxShadow: '0 0 12px rgba(251, 191, 36, 0.6)',
                         }}
                       />
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-                        <span style={{ fontSize: 7.5, color: '#000', background: '#fbbf24', padding: '1px 5px', borderRadius: 2, fontFamily: 'monospace', fontWeight: 800 }}>✨ ANIMATED COVER</span>
-                        <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>30 MASTER TRACKS ↗</span>
-                      </div>
+                      <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>30 MASTER TRACKS ↗</span>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
                       AS ABOVE, SO BELOW
