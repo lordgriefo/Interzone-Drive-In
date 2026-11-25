@@ -899,7 +899,24 @@ export default function App() {
         handlePlayTrack(entry, next);
         return next;
       }
-      // End of playlist — stop (or loop back to 0 if you want)
+      // Loop back to beginning for continuous broadcast
+      if (playlist.length > 0) {
+        handlePlayTrack(playlist[0], 0);
+        return 0;
+      }
+      return prev;
+    });
+  }, [playlist, handlePlayTrack]);
+
+  // Return to previous track in the playlist
+  const handlePlaylistPrev = useCallback(() => {
+    setPlaylistIndex((prev) => {
+      const prevIdx = prev > 0 ? prev - 1 : Math.max(0, playlist.length - 1);
+      if (playlist && playlist[prevIdx]) {
+        const entry = playlist[prevIdx];
+        handlePlayTrack(entry, prevIdx);
+        return prevIdx;
+      }
       return prev;
     });
   }, [playlist, handlePlayTrack]);
@@ -1666,6 +1683,12 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={togglePlay}
             onStop={stopEngine}
+            onPrevTrack={handlePlaylistPrev}
+            onNextTrack={handlePlaylistAdvance}
+            playlistIndex={playlistIndex}
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={seekTo}
             isMuted={isMuted}
             onToggleMute={toggleMute}
             videoPlaying={videoEnabled}

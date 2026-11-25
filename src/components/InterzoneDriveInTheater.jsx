@@ -85,6 +85,12 @@ export function InterzoneDriveInTheater({
   isPlaying,
   onTogglePlay,
   onStop = () => {},
+  onPrevTrack,
+  onNextTrack,
+  playlistIndex = 0,
+  currentTime = 0,
+  duration = 0,
+  onSeek,
   isMuted = false,
   onToggleMute = () => {},
   videoPlaying: externalVideoPlaying = true,
@@ -241,6 +247,15 @@ export function InterzoneDriveInTheater({
   const [interstitialMode, setInterstitialMode] = useState(true);
   const [radioSubTab, setRadioSubTab] = useState('tracks'); // 'tracks' | 'enoch' | 'ads'
   const [activeEnochFilter, setActiveEnochFilter] = useState('all'); // 'all' | 'intro' | 'fact' | 'error' | 'station'
+  const [showTrackDrawer, setShowTrackDrawer] = useState(false);
+  const [trackSearchQuery, setTrackSearchQuery] = useState('');
+
+  const formatTrackTime = (sec) => {
+    if (!sec || isNaN(sec) || sec < 0) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
 
   const activeStation =
     INTERZONE_RADIO_STATIONS.find((s) => s.id === activeStationId) || INTERZONE_RADIO_STATIONS[0];
@@ -1642,18 +1657,24 @@ export function InterzoneDriveInTheater({
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <img
-                        src="./as-above-so-below-cover.jpg"
-                        alt="As Above, So Below Album Cover"
+                        src="./as-above-so-below-cover.gif"
+                        alt="As Above, So Below Animated Cover"
+                        onError={(e) => {
+                          e.currentTarget.src = './as-above-so-below-cover.jpg';
+                        }}
                         style={{
-                          width: 44,
-                          height: 44,
+                          width: 48,
+                          height: 48,
                           borderRadius: 4,
-                          border: '1px solid #fbbf24',
+                          border: '1.5px solid #fbbf24',
                           objectFit: 'cover',
-                          boxShadow: '0 0 12px rgba(251, 191, 36, 0.6)',
+                          boxShadow: '0 0 14px rgba(251, 191, 36, 0.7)',
                         }}
                       />
-                      <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>30 MASTER TRACKS ↗</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                        <span style={{ fontSize: 7.5, color: '#000', background: '#fbbf24', padding: '1px 5px', borderRadius: 2, fontFamily: 'monospace', fontWeight: 800 }}>✨ ANIMATED COVER</span>
+                        <span style={{ fontSize: 8.5, color: '#fbbf24', fontFamily: 'monospace' }}>30 MASTER TRACKS ↗</span>
+                      </div>
                     </div>
                     <div style={{ fontFamily: "'Syncopate', sans-serif", fontSize: 10.5, fontWeight: 800, color: '#fbbf24' }}>
                       AS ABOVE, SO BELOW
@@ -2108,36 +2129,137 @@ export function InterzoneDriveInTheater({
                   "{activeStation.slogan}"
                 </div>
 
-                {/* Delco Tactile Broadcast Power Switch & On-Air Lamp */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
-                  <button
-                    onClick={onTogglePlay}
-                    style={{
-                      background: isPlaying
-                        ? 'linear-gradient(135deg, #ff6b00, #ff8800)'
-                        : 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
-                      color: isPlaying ? '#000' : '#fff',
-                      border: `2px solid ${isPlaying ? '#ffaa00' : 'rgba(255,255,255,0.3)'}`,
-                      borderRadius: 4,
-                      padding: '5px 12px',
-                      fontFamily: "'Syncopate', sans-serif",
-                      fontSize: 8.5,
-                      fontWeight: 800,
-                      letterSpacing: 1,
-                      cursor: 'pointer',
-                      boxShadow: isPlaying ? '0 0 16px rgba(255, 107, 0, 0.8)' : 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      transition: 'all 0.15s',
-                    }}
-                    title={isPlaying ? "Pause Radio Broadcast" : "Turn Delco Radio ON & Broadcast"}
-                  >
-                    <span>{isPlaying ? '⏸' : '▶'}</span>
-                    <span>{isPlaying ? 'ON AIR' : 'POWER ON'}</span>
-                  </button>
+                {/* Delco Tactile Broadcast Transport & On-Air Cluster */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    {/* Previous Track */}
+                    <button
+                      onClick={() => {
+                        if (onPrevTrack) onPrevTrack();
+                        if (!isPlaying && onTogglePlay) onTogglePlay();
+                      }}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        color: '#fff',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        borderRadius: 4,
+                        padding: '5px 10px',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                      title="Skip to Previous Track (⏮)"
+                    >
+                      ⏮ PREV
+                    </button>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {/* Master Power On / Pause */}
+                    <button
+                      onClick={onTogglePlay}
+                      style={{
+                        background: isPlaying
+                          ? 'linear-gradient(135deg, #ff6b00, #ff8800)'
+                          : 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+                        color: isPlaying ? '#000' : '#fff',
+                        border: `2px solid ${isPlaying ? '#ffaa00' : 'rgba(255,255,255,0.3)'}`,
+                        borderRadius: 4,
+                        padding: '5px 12px',
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontSize: 8.5,
+                        fontWeight: 800,
+                        letterSpacing: 1,
+                        cursor: 'pointer',
+                        boxShadow: isPlaying ? '0 0 16px rgba(255, 107, 0, 0.8)' : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        transition: 'all 0.15s',
+                      }}
+                      title={isPlaying ? "Pause Radio Broadcast" : "Turn Delco Radio ON & Broadcast"}
+                    >
+                      <span>{isPlaying ? '⏸' : '▶'}</span>
+                      <span>{isPlaying ? 'ON AIR' : 'POWER ON'}</span>
+                    </button>
+
+                    {/* Next Track */}
+                    <button
+                      onClick={() => {
+                        if (onNextTrack) onNextTrack();
+                        if (!isPlaying && onTogglePlay) onTogglePlay();
+                      }}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        color: '#fff',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        borderRadius: 4,
+                        padding: '5px 10px',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                      title="Skip to Next Track (⏭)"
+                    >
+                      NEXT ⏭
+                    </button>
+
+                    {/* Toggle Visual On-Demand Tracklist */}
+                    <button
+                      onClick={() => setShowTrackDrawer((prev) => !prev)}
+                      style={{
+                        background: showTrackDrawer ? '#fbbf24' : 'rgba(251, 191, 36, 0.12)',
+                        color: showTrackDrawer ? '#000' : '#fbbf24',
+                        border: `1px solid ${showTrackDrawer ? '#f59e0b' : 'rgba(251, 191, 36, 0.5)'}`,
+                        borderRadius: 4,
+                        padding: '5px 10px',
+                        fontFamily: "'Syncopate', sans-serif",
+                        fontSize: 8,
+                        fontWeight: 800,
+                        letterSpacing: 0.5,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        boxShadow: showTrackDrawer ? '0 0 12px rgba(251, 191, 36, 0.5)' : 'none',
+                        transition: 'all 0.15s',
+                      }}
+                      title="Browse all tracks visually with click-to-play"
+                    >
+                      <span>{showTrackDrawer ? '✕' : '📜'}</span>
+                      <span>{showTrackDrawer ? 'HIDE TRACKLIST' : 'ON-DEMAND JUKEBOX'}</span>
+                    </button>
+                  </div>
+
+                  {/* Scrubber Progress Bar & Time Readout */}
+                  {duration > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 440, marginTop: 2 }}>
+                      <span style={{ fontSize: 8.5, fontFamily: "'Space Mono', monospace", color: '#a1a1aa', minWidth: 32 }}>
+                        {formatTrackTime(currentTime)}
+                      </span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={duration}
+                        step={0.5}
+                        value={Math.min(currentTime, duration)}
+                        onChange={(e) => onSeek && onSeek(Number(e.target.value))}
+                        style={{
+                          flex: 1,
+                          accentColor: '#ff6b00',
+                          cursor: 'pointer',
+                          height: 4,
+                        }}
+                        title={`Seek: ${formatTrackTime(currentTime)} / ${formatTrackTime(duration)}`}
+                      />
+                      <span style={{ fontSize: 8.5, fontFamily: "'Space Mono', monospace", color: '#a1a1aa', minWidth: 32 }}>
+                        {formatTrackTime(duration)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* On-Air Live Signal Status Banner */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                     <span
                       style={{
                         width: 8,
@@ -2146,10 +2268,11 @@ export function InterzoneDriveInTheater({
                         backgroundColor: isPlaying ? '#39ff14' : '#ef4444',
                         boxShadow: isPlaying ? '0 0 10px #39ff14' : 'none',
                         display: 'inline-block',
+                        flexShrink: 0,
                       }}
                     />
-                    <span style={{ fontSize: 8.5, fontFamily: "'Space Mono', monospace", color: isPlaying ? '#39ff14' : '#a1a1aa' }}>
-                      {isPlaying ? `TRANSMITTING: ${currentTrackTitle || activeStation.name}` : 'STANDBY · CLICK POWER ON TO TRANSMIT'}
+                    <span style={{ fontSize: 8.5, fontFamily: "'Space Mono', monospace", color: isPlaying ? '#39ff14' : '#a1a1aa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 440 }}>
+                      {isPlaying ? `TRANSMITTING: ${currentTrackTitle || activeStation.name}` : 'STANDBY · CLICK POWER ON OR SELECT A TRACK TO TRANSMIT'}
                     </span>
                   </div>
                 </div>
@@ -2428,6 +2551,279 @@ export function InterzoneDriveInTheater({
                 )}
               </div>
             </div>
+
+            {/* ── EXPANDABLE ON-DEMAND TRACKLIST JUKEBOX DRAWER ── */}
+            {showTrackDrawer && (() => {
+              let displayItems = [];
+              if (radioSubTab === 'tracks') {
+                displayItems = activeStation.tracks.map((t, idx) => ({
+                  id: t.id,
+                  title: t.title,
+                  artist: t.artist || activeStation.name,
+                  duration: t.duration,
+                  url: t.url,
+                  num: t.num || idx + 1,
+                  type: 'track',
+                  raw: t,
+                }));
+              } else if (radioSubTab === 'album') {
+                displayItems = (activeStation.albumTracks || []).map((t, idx) => ({
+                  id: t.id,
+                  title: t.title,
+                  artist: t.artist || "O'Shibboleth",
+                  duration: t.duration,
+                  url: t.url,
+                  num: t.num || idx + 1,
+                  type: 'album',
+                  raw: t,
+                }));
+              } else if (radioSubTab === 'enoch') {
+                displayItems = DOC_ENOCH_MANIFEST.filter((d) => {
+                  if (activeEnochFilter === 'all') return true;
+                  if (activeEnochFilter === 'intro') return d.type === 'track_intro';
+                  if (activeEnochFilter === 'fact') return d.type === 'fact_tangent';
+                  if (activeEnochFilter === 'error') return d.type === 'transmission_error';
+                  if (activeEnochFilter === 'station') return d.type === 'station_id' || d.type === 'weather' || d.type === 'bumper';
+                  return true;
+                }).map((d, idx) => ({
+                  id: d.id,
+                  title: `[DJ DROP] ${d.track_title || d.id}`,
+                  artist: 'Doc Enoch · W-OCCULT 99.3',
+                  duration: d.duration,
+                  url: d.url,
+                  num: idx + 1,
+                  type: 'enoch',
+                  raw: d,
+                }));
+              } else if (radioSubTab === 'ads') {
+                displayItems = VINTAGE_RADIO_ADS.map((ad, idx) => ({
+                  id: ad.id,
+                  title: `[AD] ${ad.title}`,
+                  artist: 'Interzone Concessions (1965-1969)',
+                  duration: ad.duration,
+                  url: ad.url,
+                  num: idx + 1,
+                  type: 'ads',
+                  raw: ad,
+                }));
+              }
+
+              const filteredItems = trackSearchQuery.trim()
+                ? displayItems.filter((item) =>
+                    item.title.toLowerCase().includes(trackSearchQuery.toLowerCase()) ||
+                    item.artist.toLowerCase().includes(trackSearchQuery.toLowerCase())
+                  )
+                : displayItems;
+
+              return (
+                <div
+                  style={{
+                    background: 'rgba(5, 5, 12, 0.95)',
+                    border: '1px solid rgba(251, 191, 36, 0.4)',
+                    borderRadius: 6,
+                    padding: 10,
+                    boxShadow: '0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(251, 191, 36, 0.05)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 9, fontFamily: "'Syncopate', sans-serif", fontWeight: 800, color: '#fbbf24', letterSpacing: 1 }}>
+                        📜 ON-DEMAND TRACKLIST ({filteredItems.length} of {displayItems.length})
+                      </span>
+                      <span style={{ fontSize: 8, color: '#a1a1aa', fontFamily: 'monospace' }}>
+                        Click any row to jump & play
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input
+                        type="text"
+                        placeholder="Search tracks or lore..."
+                        value={trackSearchQuery}
+                        onChange={(e) => setTrackSearchQuery(e.target.value)}
+                        style={{
+                          padding: '3px 8px',
+                          fontSize: 8.5,
+                          fontFamily: 'monospace',
+                          background: '#0a0a14',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: 3,
+                          width: 150,
+                        }}
+                      />
+                      {trackSearchQuery && (
+                        <button
+                          onClick={() => setTrackSearchQuery('')}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#f87171',
+                            cursor: 'pointer',
+                            fontSize: 10,
+                          }}
+                          title="Clear search"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      maxHeight: 220,
+                      overflowY: 'auto',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 2,
+                      paddingRight: 4,
+                    }}
+                  >
+                    {filteredItems.map((item) => {
+                      const isCurrent =
+                        currentTrackTitle &&
+                        (currentTrackTitle === item.title ||
+                          currentTrackTitle.toLowerCase().includes(item.title.toLowerCase()) ||
+                          item.title.toLowerCase().includes(currentTrackTitle.toLowerCase()));
+
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            if (item.type === 'track') {
+                              const selIdx = activeStation.tracks.findIndex((t) => t.id === item.id);
+                              if (onUpdateStationPlaylist) {
+                                onUpdateStationPlaylist(activeStation.tracks, selIdx >= 0 ? selIdx : 0);
+                              } else if (onSelectTrack) {
+                                onSelectTrack({ ...item.raw, url: resolveRadioAudioUrl(item.url) });
+                              }
+                            } else if (item.type === 'album') {
+                              const selIdx = (activeStation.albumTracks || []).findIndex((t) => t.id === item.id);
+                              if (onUpdateStationPlaylist) {
+                                onUpdateStationPlaylist(activeStation.albumTracks, selIdx >= 0 ? selIdx : 0);
+                              } else if (onSelectTrack) {
+                                onSelectTrack({ ...item.raw, url: resolveRadioAudioUrl(item.url) });
+                              }
+                            } else if (item.type === 'enoch') {
+                              if (onSelectTrack) {
+                                onSelectTrack({
+                                  id: item.raw.id,
+                                  title: `[DJ DROP] ${item.raw.track_title || item.raw.id}`,
+                                  artist: 'Doc Enoch · W-OCCULT 99.3',
+                                  url: resolveRadioAudioUrl(item.raw.url),
+                                  duration: item.raw.duration,
+                                  script: item.raw.script,
+                                });
+                              }
+                            } else if (item.type === 'ads') {
+                              if (onSelectTrack) {
+                                onSelectTrack({
+                                  id: item.raw.id,
+                                  title: `[AD] ${item.raw.title}`,
+                                  artist: 'Interzone Concessions (1965-1969)',
+                                  url: resolveRadioAudioUrl(item.raw.url),
+                                  duration: item.raw.duration,
+                                  script: item.raw.text,
+                                });
+                              }
+                            }
+                            if (!isPlaying && onTogglePlay) {
+                              onTogglePlay();
+                            }
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '5px 8px',
+                            borderRadius: 4,
+                            cursor: 'pointer',
+                            background: isCurrent ? 'rgba(57, 255, 20, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                            border: `1px solid ${isCurrent ? '#39ff14' : 'rgba(255, 255, 255, 0.06)'}`,
+                            boxShadow: isCurrent ? '0 0 10px rgba(57, 255, 20, 0.3)' : 'none',
+                            transition: 'all 0.12s',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isCurrent) {
+                              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isCurrent) {
+                              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                            }
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+                            <span
+                              style={{
+                                fontSize: 8.5,
+                                fontFamily: 'monospace',
+                                color: isCurrent ? '#39ff14' : '#71717a',
+                                minWidth: 20,
+                                textAlign: 'right',
+                              }}
+                            >
+                              {isCurrent ? (isPlaying ? '🔊' : '⏸') : `${item.num}.`}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 9,
+                                fontFamily: 'monospace',
+                                fontWeight: isCurrent ? 700 : 400,
+                                color: isCurrent ? '#39ff14' : '#f4f4f5',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {item.title}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 7.5,
+                                color: '#a1a1aa',
+                                fontFamily: 'monospace',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              · {item.artist}
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 8 }}>
+                            <span style={{ fontSize: 8, fontFamily: 'monospace', color: isCurrent ? '#39ff14' : '#a1a1aa' }}>
+                              {formatTrackTime(item.duration)}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 7,
+                                fontFamily: "'Syncopate', sans-serif",
+                                fontWeight: 700,
+                                padding: '1px 5px',
+                                borderRadius: 2,
+                                background: isCurrent ? '#39ff14' : 'rgba(255, 255, 255, 0.08)',
+                                color: isCurrent ? '#000' : '#d4d4d8',
+                              }}
+                            >
+                              {isCurrent ? 'NOW PLAYING' : 'PLAY ▶'}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Bottom Row: 5 Tactile Pushbutton Preset Switches */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
