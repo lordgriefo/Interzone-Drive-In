@@ -575,35 +575,103 @@ export function InterzoneDriveInTheater({
             minHeight: 'calc(100vh - 65px)',
           }}
         >
-          {/* Background Loop: Gate entrance video */}
+          {/* Pure HTML & CSS Backing: Cosmic Desert Drive-In Starlight Atmosphere */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
               zIndex: 0,
               overflow: 'hidden',
-              opacity: 0.38,
+              pointerEvents: 'none',
+              background: 'radial-gradient(ellipse at 50% 10%, #15102a 0%, #080914 55%, #030308 100%)',
             }}
           >
-            <video
-              src="./assets-bg/drive-in/Interzone_Drive-In_entrance_midn…_202608202035.webm"
-              autoPlay
-              loop
-              muted
-              playsInline
+            {/* Layer 1: Retro Neon Horizon Glow */}
+            <div
               style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                filter: 'contrast(1.2) saturate(1.4) hue-rotate(-10deg)',
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: '36%',
+                height: 180,
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 107, 0, 0.16) 0%, rgba(251, 191, 36, 0.08) 35%, transparent 70%)',
+                filter: 'blur(30px)',
+                opacity: 0.8 + bass * 0.4,
+                transition: 'opacity 0.1s ease',
               }}
             />
-            {/* Gradient overlay for readability */}
+
+            {/* Layer 2: Cosmic Starfield Pattern (Pure CSS, 0 bytes network) */}
             <div
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'radial-gradient(circle at center, rgba(3,3,8,0.4) 0%, rgba(3,3,8,0.92) 80%)',
+                backgroundImage: `
+                  radial-gradient(rgba(255, 255, 255, 0.7) 1px, transparent 1px),
+                  radial-gradient(rgba(0, 229, 255, 0.5) 1px, transparent 1px),
+                  radial-gradient(rgba(251, 191, 36, 0.5) 1.5px, transparent 1.5px)
+                `,
+                backgroundSize: '48px 48px, 96px 96px, 144px 144px',
+                backgroundPosition: '0 0, 24px 24px, 48px 48px',
+                opacity: 0.35,
+              }}
+            />
+
+            {/* Layer 3: Distant Desert Mesa Mountain Silhouette (SVG Vector) */}
+            <svg
+              viewBox="0 0 1200 240"
+              preserveAspectRatio="none"
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: 160,
+                opacity: 0.45,
+              }}
+            >
+              <path
+                d="M0 240 L0 180 Q120 130 220 160 Q340 190 440 140 Q560 90 680 135 Q780 170 880 120 Q1000 70 1100 130 Q1160 160 1200 150 L1200 240 Z"
+                fill="#05060e"
+              />
+              <path
+                d="M0 240 L0 200 Q150 170 280 195 Q420 220 540 185 Q680 150 800 190 Q940 230 1080 180 L1200 205 L1200 240 Z"
+                fill="#020306"
+              />
+            </svg>
+
+            {/* Layer 4: Drive-In Pavement & Perspective Floor Grid */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '35%',
+                background: 'linear-gradient(to top, rgba(3, 3, 8, 0.95) 0%, rgba(5, 5, 12, 0.6) 60%, transparent 100%)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 120,
+                backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+                backgroundSize: '60px 100%',
+                transform: 'perspective(200px) rotateX(60deg)',
+                transformOrigin: 'bottom center',
+                opacity: 0.5,
+              }}
+            />
+
+            {/* Layer 5: Radial Vignette Framing */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'radial-gradient(circle at center, transparent 30%, rgba(3, 3, 8, 0.65) 75%, rgba(3, 3, 8, 0.95) 100%)',
               }}
             />
           </div>
